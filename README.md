@@ -24,6 +24,8 @@ O registro está em [`dados/palpites.csv`](dados/palpites.csv) e o diário da no
 python3 coleta/coletar.py                            # uma coleta
 python3 coleta/coletar.py --a-cada 60 --parar-no-fim # repete até a apuração terminar
 python3 analise/agora.py                             # onde falta apurar e o Lula agora x o mesmo ponto do 1º turno
+python3 analise/trajetoria.py                        # o caminho provável do placar até 100%
+python3 analise/abstencao.py                         # abstenção de todas as cidades nos dois turnos
 ```
 
 Só usa a biblioteca padrão do Python.
