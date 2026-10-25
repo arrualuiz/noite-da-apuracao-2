@@ -32,6 +32,8 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - **20h35 · meu gráfico, no estilo do UOL:** placar real (linha cheia), o caminho calculado até 100% (tracejado, recalculado a cada coleta e guardado em `dados/trajetorias.csv`), o meu palpite das 20h14 (pontilhado) e o 1º turno (tracejado claro). Com 55,6% apurado, o cálculo termina em Lula 50,80% x Flávio 49,20%; o meu palpite, em 50,2 x 49,8.
 
+- **20h47 · 73% apurado, Lula 51,03%; previsão 51,21%.** A previsão subiu sem parar desde os 30% (50,49 → 50,76 com 50% → 51,18 com 70%). Quando uma previsão anda sempre para o mesmo lado, isso é sinal de viés, não de ruído: o voto que chega mais tarde dentro de cada estado é mais favorável ao Lula, como no 1º turno. Minas, o termômetro (quem venceu lá venceu no Brasil em todos os 2º turnos de 2002 a 2022), está em 50,0%. Gráficos novos: mapa de quem lidera, mapa do crescimento com escala própria e o gráfico do 1º para o 2º turno por estado.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.
