@@ -25,6 +25,9 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - **20h25 · capital x interior e as trocas em Minas:** o coletor agora baixa também os 39 municípios da Grande SP, o Rio e BH (`coleta/municipios.py`, `dados/segmentos.csv`). Com ~10% apurado, o Lula tem 55,4% na capital paulista (52,5% no 1º turno), 53,6% no resto da Grande SP (48,5%) e 38,1% no interior e litoral (35,1%). Minas já trocou de líder 8 vezes entre as 20h00 e as 20h16, sempre a menos de 0,1 ponto dos 50%.
 
+- **20h25 · VIROU:** na versão das 20:25:30 do TSE, com 48,1% das seções apuradas, o placar passou para **Lula 50,06% x Flávio 49,94%**. O Flávio liderava o placar desde as 19h53. Dava para prever o momento? Uma reta do placar x % apurado, feita com as últimas 10 coletas, errava muito longe da virada (às 20h10 apontava 108%), melhorava às 20h15 (55,5%) e às 20h20 acertou: "49,1% apurado, daqui ~6 min".
+- **20h26 · abstenção:** 18,84% no Brasil nas seções já apuradas, contra 20,84% no 1º turno. Caiu em todas as regiões, menos no Norte (21,06% x 19,43%). Baixei os 5.757 arquivos de município dos dois turnos (`analise/abstencao.py`, `dados/abstencao_municipios.csv`). Até agora, das cidades com mais de 50 mil eleitores e 100% apuradas, o Paraná domina as maiores quedas (Sarandi −4,3 pontos, Cambé −4,1, Apucarana −3,4).
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.
