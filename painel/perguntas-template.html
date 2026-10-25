@@ -87,13 +87,19 @@ svg .eixo { stroke: var(--linha); }
     <div class="rotulo">Crescimento do Lula</div>
     <div class="pergunta">O Lula cresceu em cada estado? Isso dá para tirar a diferença do 1º turno?</div>
     <div id="virada-resumo"></div>
-    <div class="mapa-grade">
-      <div><div id="mapa"></div>
+    <div class="duas" style="margin-bottom:6px">
+      <div><div class="rotulo">Quem lidera em cada estado · previsão para 100%</div><div id="mapa-lider"></div>
+        <div class="escala" id="escala-lider"></div>
+        <div class="legenda" style="justify-content:space-between;margin:0"><span>Flávio +40 pts</span><span>empate</span><span>Lula +40 pts</span></div></div>
+      <div><div class="rotulo">Quanto o Lula cresceu sobre o 1º turno · pontos</div><div id="mapa"></div>
         <div class="escala" id="escala"></div>
-        <div class="legenda" style="justify-content:space-between;margin:0"><span>Flávio cresceu mais</span><span>Lula cresceu mais</span></div>
-        <p class="nota">Cor: ganho do Lula em pontos nos votos já apurados, sobre a parte dele em Lula + Flávio no 1º turno. Estados com menos de 3% apurado ficam claros.</p></div>
-      <div class="rolar"><table id="t-virada"></table></div>
+        <div class="legenda" style="justify-content:space-between;margin:0" id="escala-rotulos"></div></div>
     </div>
+    <p class="nota">Crescimento = % do Lula entre Lula e Flávio nos votos já apurados, menos o mesmo % no 1º turno. Estados com menos de 3% apurado ficam claros.</p>
+    <div class="rotulo" style="margin-top:14px">Do 1º para o 2º turno, estado a estado · % do Lula entre Lula e Flávio</div>
+    <div id="g-halteres"></div>
+    <p class="nota">Bolinha cinza: 1º turno. Bolinha colorida: 2º turno, nos votos já apurados. Quem cruzou a linha dos 50% mudou de lado.</p>
+    <div class="rolar" style="margin-top:10px"><table id="t-virada"></table></div>
     <p class="nota">Saldo = votos do Lula menos votos do Flávio. "Virada" = quanto o saldo do estado andou a favor do Lula do 1º para o 2º turno, com a previsão para 100%. Somando a virada de todos os estados, dá para ver se ela cobre a diferença do 1º turno.</p>
   </section>
 
@@ -256,21 +262,54 @@ document.querySelectorAll("[data-escala]").forEach(b => b.addEventListener("clic
       <div><div class="rotulo">Estados onde o Lula cresceu</div><div class="grande">${cresceu} de ${medidos}</div><div class="sub">com pelo menos 3% apurado</div></div>
     </div>`;
 
-  const cor = d3.scaleDiverging([-10, 0, 10], t => d3.interpolateRgb("#5a49d8", "#d9363e")(t)).clamp(true);
   const neutro = getComputedStyle(document.documentElement).getPropertyValue("--linha");
-  document.getElementById("escala").innerHTML = d3.range(-10, 10.1, 1).map(v => `<i style="flex:1;background:${cor(v)}"></i>`).join("");
-  if (typeof topojson !== "undefined") {
+  const ganhoMax = Math.max(3, Math.ceil(Math.max(...E.filter(e => e.apurado >= 3 && e.uf !== "ZZ").map(e => Math.abs(e.ganho_lula || 0)))));
+  const corLider = d3.scaleDiverging([-40, 0, 40], d3.piecewise(d3.interpolateRgb, ["#4b3bd6", "#ece9f3", "#d9363e"])).clamp(true);
+  const corGanho = v => v >= 0 ? d3.interpolateRgb("#f7e4e5", "#b81d2a")(Math.min(v / ganhoMax, 1)) : d3.interpolateRgb("#e6e3f7", "#4b3bd6")(Math.min(-v / ganhoMax, 1));
+  document.getElementById("escala-lider").innerHTML = d3.range(-40, 40.1, 4).map(v => `<i style="flex:1;background:${corLider(v)}"></i>`).join("");
+  document.getElementById("escala").innerHTML = d3.range(0, ganhoMax + 0.01, ganhoMax / 20).map(v => `<i style="flex:1;background:${corGanho(v)}"></i>`).join("");
+  document.getElementById("escala-rotulos").innerHTML = `<span>0</span><span>+${(ganhoMax / 2).toFixed(1).replace(".", ",")}</span><span>+${ganhoMax} pts</span>`;
+  function mapa(id, cor, rotulo, dica) {
+    if (typeof topojson === "undefined") return;
     const W = 420, H = 420, geo = topojson.feature(D.topo, D.topo.objects.default);
-    const proj = d3.geoMercator().fitSize([W, H], geo), path = d3.geoPath(proj);
-    const svg = d3.select("#mapa").append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("width", "100%");
+    const path = d3.geoPath(d3.geoMercator().fitSize([W, H], geo));
+    const svg = d3.select(id).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("width", "100%");
+    const est = f => D.estados[f.properties["hc-a2"]];
     svg.selectAll("path").data(geo.features).join("path").attr("d", path)
-      .attr("fill", f => { const e = D.estados[f.properties["hc-a2"]]; return !e || e.ganho_lula == null ? neutro : cor(e.ganho_lula); })
-      .attr("fill-opacity", f => { const e = D.estados[f.properties["hc-a2"]]; return e && e.apurado >= 3 ? 1 : .35; })
-      .append("title").text(f => { const e = D.estados[f.properties["hc-a2"]]; return e ? `${e.nome}: ${sinal(e.ganho_lula, n => n.toFixed(1))} pts (${e.apurado.toFixed(1)}% apurado)` : ""; });
+      .attr("fill", f => est(f) ? cor(est(f)) : neutro)
+      .attr("fill-opacity", f => est(f) && est(f).apurado >= 3 ? 1 : .35)
+      .append("title").text(f => est(f) ? dica(est(f)) : "");
+    const pequenos = ["DF", "SE", "AL", "PB", "RN", "ES", "RJ", "PE"];
     svg.selectAll("text").data(geo.features).join("text")
       .attr("transform", f => `translate(${path.centroid(f)})`).attr("text-anchor", "middle").attr("dy", "0.35em")
-      .text(f => { const e = D.estados[f.properties["hc-a2"]]; return e && e.ganho_lula != null ? sinal(e.ganho_lula, n => n.toFixed(0)) : ""; });
+      .style("font-size", f => pequenos.includes(f.properties["hc-a2"]) ? "8px" : "10px").style("fill", "#fff").style("font-weight", 600)
+      .text(f => est(f) ? rotulo(est(f)) : "");
   }
+  const margem = e => e.prev_pct_lula - (100 - e.prev_pct_lula);
+  mapa("#mapa-lider", e => corLider(margem(e)), e => e.uf,
+       e => `${e.nome}: ${margem(e) >= 0 ? "Lula" : "Flávio"} por ${Math.abs(margem(e)).toFixed(1)} pts (previsão; ${e.apurado.toFixed(1)}% apurado)`);
+  mapa("#mapa", e => e.ganho_lula == null ? neutro : corGanho(e.ganho_lula), e => e.ganho_lula == null ? "" : sinal(e.ganho_lula, n => n.toFixed(1).replace(".", ",")),
+       e => `${e.nome}: ${sinal(e.ganho_lula, n => n.toFixed(1))} pts (${e.apurado.toFixed(1)}% apurado)`);
+
+  // halteres: 1º turno -> 2º turno
+  (function () {
+    const lista = E.filter(e => e.pct_lula != null).sort((a, b) => b.pct_lula - a.pct_lula);
+    const lin = 19, W = 1000, m = { l: 150, r: 60, t: 24, b: 8 }, H = m.t + lista.length * lin + m.b;
+    const vs = lista.flatMap(e => [e.pct_lula, e.pct_lula_1t]);
+    const lo = Math.floor(Math.min(...vs) / 5) * 5, hi = Math.ceil(Math.max(...vs) / 5) * 5;
+    const x = v => m.l + (v - lo) / (hi - lo) * (W - m.l - m.r);
+    let g = "";
+    for (let v = lo; v <= hi; v += 5) g += `<line class="eixo" x1="${x(v)}" x2="${x(v)}" y1="${m.t - 6}" y2="${H - m.b}" ${v === 50 ? 'style="stroke:var(--texto);stroke-opacity:.6" stroke-dasharray="4 3"' : ""}/><text x="${x(v)}" y="${m.t - 10}" text-anchor="middle">${v}%</text>`;
+    lista.forEach((e, i) => {
+      const yy = m.t + i * lin + lin / 2, a = e.pct_lula_1t, b = e.pct_lula;
+      const virou = (a - 50) * (b - 50) < 0, c = b >= 50 ? "var(--lula)" : "var(--flavio)";
+      g += `<text x="${m.l - 10}" y="${yy + 4}" text-anchor="end" style="fill:var(--texto);${virou ? "font-weight:700" : ""}">${e.nome}${virou ? " ⟵ virou" : ""}</text>`;
+      g += `<line x1="${x(a)}" x2="${x(b)}" y1="${yy}" y2="${yy}" stroke="${c}" stroke-width="3" stroke-opacity=".45"/>`;
+      g += `<circle cx="${x(a)}" cy="${yy}" r="4" fill="var(--suave)"/><circle cx="${x(b)}" cy="${yy}" r="5.5" fill="${c}"${e.apurado < 3 ? ' fill-opacity=".4"' : ""}><title>${e.nome}: ${a.toFixed(1)}% → ${b.toFixed(1)}% (${e.apurado.toFixed(1)}% apurado)</title></circle>`;
+      g += `<text x="${x(Math.max(a, b)) + 9}" y="${yy + 4}">${sinal(b - a, n => n.toFixed(1).replace(".", ","))}</text>`;
+    });
+    document.getElementById("g-halteres").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Do 1º para o 2º turno, estado a estado">${g}</svg>`;
+  })();
 
   const max = Math.max(...E.map(e => Math.abs(e.virada)));
   let h = `<tr><th>Estado</th><th>Apurado</th><th>Ganho</th><th>Saldo 1º</th><th>Saldo 2º (prev.)</th><th>Virada</th><th></th><th>Virou?</th></tr>`;
