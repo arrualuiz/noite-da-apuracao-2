@@ -21,8 +21,8 @@ A lista vai crescendo conforme as dúvidas aparecem. O painel `painel/perguntas.
 - [x] ⚙️ Coletor do 1º turno apontado para o 2º (TSE 6258), uma coleta por minuto, PC sem suspender
 - [x] 🙋 Palpites registrados às 19h16 (`dados/palpites.csv`)
 - [x] ⚙️ Repositório git local, README e diário da noite (`notas/notas.md`)
-- [ ] 🙋 Autorizar o repositório público `noite-da-apuracao-2` no GitHub
-- [ ] ⚙️ Religar o coletor com `--git`, que envia os dados ao GitHub a cada 30 min
+- [x] 🙋 Repositório público no GitHub: https://github.com/arrualuiz/noite-da-apuracao-2 (19h55)
+- [x] ⚙️ Coletor religado com `--git`: envia os dados ao GitHub a cada 30 min e no fim
 - [x] ⚙️ Painel das perguntas (`painel/perguntas.html`) e previsão do resultado final (`analise/perguntas.py`, `dados/previsao.csv`), recalculados a cada coleta
 - [ ] ⚙️ Anotar no diário os marcos da noite: virada (se houver), resultado matematicamente definido e 100%
 
