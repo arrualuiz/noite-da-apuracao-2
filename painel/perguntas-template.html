@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="refresh" content="60">
 <title>As perguntas da noite</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <style>
 :root {
   --fundo: #f6f5f2; --cartao: #ffffff; --texto: #1d1d1f; --suave: #6b6b70; --linha: #e3e1dc;
@@ -40,6 +42,12 @@ svg text { fill: var(--suave); font-size: 11px; }
 svg .eixo { stroke: var(--linha); }
 .legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--suave); margin-top: 6px; }
 .legenda i { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 5px; }
+.vb { position: relative; height: 12px; min-width: 70px; }
+.vb i { position: absolute; top: 0; bottom: 0; } .vb .zero { left: 50%; width: 1px; background: var(--suave); }
+.mapa-grade { display: grid; gap: 16px; grid-template-columns: minmax(260px, 1fr) minmax(300px, 1.3fr); align-items: start; }
+@media (max-width: 760px) { .mapa-grade { grid-template-columns: 1fr; } }
+#mapa path { stroke: var(--cartao); stroke-width: .8; } #mapa text { font-size: 10px; fill: var(--texto); pointer-events: none; }
+.escala { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 4px 0; }
 .duas { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
 </style>
 </head>
@@ -55,6 +63,20 @@ svg .eixo { stroke: var(--linha); }
     <div class="sub">% do Lula nos votos válidos: o placar do TSE x a previsão para 100%, conforme as seções são apuradas.</div>
     <div id="g-previsao"></div>
     <div class="legenda"><span><i style="background:var(--suave)"></i>placar</span><span><i style="background:var(--lula)"></i>previsão nacional</span><span><i style="background:var(--destaque)"></i>previsão em Minas</span></div>
+  </section>
+
+  <section class="cartao secao">
+    <div class="rotulo">Crescimento do Lula</div>
+    <div class="pergunta">O Lula cresceu em cada estado? Isso dá para tirar a diferença do 1º turno?</div>
+    <div id="virada-resumo"></div>
+    <div class="mapa-grade">
+      <div><div id="mapa"></div>
+        <div class="escala" id="escala"></div>
+        <div class="legenda" style="justify-content:space-between;margin:0"><span>Flávio cresceu mais</span><span>Lula cresceu mais</span></div>
+        <p class="nota">Cor: ganho do Lula em pontos nos votos já apurados, sobre a parte dele em Lula + Flávio no 1º turno. Estados com menos de 3% apurado ficam claros.</p></div>
+      <div class="rolar"><table id="t-virada"></table></div>
+    </div>
+    <p class="nota">Saldo = votos do Lula menos votos do Flávio. "Virada" = quanto o saldo do estado andou a favor do Lula do 1º para o 2º turno, com a previsão para 100%. Somando a virada de todos os estados, dá para ver se ela cobre a diferença do 1º turno.</p>
   </section>
 
   <section class="cartao secao">
@@ -149,6 +171,48 @@ document.getElementById("cartoes").innerHTML =
   for (let v = 0; v <= 100; v += 10) g += `<text x="${x(v)}" y="${H - 8}" text-anchor="middle">${v}%</text>`;
   g += linha("pct_lula", "var(--suave)", 1.5) + linha("mg_prev_pct_lula", "var(--destaque)", 1.5) + linha("prev_pct_lula", "var(--lula)", 2.5);
   document.getElementById("g-previsao").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Previsão ao longo da noite">${g}</svg>`;
+})();
+
+// crescimento do Lula: resumo, mapa e tabela
+(function () {
+  const E = Object.values(D.estados), gap = -(T.lula_1t - T.flavio_1t), soma = E.reduce((s, e) => s + e.virada, 0);
+  const mi = n => (n / 1e6).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " mi";
+  const cobre = soma >= gap, cresceu = E.filter(e => e.ganho_lula > 0 && e.apurado >= 3).length, medidos = E.filter(e => e.apurado >= 3).length;
+  document.getElementById("virada-resumo").innerHTML = `
+    <div class="grade" style="margin:6px 0 14px">
+      <div><div class="rotulo">Diferença do 1º turno</div><div class="grande flavio">Flávio +${mi(gap)}</div></div>
+      <div><div class="rotulo">Virada prevista do Lula</div><div class="grande lula">${sinal(soma, mi)}</div><div class="sub">soma dos estados, para 100%</div></div>
+      <div><div class="rotulo">Cobre a diferença?</div><div class="grande" style="color:${cobre ? "var(--lula)" : "var(--flavio)"}">${cobre ? "Sim" : "Não"}, ${cobre ? "sobra" : "falta"} ${mi(Math.abs(soma - gap))}</div></div>
+      <div><div class="rotulo">Estados onde o Lula cresceu</div><div class="grande">${cresceu} de ${medidos}</div><div class="sub">com pelo menos 3% apurado</div></div>
+    </div>`;
+
+  const cor = d3.scaleDiverging([-10, 0, 10], t => d3.interpolateRgb("#5a49d8", "#d9363e")(t)).clamp(true);
+  const neutro = getComputedStyle(document.documentElement).getPropertyValue("--linha");
+  document.getElementById("escala").innerHTML = d3.range(-10, 10.1, 1).map(v => `<i style="flex:1;background:${cor(v)}"></i>`).join("");
+  if (typeof topojson !== "undefined") {
+    const W = 420, H = 420, geo = topojson.feature(D.topo, D.topo.objects.default);
+    const proj = d3.geoMercator().fitSize([W, H], geo), path = d3.geoPath(proj);
+    const svg = d3.select("#mapa").append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("width", "100%");
+    svg.selectAll("path").data(geo.features).join("path").attr("d", path)
+      .attr("fill", f => { const e = D.estados[f.properties["hc-a2"]]; return !e || e.ganho_lula == null ? neutro : cor(e.ganho_lula); })
+      .attr("fill-opacity", f => { const e = D.estados[f.properties["hc-a2"]]; return e && e.apurado >= 3 ? 1 : .35; })
+      .append("title").text(f => { const e = D.estados[f.properties["hc-a2"]]; return e ? `${e.nome}: ${sinal(e.ganho_lula, n => n.toFixed(1))} pts (${e.apurado.toFixed(1)}% apurado)` : ""; });
+    svg.selectAll("text").data(geo.features).join("text")
+      .attr("transform", f => `translate(${path.centroid(f)})`).attr("text-anchor", "middle").attr("dy", "0.35em")
+      .text(f => { const e = D.estados[f.properties["hc-a2"]]; return e && e.ganho_lula != null ? sinal(e.ganho_lula, n => n.toFixed(0)) : ""; });
+  }
+
+  const max = Math.max(...E.map(e => Math.abs(e.virada)));
+  let h = `<tr><th>Estado</th><th>Apurado</th><th>Ganho</th><th>Saldo 1º</th><th>Saldo 2º (prev.)</th><th>Virada</th><th></th><th>Virou?</th></tr>`;
+  for (const e of E.sort((a, b) => b.virada - a.virada)) {
+    const w = Math.abs(e.virada) / max * 50, virou = Math.sign(e.saldo_1t) !== Math.sign(e.saldo_prev);
+    const ladoAntes = e.saldo_1t >= 0 ? "Lula" : "Flávio";
+    h += `<tr${e.apurado < 3 ? ' style="opacity:.55"' : ""}><td>${e.uf}</td><td>${pc(e.apurado, 1)}</td><td>${sinal(e.ganho_lula, n => n.toFixed(1).replace(".", ","))}</td>
+      <td>${sinal(e.saldo_1t, mil)}</td><td>${sinal(e.saldo_prev, mil)}</td><td>${sinal(e.virada, mil)}</td>
+      <td><div class="vb"><span class="zero" style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--suave)"></span><i style="${e.virada >= 0 ? `left:50%;width:${w}%;background:var(--lula)` : `right:50%;width:${w}%;background:var(--flavio)`}"></i></div></td>
+      <td>${virou ? `<span class="tag" style="color:var(--destaque)">${e.saldo_prev >= 0 ? "para o Lula" : "para o Flávio"}</span>` : ""}</td></tr>`;
+  }
+  document.getElementById("t-virada").innerHTML = h;
 })();
 
 // pergunta 1: regiões e estados

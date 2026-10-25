@@ -15,6 +15,8 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - **19h50 · quando dá para afirmar o resultado?** Medi o erro da projeção por estado no 1º turno de 2026, na diferença entre os dois primeiros: 4,1 pontos com 25% apurado, 2,2 com 50%, 1,4 com 70%, 0,7 com 90% e 0,2 com 99%. E o erro foi sempre para o mesmo lado: o voto apurado mais tarde era mais favorável ao Lula. Regra do painel: "provável" quando a vantagem prevista passa do erro típico daquele ponto; "com segurança" quando passa do dobro.
 
+- **19h57 · o crescimento do Lula, estado por estado (20% apurado):** na previsão para 100%, o saldo do Lula (votos dele menos os do Flávio) anda +3,67 milhões em relação ao 1º turno, somando todos os estados. A diferença do 1º turno era Flávio +2,22 milhões, então sobram ~1,44 milhão para o Lula. Ele cresceu em 21 dos 25 estados com pelo menos 3% apurado. As maiores viradas: PE, SC, BA e MG. Contra: SP, RS e AM. Novo bloco no painel, com mapa.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.

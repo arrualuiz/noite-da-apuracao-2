@@ -15,6 +15,7 @@ A lista vai crescendo conforme as dúvidas aparecem. O painel `painel/perguntas.
 3. **Algum estado do Sul mudou de lado entre o 1º e o 2º turno?** Sou do Sul.
 4. **Nordeste: o Lula cresceu em votos? E o Flávio?** Votos absolutos, do 1º para o 2º turno.
 5. **O comparecimento mudou do 1º para o 2º turno?** Polêmicas sobre transporte público no Sudeste e no Nordeste, e o clima no Sul. Os dados medem a diferença; a causa precisa de outra fonte (notícias, clima por município) e fica para depois.
+6. **O Lula cresceu em cada estado? Isso dá para tirar a diferença do 1º turno?** Mapa do ganho do Lula e a virada de cada estado em votos, somada contra a diferença do 1º turno (Flávio +2,22 milhões).
 
 ## Sprint 0 · A noite (25/10, 19h15 até o fim da apuração) ▶️
 

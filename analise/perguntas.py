@@ -7,6 +7,7 @@ Perguntas:
   3. Algum estado do Sul mudou de lado entre o 1º e o 2º turno?
   +  Nordeste: Lula e Flávio cresceram em votos?
   +  O comparecimento mudou do 1º para o 2º turno?
+  +  O Lula cresceu em cada estado? O crescimento dá para tirar a diferença do 1º turno?
 
 Previsão: para o que falta apurar em cada estado, mistura o que o estado já mostrou no 2º turno
 com o 1º turno do estado corrigido pelo ganho médio do Lula na região. Quanto mais apurado,
@@ -139,6 +140,10 @@ def calcular(pasta, t1):
             "outros_para_lula": round((s_obs - p_l) / p_o * 100, 1) if n and p_o else None,
             "prev_lula": round(pl), "prev_flavio": round(pf), "prev_pct_lula": round(pl / (pl + pf) * 100, 2),
             "lula_1t": a["lula"], "flavio_1t": a["flavio"], "outros_1t": a["outros"],
+            # saldo = Lula - Flávio em votos; virada = quanto o saldo andou a favor do Lula do 1º para o 2º turno
+            "cresc_lula": round(pl - a["lula"]), "cresc_flavio": round(pf - a["flavio"]),
+            "saldo_1t": a["lula"] - a["flavio"], "saldo_prev": round(pl - pf),
+            "virada": round((pl - pf) - (a["lula"] - a["flavio"])),
             "comparecimento": round(comp_obs * 100, 2) if x["c"] + x["a"] else None,
             "comparecimento_1t": round(comp1 * 100, 2),
         }
@@ -182,6 +187,7 @@ def main():
             "coleta_id": pasta.name, "secoes_pct": br["secoes"],
             "pct_lula": tot["pct_lula"], "prev_pct_lula": tot["prev_pct_lula"],
             "prev_dif_votos": tot["prev_lula"] - tot["prev_flavio"], "ganho_lula": round(g * 100, 2),
+            "dif_1t": tot["lula_1t"] - tot["flavio_1t"],
             "mg_apurado": mg["apurado"], "mg_pct_lula": mg["pct_lula"], "mg_prev_pct_lula": mg["prev_pct_lula"],
             "comparecimento": comp, "comparecimento_1t": comp1,
         })
@@ -209,6 +215,7 @@ def main():
         "md": br["md"], "tf": br["tf"], "ganho_lula": round(g * 100, 2),
         "total": somar(est, list(NOMES)), "erro_esperado": round(erro_esperado(br["secoes"]), 2), "estados": est, "regioes": regioes, "serie": linhas,
         "v2022": {uf: {"lula": v.get("13", 0), "bolsonaro": v.get("22", 0)} for uf, v in v22.items()},
+        "topo": json.loads((PASTA / "br-estados.topo.json").read_text(encoding="utf-8")),
         "palpites": list(csv.DictReader((PASTA / "palpites.csv").open(encoding="utf-8"))),
     }
     html = TEMPLATE.read_text(encoding="utf-8").replace("/*DADOS*/null", json.dumps(dados, ensure_ascii=False))
