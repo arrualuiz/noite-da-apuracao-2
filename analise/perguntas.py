@@ -216,6 +216,7 @@ def main():
         "total": somar(est, list(NOMES)), "erro_esperado": round(erro_esperado(br["secoes"]), 2), "estados": est, "regioes": regioes, "serie": linhas,
         "v2022": {uf: {"lula": v.get("13", 0), "bolsonaro": v.get("22", 0)} for uf, v in v22.items()},
         "topo": json.loads((PASTA / "br-estados.topo.json").read_text(encoding="utf-8")),
+        "pesquisas": list(csv.DictReader((PASTA / "pesquisas.csv").open(encoding="utf-8"))) if (PASTA / "pesquisas.csv").exists() else [],
         "palpites": list(csv.DictReader((PASTA / "palpites.csv").open(encoding="utf-8"))),
     }
     html = TEMPLATE.read_text(encoding="utf-8").replace("/*DADOS*/null", json.dumps(dados, ensure_ascii=False))

@@ -17,6 +17,8 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - **19h57 · o crescimento do Lula, estado por estado (20% apurado):** na previsão para 100%, o saldo do Lula (votos dele menos os do Flávio) anda +3,67 milhões em relação ao 1º turno, somando todos os estados. A diferença do 1º turno era Flávio +2,22 milhões, então sobram ~1,44 milhão para o Lula. Ele cresceu em 21 dos 25 estados com pelo menos 3% apurado. As maiores viradas: PE, SC, BA e MG. Contra: SP, RS e AM. Novo bloco no painel, com mapa.
 
+- **20h05 · as pesquisas x a apuração:** as 11 pesquisas da última semana com números publicados (`dados/pesquisas.csv`) davam, em média, Lula 49,2% x Flávio 50,8% dos válidos; só a Vox Brasil tinha o Lula na frente. A previsão das 20h, com 20% apurado, dá Lula ~50,6%: uns 1,4 ponto acima da média das pesquisas, dentro das margens de erro (1 a 2,4 pontos). No 1º turno foi o contrário: a Quaest deu Lula 46% x Flávio 45% e as urnas deram Flávio 47,03% x Lula 45,16%.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.

@@ -169,6 +169,10 @@ document.getElementById("cartoes").innerHTML =
   let g = "";
   for (let v = lo; v <= hi; v++) g += `<line class="eixo" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" ${v === 50 ? 'stroke-dasharray="4 3" style="stroke:var(--suave)"' : ""}/><text x="${m.l - 6}" y="${y(v) + 4}" text-anchor="end">${v}%</text>`;
   for (let v = 0; v <= 100; v += 10) g += `<text x="${x(v)}" y="${H - 8}" text-anchor="middle">${v}%</text>`;
+  if (D.pesquisas.length) {  // média das últimas pesquisas (votos válidos do Lula)
+    const mp = D.pesquisas.reduce((s, p) => s + +p.lula_validos, 0) / D.pesquisas.length;
+    g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(mp)}" y2="${y(mp)}" stroke="var(--flavio)" stroke-dasharray="2 4" stroke-width="1.5"/><text x="${W - m.r}" y="${y(mp) - 5}" text-anchor="end">média de ${D.pesquisas.length} pesquisas: ${mp.toFixed(1).replace(".", ",")}%</text>`;
+  }
   g += linha("pct_lula", "var(--suave)", 1.5) + linha("mg_prev_pct_lula", "var(--destaque)", 1.5) + linha("prev_pct_lula", "var(--lula)", 2.5);
   document.getElementById("g-previsao").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Previsão ao longo da noite">${g}</svg>`;
 })();
