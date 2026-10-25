@@ -1,0 +1,31 @@
+# dependências
+node_modules
+__pycache__/
+
+# gerado a cada coleta
+painel/painel.html
+
+# dados volumosos ou de terceiros (ficam só local)
+dados/brutos/
+dados/uol-*.json
+dados/.chrome-*/
+dados/.ultima_coleta_tse
+
+# runtime
+dados/coleta.log
+dados/coleta.pid
+*.bak
+
+# gráficos gerados pelos scripts R
+R/*.png
+
+# prints que tirei dos sites (telas de terceiros; só local)
+prints/*.png
+
+# cache dos dados abertos do TSE e do IBGE (baixados por analise/historico_tse.py e analise/municipios.py)
+dados/historico/tse/
+dados/historico/ibge/
+
+# arquivos pessoais (só locais)
+privado/
+mover-para-dev.sh

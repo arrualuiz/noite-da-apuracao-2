@@ -1,0 +1,16 @@
+{
+  "name": "noite-do-primeiro-turno-2026",
+  "version": "1.0.0",
+  "description": "Prints automáticos da apuração (Puppeteer) para o monitor das eleições 2026",
+  "scripts": {
+    "prints": "node coleta/prints.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "puppeteer-core": "^25.12.0"
+  },
+  "private": true
+}
