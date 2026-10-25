@@ -222,6 +222,15 @@ def main():
         w.writeheader()
         w.writerows(est.values())
 
+    try:  # caminho provável até 100% (precisa do perguntas_uf.csv recém-gravado)
+        import trajetoria
+        sim = trajetoria.simular()
+        trajetoria.guardar(sim)
+        caminho = [[c[1], c[2]] for c in sim["caminho"]]
+    except Exception as e:  # sem histórico suficiente ainda
+        print(f"  ! trajetória: {e}")
+        caminho = []
+
     regioes = {}
     for r, lista in REGIOES.items():
         s = somar(est, lista)
@@ -233,7 +242,10 @@ def main():
         "total": somar(est, list(NOMES)), "erro_esperado": round(erro_esperado(br["secoes"]), 2), "estados": est, "regioes": regioes, "serie": linhas,
         "v2022": {uf: {"lula": v.get("13", 0), "bolsonaro": v.get("22", 0)} for uf, v in v22.items()},
         "topo": json.loads((PASTA / "br-estados.topo.json").read_text(encoding="utf-8")),
-        "segmentos": segmentos_ultimos(),
+        "segmentos": segmentos_ultimos(), "caminho": caminho,
+        "uol_1t": [[e["sap"], {c["num"]: c["vp"] for c in e["ca"]}.get(13), {c["num"]: c["vp"] for c in e["ca"]}.get(22)]
+                   for e in (json.loads((PASTA / "uol-evolucao-2026-t1.json").read_text(encoding="utf-8")).get("evol", [])
+                             if (PASTA / "uol-evolucao-2026-t1.json").exists() else [])],
         "pesquisas": list(csv.DictReader((PASTA / "pesquisas.csv").open(encoding="utf-8"))) if (PASTA / "pesquisas.csv").exists() else [],
         "palpites": list(csv.DictReader((PASTA / "palpites.csv").open(encoding="utf-8"))),
     }

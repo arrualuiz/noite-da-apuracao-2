@@ -48,6 +48,8 @@ svg .eixo { stroke: var(--linha); }
 @media (max-width: 760px) { .mapa-grade { grid-template-columns: 1fr; } }
 #mapa path { stroke: var(--cartao); stroke-width: .8; } #mapa text { font-size: 10px; fill: var(--texto); pointer-events: none; }
 .escala { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 4px 0; }
+.botao { font: inherit; font-size: 12px; color: var(--texto); background: var(--fundo); border: 1px solid var(--linha); border-radius: 14px; padding: 3px 10px; cursor: pointer; }
+.botao.ativo { border-color: var(--texto); font-weight: 600; }
 .duas { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
 </style>
 </head>
@@ -57,6 +59,22 @@ svg .eixo { stroke: var(--linha); }
   <div class="sub" id="status"></div>
 
   <div class="grade" id="cartoes"></div>
+
+  <section class="cartao secao">
+    <h2>Minha expectativa x a apuração</h2>
+    <div class="sub">Linha cheia: o placar real do 2º turno. Tracejado grosso: o caminho calculado daqui até 100%, recalculado a cada coleta. Pontilhado: o meu palpite, saindo do momento em que falei. Tracejado claro: o 1º turno de 2026.</div>
+    <div class="legenda" style="margin:8px 0 4px">
+      <button type="button" class="botao" data-escala="zoom">Zoom (47–53%)</button>
+      <button type="button" class="botao" data-escala="uol">Escala do UOL (40–60%)</button>
+    </div>
+    <div id="g-expectativa"></div>
+    <div class="legenda">
+      <span><i style="background:var(--lula)"></i>Lula</span><span><i style="background:var(--flavio)"></i>Flávio</span>
+      <span><i style="background:repeating-linear-gradient(90deg,var(--suave) 0 6px,transparent 6px 9px)"></i>cálculo até 100%</span>
+      <span><i style="background:repeating-linear-gradient(90deg,var(--destaque) 0 2px,transparent 2px 5px)"></i>meu palpite</span>
+      <span><i style="background:repeating-linear-gradient(90deg,var(--linha) 0 4px,transparent 4px 7px)"></i>1º turno</span>
+    </div>
+  </section>
 
   <section class="cartao secao">
     <h2>A previsão ao longo da noite</h2>
@@ -161,6 +179,47 @@ document.getElementById("cartoes").innerHTML =
     <div class="sub">média dos estados, nos votos já apurados, sobre a parte dele em Lula + Flávio no 1º turno</div></div>` +
   `<div class="cartao"><div class="rotulo">Comparecimento</div><div class="grande">${pc(comp.comparecimento)}</div>
     <div class="sub">nas seções apuradas · 1º turno: ${pc(comp.comparecimento_1t)}</div></div>`;
+
+// minha expectativa x a apuração (no estilo do gráfico do UOL)
+function desenharExpectativa(escala) {
+  const [lo, hi] = escala === "uol" ? [40, 60] : [47, 53];
+  const W = 1000, H = 360, m = { l: 40, r: 70, t: 12, b: 28 };
+  const x = v => m.l + v / 100 * (W - m.l - m.r), y = v => m.t + (hi - v) / (hi - lo) * (H - m.t - m.b);
+  const pts = arr => arr.filter(p => p[1] != null).map(p => `${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join(" ");
+  const linha = (arr, cor, w, tr, op = 1) => `<polyline points="${pts(arr)}" fill="none" stroke="${cor}" stroke-width="${w}" stroke-dasharray="${tr}" stroke-opacity="${op}" stroke-linejoin="round" clip-path="url(#corte)"/>`;
+  let g = `<defs><clipPath id="corte"><rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}"/></clipPath></defs>`;
+  const passo = hi - lo > 10 ? 5 : 1;
+  for (let v = lo; v <= hi; v += passo) g += `<line class="eixo" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" ${v === 50 ? 'stroke-dasharray="4 3" style="stroke:var(--suave)"' : ""}/><text x="${m.l - 6}" y="${y(v) + 4}" text-anchor="end">${v}%</text>`;
+  for (let v = 0; v <= 100; v += 10) g += `<text x="${x(v)}" y="${H - 8}" text-anchor="middle">${v}%</text>`;
+  // 1º turno (UOL): Lula e Flávio entre todos os candidatos
+  g += linha(D.uol_1t.map(p => [p[0], p[1]]), "var(--lula)", 1.2, "4 3", .35) + linha(D.uol_1t.map(p => [p[0], p[2]]), "var(--flavio)", 1.2, "4 3", .35);
+  // real
+  const real = D.serie.map(p => [p.secoes_pct, p.pct_lula]);
+  g += linha(real, "var(--lula)", 2.5, "none") + linha(real.map(p => [p[0], 100 - p[1]]), "var(--flavio)", 2.5, "none");
+  // cálculo daqui até 100%
+  if (D.caminho.length) {
+    const ult = real.at(-1), cam = [ult, ...D.caminho];
+    g += linha(cam, "var(--lula)", 2, "7 5") + linha(cam.map(p => [p[0], 100 - p[1]]), "var(--flavio)", 2, "7 5");
+    const fim = D.caminho.at(-1)[1];
+    g += `<text x="${x(100) + 6}" y="${y(fim) + 4}" style="fill:var(--lula);font-weight:600">${fim.toFixed(2).replace(".", ",")}%</text>`;
+    g += `<text x="${x(100) + 6}" y="${y(100 - fim) + 4}" style="fill:var(--flavio);font-weight:600">${(100 - fim).toFixed(2).replace(".", ",")}%</text>`;
+  }
+  // meus palpites com número: do momento em que falei até 100%
+  for (const p of D.palpites.filter(p => p.lula_final)) {
+    const x0 = +p.urnas_pct, perto = D.serie.reduce((a, b) => Math.abs(b.secoes_pct - x0) < Math.abs(a.secoes_pct - x0) ? b : a);
+    const l0 = perto.pct_lula, lf = +p.lula_final;
+    g += linha([[x0, l0], [100, lf]], "var(--destaque)", 2, "2 4") + linha([[x0, 100 - l0], [100, 100 - lf]], "var(--destaque)", 2, "2 4");
+    g += `<circle cx="${x(100)}" cy="${y(lf)}" r="4" fill="var(--destaque)"/><circle cx="${x(100)}" cy="${y(100 - lf)}" r="4" fill="var(--destaque)"/>`;
+    g += `<text x="${x(x0)}" y="${y(Math.max(l0, 100 - l0)) - 10}" text-anchor="middle" style="fill:var(--destaque)">meu palpite ${p.horario.slice(11, 16)}: ${lf.toFixed(1).replace(".", ",")} x ${(100 - lf).toFixed(1).replace(".", ",")}</text>`;
+  }
+  document.getElementById("g-expectativa").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Minha expectativa x a apuração">${g}</svg>`;
+  document.querySelectorAll("[data-escala]").forEach(b => b.classList.toggle("ativo", b.dataset.escala === escala));
+  try { localStorage.setItem("escala", escala); } catch (e) {}
+}
+let escalaSalva = "zoom";
+try { escalaSalva = localStorage.getItem("escala") || "zoom"; } catch (e) {}
+desenharExpectativa(escalaSalva);
+document.querySelectorAll("[data-escala]").forEach(b => b.addEventListener("click", () => desenharExpectativa(b.dataset.escala)));
 
 // gráfico da previsão
 (function () {

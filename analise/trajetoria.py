@@ -6,7 +6,8 @@ Para cada estado (e SP dividido em capital, Grande SP e interior), usa:
   - o % do Lula esperado no que falta, tirado da previsão (analise/perguntas.py).
 Depois avança minuto a minuto, cada lugar no seu ritmo, e mostra o placar nacional no caminho.
 
-Uso: python3 analise/trajetoria.py
+Uso: python3 analise/trajetoria.py   (o analise/perguntas.py também chama simular() a cada coleta,
+                                      guarda o caminho em dados/trajetorias.csv e desenha no painel)
 """
 import csv
 import json
@@ -42,7 +43,8 @@ def segmentos_sp(coleta_id):
     return out
 
 
-def main():
+def simular():
+    """Simula o resto da apuração. Devolve o ponto de partida, o caminho e o resumo por lugar."""
     lista = coletas()
     agora = lista[-1]
     antes = min(lista, key=lambda p: abs((hora(agora) - hora(p)).total_seconds() / 60 - JANELA_MIN))
@@ -99,17 +101,42 @@ def main():
         resta = sum(p["falta_el"] for p in lugares.values())
         caminho.append((t, 1 - resta / total_el, L / (L + F) * 100))
 
-    pct_agora = json.loads((agora / "br-u.json").read_text(encoding="utf-8"))["s"]["pstn"].replace(",", ".")
+    pct_agora = float(json.loads((agora / "br-u.json").read_text(encoding="utf-8"))["s"]["pstn"].replace(",", "."))
     x = {uf: uf_json(agora, uf) for uf in prev}
     L0, F0 = sum(v["l"] for v in x.values()), sum(v["f"] for v in x.values())
-    print(f"Agora ({agora.name[9:11]}:{agora.name[11:13]}, {float(pct_agora):.1f}% das seções): Lula {L0 / (L0 + F0) * 100:.2f}%")
+    # no gráfico, o caminho vai do % de seções de agora até 100%, na proporção do eleitorado que falta
+    caminho = [(m, round(pct_agora + frac * (100 - pct_agora), 2), round(l, 3)) for m, frac, l in caminho]
+    return {"agora": agora, "antes": antes, "secoes": pct_agora, "lula": L0 / (L0 + F0) * 100,
+            "caminho": caminho, "resumo": resumo}
+
+
+def guardar(s):
+    """Acrescenta o caminho desta coleta em dados/trajetorias.csv (um ponto a cada 5 min e o final)."""
+    arq = PASTA / "trajetorias.csv"
+    if arq.exists() and s["agora"].name in arq.read_text(encoding="utf-8"):
+        return
+    novo = not arq.exists()
+    pontos = [c for c in s["caminho"] if c[0] % 5 == 0]
+    if s["caminho"][-1][0] % 5:
+        pontos.append(s["caminho"][-1])
+    with arq.open("a", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        if novo:
+            w.writerow(["coleta_id", "minutos", "secoes_pct", "pct_lula"])
+        w.writerows([s["agora"].name, *c] for c in pontos)
+
+
+def main():
+    s = simular()
+    agora, antes, pct_agora, caminho, resumo = s["agora"], s["antes"], s["secoes"], s["caminho"], s["resumo"]
+    print(f"Agora ({agora.name[9:11]}:{agora.name[11:13]}, {pct_agora:.1f}% das seções): Lula {s['lula']:.2f}%")
     print(f"Ritmo medido entre {antes.name[9:11]}:{antes.name[11:13]} e {agora.name[9:11]}:{agora.name[11:13]}\n")
     print("Caminho provável do placar (Lula):")
     marcos = [m for m in (10, 20, 30, 45, 60, 90, 120, 180, 240) if m <= len(caminho)]
     for m in marcos:
-        tt, frac, l = caminho[m - 1]
-        print(f"  +{tt:3d} min · {frac * 100:5.1f}% do que falta  · Lula {l:.2f}%")
-    tt, frac, l = caminho[-1]
+        tt, sec, l = caminho[m - 1]
+        print(f"  +{tt:3d} min · ~{sec:5.1f}% das seções · Lula {l:.2f}%")
+    tt, sec, l = caminho[-1]
     print(f"  fim (+{tt} min) · Lula {l:.2f}%")
     pico = max(caminho, key=lambda c: c[2])
     print(f"\nPico: Lula {pico[2]:.2f}% daqui a ~{pico[0]} min · final {caminho[-1][2]:.2f}%")
@@ -118,6 +145,7 @@ def main():
     for mins, nome, falta, lula in sorted(resumo):
         if falta >= 50_000:
             print(f"  {nome:27} faltam {falta / 1e6:5.2f} mi eleitores · termina em ~{mins:4.0f} min · Lula no que falta ~{lula:.0f}%")
+
 
 if __name__ == "__main__":
     main()

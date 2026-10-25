@@ -30,6 +30,8 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - **20h30 · o Lula sobe e depois cai?** Simulei o caminho do placar (`analise/trajetoria.py`): cada estado no ritmo de apuração dos últimos 10 min, com o % do Lula previsto para o que falta. Com 53% das seções, Lula 50,23%. O caminho provável: sobe até ~51,0% por volta das 21h05, quando o Nordeste (CE, PE, PI, BA) e o Sul terminarem, e depois cai uns 0,2 ponto, porque o Rio (11,8 milhões de eleitores faltando, Lula ~45% no que falta) é o mais lento e fica para o fim. Final previsto: ~50,8%.
 
+- **20h35 · meu gráfico, no estilo do UOL:** placar real (linha cheia), o caminho calculado até 100% (tracejado, recalculado a cada coleta e guardado em `dados/trajetorias.csv`), o meu palpite das 20h14 (pontilhado) e o 1º turno (tracejado claro). Com 55,6% apurado, o cálculo termina em Lula 50,80% x Flávio 49,20%; o meu palpite, em 50,2 x 49,8.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.
