@@ -26,8 +26,6 @@ python3 coleta/coletar.py --a-cada 60 --parar-no-fim # repete até a apuração 
 
 Só usa a biblioteca padrão do Python.
 
-## Ainda falta
+## Próximos passos
 
-- Adaptar o painel e o site (`site/index.html` ainda conta a noite do 1º turno) para o 2º turno.
-- Comparar a curva desta noite com as de 2018, 2022 e do 1º turno de 2026.
-- Conferir os palpites com o resultado final.
+O projeto está organizado em sprints no [`PLANO.md`](PLANO.md): a noite, o fechamento, a análise em R, o pipeline em Databricks, o relatório em Fabric/Power BI e o case no LinkedIn. O site (`site/index.html`) ainda conta a noite do 1º turno.
