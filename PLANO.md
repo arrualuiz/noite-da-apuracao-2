@@ -1,18 +1,20 @@
 # Plano em sprints
 
+Agora o foco é a noite inteira: os dados guardados, os painéis e a previsão. As sprints 1 a 5 ficam para depois.
+
 Objetivo: transformar a noite do 2º turno num case de **análise de dados** para o LinkedIn, mostrando o caminho completo: coleta, banco, análise em R, pipeline em Databricks e relatório em Fabric/Power BI. A ideia é que uma empresa de dados olhe e veja que eu sei trabalhar com dados de ponta a ponta.
 
 **Legenda:** 🙋 eu faço/decido · ⚙️ trabalho técnico · ▶️ em andamento · ✅ feito
 
-## A pergunta do case
+## As perguntas do case
 
-Um case bom responde a uma pergunta. A minha proposta:
+A lista vai crescendo conforme as dúvidas aparecem. O painel `painel/perguntas.html` responde as que dá para medir durante a noite, e se atualiza a cada coleta.
 
-> **Para onde foram os votos de quem não votou em Lula nem em Flávio no 1º turno?**
-
-No 1º turno, o case 17 calculou que o Lula precisava de ~65% desses votos para empatar. Hoje dá para medir quanto ele levou: estado por estado ao vivo e, depois, município por município, com os dados abertos do TSE. Essa pergunta atravessa todas as sprints.
-
-- [ ] 🙋 Confirmar ou trocar a pergunta do case
+1. **Para onde foram os votos de quem não votou em Lula nem em Flávio no 1º turno?** Ao vivo, por estado; depois, por município. Não dá para saber com certeza o que cada eleitor fez, só estimar pelo saldo.
+2. **Quem ganha Minas?** Meu foco. Em 2022, Minas foi decidida por ~50 mil votos.
+3. **Algum estado do Sul mudou de lado entre o 1º e o 2º turno?** Sou do Sul.
+4. **Nordeste: o Lula cresceu em votos? E o Flávio?** Votos absolutos, do 1º para o 2º turno.
+5. **O comparecimento mudou do 1º para o 2º turno?** Polêmicas sobre transporte público no Sudeste e no Nordeste, e o clima no Sul. Os dados medem a diferença; a causa precisa de outra fonte (notícias, clima por município) e fica para depois.
 
 ## Sprint 0 · A noite (25/10, 19h15 até o fim da apuração) ▶️
 
@@ -21,7 +23,7 @@ No 1º turno, o case 17 calculou que o Lula precisava de ~65% desses votos para 
 - [x] ⚙️ Repositório git local, README e diário da noite (`notas/notas.md`)
 - [ ] 🙋 Autorizar o repositório público `noite-da-apuracao-2` no GitHub
 - [ ] ⚙️ Religar o coletor com `--git`, que envia os dados ao GitHub a cada 30 min
-- [ ] ⚙️ Acompanhar ao vivo quanto o Lula ganha sobre o 1º turno em cada estado (a pergunta do case)
+- [x] ⚙️ Painel das perguntas (`painel/perguntas.html`) e previsão do resultado final (`analise/perguntas.py`, `dados/previsao.csv`), recalculados a cada coleta
 - [ ] ⚙️ Anotar no diário os marcos da noite: virada (se houver), resultado matematicamente definido e 100%
 
 ## Sprint 1 · Fechar a noite (26 e 27/10)

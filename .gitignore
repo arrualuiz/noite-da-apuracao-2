@@ -4,6 +4,7 @@ __pycache__/
 
 # gerado a cada coleta
 painel/painel.html
+painel/perguntas.html
 
 # dados volumosos ou de terceiros (ficam só local)
 dados/brutos/

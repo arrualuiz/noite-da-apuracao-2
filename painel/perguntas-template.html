@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="60">
+<title>As perguntas da noite</title>
+<style>
+:root {
+  --fundo: #f6f5f2; --cartao: #ffffff; --texto: #1d1d1f; --suave: #6b6b70; --linha: #e3e1dc;
+  --lula: #d62f3a; --flavio: #4f3fd6; --destaque: #e07b1f; --ok: #1f8a4c;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --fundo: #141416; --cartao: #1e1e22; --texto: #ececef; --suave: #9a9aa2; --linha: #33333a;
+          --lula: #f05a63; --flavio: #8a7dff; --destaque: #f39a45; --ok: #3cc47a; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fundo); color: var(--texto); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; }
+h1 { font-size: 24px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 0 0 4px; }
+.sub { color: var(--suave); font-size: 13px; }
+.grade { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 16px 0; }
+.cartao { background: var(--cartao); border: 1px solid var(--linha); border-radius: 10px; padding: 14px 16px; }
+.secao { margin-top: 18px; }
+.rotulo { font-size: 12px; color: var(--suave); text-transform: uppercase; letter-spacing: .04em; }
+.grande { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.lula { color: var(--lula); } .flavio { color: var(--flavio); }
+.barra { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0 4px; position: relative; }
+.barra i { display: block; } .barra .meio { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--texto); opacity: .5; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
+th, td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--linha); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 12px; color: var(--suave); font-weight: 600; }
+.rolar { overflow-x: auto; }
+.nota { color: var(--suave); font-size: 13px; margin: 8px 0 0; }
+.pergunta { font-weight: 600; margin: 2px 0 10px; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 1px solid currentColor; }
+svg text { fill: var(--suave); font-size: 11px; }
+svg .eixo { stroke: var(--linha); }
+.legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--suave); margin-top: 6px; }
+.legenda i { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 5px; }
+.duas { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+</style>
+</head>
+<body>
+<main>
+  <h1>As perguntas da noite</h1>
+  <div class="sub" id="status"></div>
+
+  <div class="grade" id="cartoes"></div>
+
+  <section class="cartao secao">
+    <h2>A previsão ao longo da noite</h2>
+    <div class="sub">% do Lula nos votos válidos: o placar do TSE x a previsão para 100%, conforme as seções são apuradas.</div>
+    <div id="g-previsao"></div>
+    <div class="legenda"><span><i style="background:var(--suave)"></i>placar</span><span><i style="background:var(--lula)"></i>previsão nacional</span><span><i style="background:var(--destaque)"></i>previsão em Minas</span></div>
+  </section>
+
+  <section class="cartao secao">
+    <div class="rotulo">Pergunta 1</div>
+    <div class="pergunta">Para onde foram os votos de quem não votou em Lula nem em Flávio no 1º turno?</div>
+    <div class="rolar"><table id="t-regioes"></table></div>
+    <p class="nota">"Lula 1º turno" é a parte dele só entre Lula e Flávio. "Dos outros, para o Lula" supõe que ninguém trocou de lado e que o comparecimento não mudou: é uma estimativa, não uma medida. No 1º turno, o case 17 calculou que ele precisava de ~65% para empatar.</p>
+  </section>
+
+  <div class="duas secao">
+    <section class="cartao">
+      <div class="rotulo">Pergunta 2</div>
+      <div class="pergunta">Quem ganha Minas?</div>
+      <div id="minas"></div>
+    </section>
+    <section class="cartao">
+      <div class="rotulo">Pergunta 3</div>
+      <div class="pergunta">Algum estado do Sul mudou de lado?</div>
+      <div class="rolar"><table id="t-sul"></table></div>
+      <p class="nota">Lado = quem tinha mais votos entre Lula e Flávio no 1º turno x quem lidera a previsão agora.</p>
+    </section>
+  </div>
+
+  <section class="cartao secao">
+    <div class="rotulo">Nordeste</div>
+    <div class="pergunta">Lula e Flávio cresceram em votos do 1º para o 2º turno?</div>
+    <div class="rolar"><table id="t-nordeste"></table></div>
+    <p class="nota">Votos do 2º turno = previsão para 100% de cada estado. Só vira número fechado no fim da apuração.</p>
+  </section>
+
+  <section class="cartao secao">
+    <div class="rotulo">Comparecimento</div>
+    <div class="pergunta">Mais ou menos gente foi votar no 2º turno?</div>
+    <div class="rolar"><table id="t-comparecimento"></table></div>
+    <p class="nota">2º turno: só as seções já apuradas. As primeiras seções de cada estado não precisam ser parecidas com o estado inteiro, então a diferença só vale de verdade perto dos 100%.</p>
+  </section>
+
+  <p class="nota">Previsão: o que falta de cada estado mistura o que o estado já mostrou no 2º turno com o 1º turno do estado corrigido pelo ganho médio do Lula na região. Com 10% apurado, os dois pesam igual. Fonte: TSE (resultados.tse.jus.br, eleição 6258) e resultado final do 1º turno de 2026.</p>
+</main>
+
+<script>
+const D = /*DADOS*/null;
+const br = n => n == null ? "–" : Math.round(n).toLocaleString("pt-BR");
+const pc = (n, c = 2) => n == null ? "–" : n.toFixed(c).replace(".", ",") + "%";
+const sinal = (n, f) => n == null ? "–" : (n > 0 ? "+" : n < 0 ? "−" : "") + f(Math.abs(n));
+const mil = n => (n / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 0 }) + " mil";
+
+const T = D.total;
+document.getElementById("status").textContent =
+  `TSE ${D.versao_tse} · ${pc(D.secoes)} das seções apuradas · atualizado ${D.gerado}` +
+  (D.md === "s" ? " · resultado matematicamente definido" : "") + (D.tf === "s" ? " · totalização final" : "");
+
+function barra(l) {
+  return `<div class="barra"><i style="width:${l}%;background:var(--lula)"></i><i style="width:${100 - l}%;background:var(--flavio)"></i><span class="meio"></span></div>`;
+}
+function cartao(rotulo, l, extra) {
+  return `<div class="cartao"><div class="rotulo">${rotulo}</div>
+    <div class="grande"><span class="lula">${pc(l)}</span> <span class="sub">x</span> <span class="flavio">${pc(100 - l)}</span></div>
+    ${barra(l)}<div class="sub">${extra}</div></div>`;
+}
+const dif = T.prev_lula - T.prev_flavio;
+const comp = D.serie.at(-1);
+document.getElementById("cartoes").innerHTML =
+  cartao("Placar agora · Lula x Flávio", T.pct_lula, `${pc(D.secoes)} das seções`) +
+  cartao("Previsão para 100%", T.prev_pct_lula, `${dif >= 0 ? "Lula" : "Flávio"} por ~${mil(Math.abs(dif))} votos`) +
+  `<div class="cartao"><div class="rotulo">Ganho do Lula sobre o 1º turno</div><div class="grande">${sinal(D.ganho_lula, n => n.toFixed(2).replace(".", ","))} pts</div>
+    <div class="sub">média dos estados, nos votos já apurados, sobre a parte dele em Lula + Flávio no 1º turno</div></div>` +
+  `<div class="cartao"><div class="rotulo">Comparecimento</div><div class="grande">${pc(comp.comparecimento)}</div>
+    <div class="sub">nas seções apuradas · 1º turno: ${pc(comp.comparecimento_1t)}</div></div>`;
+
+// gráfico da previsão
+(function () {
+  const s = D.serie, W = 1000, H = 280, m = { l: 40, r: 12, t: 12, b: 28 };
+  const vals = s.flatMap(p => [p.pct_lula, p.prev_pct_lula, p.mg_prev_pct_lula]).filter(v => v != null);
+  let lo = Math.min(48, ...vals), hi = Math.max(52, ...vals);
+  lo = Math.floor(lo); hi = Math.ceil(hi);
+  const x = v => m.l + v / 100 * (W - m.l - m.r), y = v => m.t + (hi - v) / (hi - lo) * (H - m.t - m.b);
+  const linha = (k, cor, w) => {
+    const pts = s.filter(p => p[k] != null).map(p => `${x(p.secoes_pct).toFixed(1)},${y(p[k]).toFixed(1)}`).join(" ");
+    return `<polyline points="${pts}" fill="none" stroke="${cor}" stroke-width="${w}" stroke-linejoin="round"/>`;
+  };
+  let g = "";
+  for (let v = lo; v <= hi; v++) g += `<line class="eixo" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" ${v === 50 ? 'stroke-dasharray="4 3" style="stroke:var(--suave)"' : ""}/><text x="${m.l - 6}" y="${y(v) + 4}" text-anchor="end">${v}%</text>`;
+  for (let v = 0; v <= 100; v += 10) g += `<text x="${x(v)}" y="${H - 8}" text-anchor="middle">${v}%</text>`;
+  g += linha("pct_lula", "var(--suave)", 1.5) + linha("mg_prev_pct_lula", "var(--destaque)", 1.5) + linha("prev_pct_lula", "var(--lula)", 2.5);
+  document.getElementById("g-previsao").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Previsão ao longo da noite">${g}</svg>`;
+})();
+
+// pergunta 1: regiões e estados
+(function () {
+  const E = D.estados, ordem = ["Nordeste", "Sudeste", "Sul", "Norte", "Centro-Oeste", "Exterior"];
+  let h = `<tr><th>Região / estado</th><th>Apurado</th><th>Lula 1º turno</th><th>Lula 2º turno</th><th>Ganho</th><th>Dos outros, para o Lula</th></tr>`;
+  for (const r of ordem) {
+    const ufs = Object.values(E).filter(e => e.regiao === r);
+    const R = D.regioes[r];
+    const l1 = R.lula_1t / (R.lula_1t + R.flavio_1t) * 100;
+    h += `<tr style="font-weight:600"><td>${r}</td><td></td><td>${pc(l1, 1)}</td><td>${pc(R.pct_lula, 1)}</td><td>${R.pct_lula == null ? "–" : sinal(R.pct_lula - l1, n => n.toFixed(1).replace(".", ","))}</td><td></td></tr>`;
+    for (const e of ufs.sort((a, b) => b.apurado - a.apurado)) {
+      const o = e.outros_para_lula, fraco = e.apurado < 5 ? ' style="opacity:.55"' : "";
+      h += `<tr${fraco}><td>&nbsp;&nbsp;${e.nome}</td><td>${pc(e.apurado, 1)}</td><td>${pc(e.pct_lula_1t, 1)}</td><td>${pc(e.pct_lula, 1)}</td><td>${sinal(e.ganho_lula, n => n.toFixed(1).replace(".", ","))}</td><td>${o == null ? "–" : pc(Math.max(-99, Math.min(199, o)), 0)}</td></tr>`;
+    }
+  }
+  document.getElementById("t-regioes").innerHTML = h;
+})();
+
+// pergunta 2: Minas
+(function () {
+  const e = D.estados.MG, v = D.v2022.MG;
+  const l22 = v.lula / (v.lula + v.bolsonaro) * 100;
+  const lider = e.prev_pct_lula >= 50 ? '<span class="tag lula">Lula na frente</span>' : '<span class="tag flavio">Flávio na frente</span>';
+  document.getElementById("minas").innerHTML = `
+    <div class="rotulo">Previsão para 100% · ${pc(e.apurado, 1)} apurado</div>
+    <div class="grande"><span class="lula">${pc(e.prev_pct_lula)}</span> <span class="sub">x</span> <span class="flavio">${pc(100 - e.prev_pct_lula)}</span></div>
+    ${barra(e.prev_pct_lula)} ${lider}
+    <table style="margin-top:10px">
+      <tr><th></th><th>Lula</th><th>Adversário</th></tr>
+      <tr><td>Placar agora</td><td>${pc(e.pct_lula)}</td><td>${pc(e.pct_lula == null ? null : 100 - e.pct_lula)}</td></tr>
+      <tr><td>1º turno 2026 (só os dois)</td><td>${pc(e.pct_lula_1t)}</td><td>${pc(100 - e.pct_lula_1t)}</td></tr>
+      <tr><td>2º turno 2022</td><td>${pc(l22)}</td><td>${pc(100 - l22)}</td></tr>
+    </table>
+    <p class="nota">Em 2022, Minas foi decidida por ${br(v.lula - v.bolsonaro)} votos.</p>`;
+})();
+
+// pergunta 3: Sul
+(function () {
+  let h = `<tr><th>Estado</th><th>Apurado</th><th>1º turno</th><th>Previsão 2º</th><th>Mudou?</th></tr>`;
+  for (const uf of ["PR", "SC", "RS"]) {
+    const e = D.estados[uf];
+    const lado1 = e.pct_lula_1t >= 50 ? "Lula" : "Flávio", lado2 = e.prev_pct_lula >= 50 ? "Lula" : "Flávio";
+    h += `<tr><td>${e.nome}</td><td>${pc(e.apurado, 1)}</td><td>${lado1} ${pc(Math.max(e.pct_lula_1t, 100 - e.pct_lula_1t), 1)}</td>
+      <td>${lado2} ${pc(Math.max(e.prev_pct_lula, 100 - e.prev_pct_lula), 1)}</td>
+      <td>${lado1 === lado2 ? "não" : '<span class="tag" style="color:var(--destaque)">sim</span>'}</td></tr>`;
+  }
+  document.getElementById("t-sul").innerHTML = h;
+})();
+
+// Nordeste: votos
+(function () {
+  const ufs = Object.values(D.estados).filter(e => e.regiao === "Nordeste").sort((a, b) => b.lula_1t - a.lula_1t);
+  const d = (a, b) => sinal(b - a, mil);
+  let h = `<tr><th>Estado</th><th>Apurado</th><th>Lula 1º</th><th>Lula 2º (prev.)</th><th>Δ</th><th>Flávio 1º</th><th>Flávio 2º (prev.)</th><th>Δ</th></tr>`;
+  const linha = (n, ap, l1, l2, f1, f2, neg) => `<tr${neg ? ' style="font-weight:600"' : ""}><td>${n}</td><td>${ap}</td><td>${mil(l1)}</td><td>${mil(l2)}</td><td class="lula">${d(l1, l2)}</td><td>${mil(f1)}</td><td>${mil(f2)}</td><td class="flavio">${d(f1, f2)}</td></tr>`;
+  const R = D.regioes.Nordeste;
+  h += linha("Nordeste", "", R.lula_1t, R.prev_lula, R.flavio_1t, R.prev_flavio, true);
+  for (const e of ufs) h += linha(e.nome, pc(e.apurado, 1), e.lula_1t, e.prev_lula, e.flavio_1t, e.prev_flavio);
+  document.getElementById("t-nordeste").innerHTML = h;
+})();
+
+// comparecimento
+(function () {
+  let h = `<tr><th>Região</th><th>1º turno</th><th>2º turno (apurado)</th><th>Diferença</th></tr>`;
+  for (const r of ["Nordeste", "Sudeste", "Sul", "Norte", "Centro-Oeste"]) {
+    const R = D.regioes[r];
+    h += `<tr><td>${r}</td><td>${pc(R.comparecimento_1t)}</td><td>${pc(R.comparecimento)}</td><td>${R.comparecimento == null ? "–" : sinal(R.comparecimento - R.comparecimento_1t, n => n.toFixed(2).replace(".", ",") + " pts")}</td></tr>`;
+  }
+  document.getElementById("t-comparecimento").innerHTML = h;
+})();
+</script>
+</body>
+</html>
