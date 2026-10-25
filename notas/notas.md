@@ -21,6 +21,8 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - **20h14 · 34,45% apurado:** placar Flávio 50,32% x Lula 49,68%; previsão Lula 50,56%. Abstenção nas seções apuradas: 19,26%. Novo palpite: Lula 50,2% x Flávio 49,8% e abstenção igual à de 2022 (20,58%).
 
+- **20h18 · 39,8% apurado, comparando com o mesmo ponto do 1º turno** (`analise/agora.py`): o Lula está à frente de onde estava no 1º turno em quase todo lugar. SP 42,0% (no mesmo ponto do 1º turno: 38,0%), MG 50,0% (45,7%), Nordeste 68,1% (66,1%), Sul 37,5% (34,9%). Só o RJ está igual, com 3% apurado. Falta apurar: SP é 30% dos eleitores que faltam, o Nordeste 28%, o RJ 13% e MG 11%.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.

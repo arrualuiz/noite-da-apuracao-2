@@ -22,6 +22,7 @@ O registro está em [`dados/palpites.csv`](dados/palpites.csv) e o diário da no
 ```bash
 python3 coleta/coletar.py                            # uma coleta
 python3 coleta/coletar.py --a-cada 60 --parar-no-fim # repete até a apuração terminar
+python3 analise/agora.py                             # onde falta apurar e o Lula agora x o mesmo ponto do 1º turno
 ```
 
 Só usa a biblioteca padrão do Python.
