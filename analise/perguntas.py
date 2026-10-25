@@ -48,6 +48,18 @@ NOMES = {
     "TO": "Tocantins", "ZZ": "Exterior",
 }
 MEIA_CONFIANCA = 0.10  # com 10% apurado, o estado e o 1º turno pesam igual
+# Erro da projeção por estado na diferença entre os dois primeiros (pontos), medido no 1º turno de 2026
+# (noite-do-primeiro-turno-2026, dados/export/nacional.csv x resultado final). Antes dos 25%, não há medida.
+ERRO_1T = [(0, 6.0), (25, 4.1), (30, 3.3), (40, 2.6), (50, 2.2), (60, 1.5), (70, 1.4), (80, 1.05),
+           (90, 0.72), (95, 0.46), (99, 0.17), (100, 0.0)]
+
+
+def erro_esperado(secoes):
+    """Erro típico da previsão neste ponto da apuração, interpolado da tabela do 1º turno."""
+    for (x0, e0), (x1, e1) in zip(ERRO_1T, ERRO_1T[1:]):
+        if secoes <= x1:
+            return e0 + (e1 - e0) * (secoes - x0) / (x1 - x0)
+    return 0.0
 
 
 def ler_1t():
@@ -195,7 +207,7 @@ def main():
     dados = {
         "gerado": datetime.now().strftime("%d/%m %H:%M:%S"), "versao_tse": br["versao"], "secoes": br["secoes"],
         "md": br["md"], "tf": br["tf"], "ganho_lula": round(g * 100, 2),
-        "total": somar(est, list(NOMES)), "estados": est, "regioes": regioes, "serie": linhas,
+        "total": somar(est, list(NOMES)), "erro_esperado": round(erro_esperado(br["secoes"]), 2), "estados": est, "regioes": regioes, "serie": linhas,
         "v2022": {uf: {"lula": v.get("13", 0), "bolsonaro": v.get("22", 0)} for uf, v in v22.items()},
         "palpites": list(csv.DictReader((PASTA / "palpites.csv").open(encoding="utf-8"))),
     }

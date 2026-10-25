@@ -120,6 +120,14 @@ const comp = D.serie.at(-1);
 document.getElementById("cartoes").innerHTML =
   cartao("Placar agora · Lula x Flávio", T.pct_lula, `${pc(D.secoes)} das seções`) +
   cartao("Previsão para 100%", T.prev_pct_lula, `${dif >= 0 ? "Lula" : "Flávio"} por ~${mil(Math.abs(dif))} votos`) +
+  (() => {
+    const m = Math.abs(T.prev_pct_lula - (100 - T.prev_pct_lula)), e = D.erro_esperado, lider = T.prev_pct_lula >= 50 ? "Lula" : "Flávio";
+    const [txt, cor] = D.md === "s" ? ["Sim: matematicamente definido", "var(--ok)"]
+      : m > 2 * e ? [`Sim, com segurança: ${lider}`, "var(--ok)"]
+      : m > e ? [`Provável: ${lider}`, "var(--destaque)"] : ["Ainda não", "var(--suave)"];
+    return `<div class="cartao"><div class="rotulo">Dá para afirmar o resultado?</div><div class="grande" style="color:${cor};font-size:21px">${txt}</div>
+      <div class="sub">vantagem prevista ${m.toFixed(2).replace(".", ",")} pts · erro típico da previsão neste ponto: ${e.toFixed(2).replace(".", ",")} pts (${D.secoes < 25 ? "estimado: o 1º turno só foi medido a partir de 25%" : "medido no 1º turno"})</div></div>`;
+  })() +
   `<div class="cartao"><div class="rotulo">Ganho do Lula sobre o 1º turno</div><div class="grande">${sinal(D.ganho_lula, n => n.toFixed(2).replace(".", ","))} pts</div>
     <div class="sub">média dos estados, nos votos já apurados, sobre a parte dele em Lula + Flávio no 1º turno</div></div>` +
   `<div class="cartao"><div class="rotulo">Comparecimento</div><div class="grande">${pc(comp.comparecimento)}</div>

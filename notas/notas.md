@@ -13,6 +13,8 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - **19h45 · as perguntas da noite:** para onde foram os votos dos outros candidatos, quem ganha Minas, se algum estado do Sul mudou de lado, se Lula e Flávio cresceram em votos no Nordeste e se o comparecimento mudou. Montei um painel que responde a cada coleta (`painel/perguntas.html`) e uma previsão do resultado final.
 
+- **19h50 · quando dá para afirmar o resultado?** Medi o erro da projeção por estado no 1º turno de 2026, na diferença entre os dois primeiros: 4,1 pontos com 25% apurado, 2,2 com 50%, 1,4 com 70%, 0,7 com 90% e 0,2 com 99%. E o erro foi sempre para o mesmo lado: o voto apurado mais tarde era mais favorável ao Lula. Regra do painel: "provável" quando a vantagem prevista passa do erro típico daquele ponto; "com segurança" quando passa do dobro.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.
