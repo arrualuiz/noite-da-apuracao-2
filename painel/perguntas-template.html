@@ -101,6 +101,13 @@ svg .eixo { stroke: var(--linha); }
   </div>
 
   <section class="cartao secao">
+    <div class="rotulo">Capital x interior</div>
+    <div class="pergunta">Como o Lula está na capital, na Grande SP e no interior? (e no Rio e em BH)</div>
+    <div class="rolar"><table id="t-segmentos"></table></div>
+    <p class="nota">Grande SP = os outros 38 municípios da região metropolitana. O "resto" de cada estado é o estado menos as cidades acima. Lula = % entre Lula e Flávio.</p>
+  </section>
+
+  <section class="cartao secao">
     <div class="rotulo">Nordeste</div>
     <div class="pergunta">Lula e Flávio cresceram em votos do 1º para o 2º turno?</div>
     <div class="rolar"><table id="t-nordeste"></table></div>
@@ -251,7 +258,21 @@ document.getElementById("cartoes").innerHTML =
       <tr><td>1º turno 2026 (só os dois)</td><td>${pc(e.pct_lula_1t)}</td><td>${pc(100 - e.pct_lula_1t)}</td></tr>
       <tr><td>2º turno 2022</td><td>${pc(l22)}</td><td>${pc(100 - l22)}</td></tr>
     </table>
-    <p class="nota">Em 2022, Minas foi decidida por ${br(v.lula - v.bolsonaro)} votos.</p>`;
+    <p class="nota">Em 2022, Minas foi decidida por ${br(v.lula - v.bolsonaro)} votos.</p>
+    <div class="rotulo" style="margin-top:12px">Placar de Minas ao longo da apuração · <span id="mg-trocas"></span></div>
+    <div id="g-minas"></div>`;
+  const s = D.serie.filter(p => p.mg_pct_lula != null && p.mg_apurado > 0.5), W = 600, H = 200, m = { l: 36, r: 8, t: 8, b: 22 };
+  const vals = s.map(p => p.mg_pct_lula), lo = Math.floor(Math.min(49, ...vals)), hi = Math.ceil(Math.max(51, ...vals));
+  const xm = Math.max(...s.map(p => p.mg_apurado), 10);
+  const x = v => m.l + v / xm * (W - m.l - m.r), y = v => m.t + (hi - v) / (hi - lo) * (H - m.t - m.b);
+  let g = "", trocas = [], quemLidera = null;
+  for (let v = lo; v <= hi; v++) g += `<line class="eixo" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" ${v === 50 ? 'stroke-dasharray="4 3" style="stroke:var(--suave)"' : ""}/><text x="${m.l - 5}" y="${y(v) + 4}" text-anchor="end">${v}%</text>`;
+  for (let v = 0; v <= xm; v += xm > 50 ? 20 : 10) g += `<text x="${x(v)}" y="${H - 6}" text-anchor="middle">${v}%</text>`;
+  s.forEach(p => { const q = p.mg_pct_lula > 50 ? "Lula" : "Flávio"; if (q !== quemLidera) { if (quemLidera) trocas.push(p); quemLidera = q; } });
+  g += `<polyline points="${s.map(p => `${x(p.mg_apurado).toFixed(1)},${y(p.mg_pct_lula).toFixed(1)}`).join(" ")}" fill="none" stroke="var(--destaque)" stroke-width="2"/>`;
+  g += trocas.map(p => `<circle cx="${x(p.mg_apurado)}" cy="${y(p.mg_pct_lula)}" r="3.5" fill="${p.mg_pct_lula > 50 ? "var(--lula)" : "var(--flavio)"}"/>`).join("");
+  document.getElementById("g-minas").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Placar de Minas">${g}</svg>`;
+  document.getElementById("mg-trocas").textContent = `${trocas.length} trocas de liderança · agora: ${quemLidera}`;
 })();
 
 // pergunta 3: Sul
@@ -265,6 +286,13 @@ document.getElementById("cartoes").innerHTML =
       <td>${lado1 === lado2 ? "não" : '<span class="tag" style="color:var(--destaque)">sim</span>'}</td></tr>`;
   }
   document.getElementById("t-sul").innerHTML = h;
+})();
+
+// capital x interior
+(function () {
+  let h = `<tr><th>Segmento</th><th>Apurado</th><th>Eleitores que faltam</th><th>Lula agora</th><th>Lula 1º turno</th><th>Diferença</th></tr>`;
+  for (const s of D.segmentos) h += `<tr${s.apurado < 3 ? ' style="opacity:.55"' : ""}><td>${s.segmento}</td><td>${pc(s.apurado, 1)}</td><td>${(s.faltam / 1e6).toFixed(1).replace(".", ",")} mi</td><td>${pc(s.pct_lula, 1)}</td><td>${pc(s.pct_lula_1t, 1)}</td><td>${s.pct_lula == null ? "–" : sinal(s.pct_lula - s.pct_lula_1t, n => n.toFixed(1).replace(".", ","))}</td></tr>`;
+  document.getElementById("t-segmentos").innerHTML = D.segmentos.length ? h : "<tr><td>sem dados ainda</td></tr>";
 })();
 
 // Nordeste: votos

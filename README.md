@@ -15,6 +15,7 @@ O registro está em [`dados/palpites.csv`](dados/palpites.csv) e o diário da no
 
 - **Coleta** (`coleta/coletar.py`): a cada 60 s consulta os 29 arquivos de `resultados.tse.jus.br` (27 UFs, exterior e nacional) da eleição 6258, grava o placar nacional, o andamento de cada estado e os candidatos em CSV e SQLite, e baixa a curva de evolução do UOL (2026 e 2022).
 - **Painel** (`painel/painel.html`, gerado a cada coleta): placar, evolução 2026 x 2022, projeção por estado e andamento por estado e região.
+- **Capital x interior** (`coleta/municipios.py`): a cada coleta, os 39 municípios da Grande SP, o Rio e BH, para separar capital, região metropolitana e interior (`dados/segmentos.csv`).
 - **Histórico** (`dados/historico/`): resultados oficiais do TSE de 2002 a 2022 e o resultado final do 1º turno de 2026 por estado (`2026-t1-uf.csv`).
 
 ## Rodar

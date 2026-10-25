@@ -76,6 +76,32 @@ def main():
         print(f"{nome:16}{g['apurado']:7.1f}%{faltam / 1e6:8.1f} mi{faltam / faltam_total * 100:7.0f}%"
               f"{agora}{mesmo}{l1 / (l1 + f1) * 100:8.1f}%")
     print()
+    seg = PASTA / "segmentos.csv"
+    if seg.exists():
+        linhas = list(csv.DictReader(seg.open(encoding="utf-8")))
+        ult = [r for r in linhas if r["coleta_id"] == linhas[-1]["coleta_id"]]
+        h1 = {r["segmento"]: r for r in csv.DictReader((PASTA / "historico" / "2026-t1-segmentos.csv").open(encoding="utf-8"))}
+        print(f"{'Capital x interior':27}{'apurado':>8}{'faltam':>10}{'Lula':>7}{'Lula 1º':>9}")
+        for r in ult:
+            l, f, el, ap = int(r["lula"]), int(r["flavio"]), int(r["eleitorado"]), int(r["apurado_eleit"])
+            a1 = h1.get(r["segmento"])
+            l1 = int(a1["lula"]) / (int(a1["lula"]) + int(a1["flavio"])) * 100 if a1 else None
+            agora = f"{l / (l + f) * 100:6.1f}%" if l + f else f"{'–':>7}"
+            print(f"{r['segmento']:27}{ap / el * 100:7.1f}%{(el - ap) / 1e6:8.1f} mi{agora}{l1:8.1f}%")
+
+    print()
+    print("Minas: trocas de liderança no placar")
+    hist, lider = list(csv.DictReader((PASTA / "previsao.csv").open(encoding="utf-8"))), None
+    trocas = []
+    for r in hist:
+        if r["mg_pct_lula"]:
+            quem = "Lula" if float(r["mg_pct_lula"]) > 50 else "Flávio"
+            if quem != lider:
+                trocas.append(f"  {r['horario'][11:16]}  {float(r['mg_apurado']):5.1f}% apurado  Lula {float(r['mg_pct_lula']):.2f}%  → {quem}")
+                lider = quem
+    print("\n".join(trocas))
+    print(f"  {len(trocas) - 1} trocas · agora: {lider} ({float(hist[-1]['mg_pct_lula']):.2f}% Lula, {float(hist[-1]['mg_apurado']):.1f}% apurado)")
+    print()
     print("Lula = % entre Lula e Flávio. \"Mesmo pt\" = o 1º turno quando o lugar tinha o mesmo % apurado de agora.")
     print("\"Do que falta\" = parte dos eleitores ainda não apurados que está naquele lugar.")
 

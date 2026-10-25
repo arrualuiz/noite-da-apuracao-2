@@ -23,6 +23,8 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - **20h18 · 39,8% apurado, comparando com o mesmo ponto do 1º turno** (`analise/agora.py`): o Lula está à frente de onde estava no 1º turno em quase todo lugar. SP 42,0% (no mesmo ponto do 1º turno: 38,0%), MG 50,0% (45,7%), Nordeste 68,1% (66,1%), Sul 37,5% (34,9%). Só o RJ está igual, com 3% apurado. Falta apurar: SP é 30% dos eleitores que faltam, o Nordeste 28%, o RJ 13% e MG 11%.
 
+- **20h25 · capital x interior e as trocas em Minas:** o coletor agora baixa também os 39 municípios da Grande SP, o Rio e BH (`coleta/municipios.py`, `dados/segmentos.csv`). Com ~10% apurado, o Lula tem 55,4% na capital paulista (52,5% no 1º turno), 53,6% no resto da Grande SP (48,5%) e 38,1% no interior e litoral (35,1%). Minas já trocou de líder 8 vezes entre as 20h00 e as 20h16, sempre a menos de 0,1 ponto dos 50%.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.

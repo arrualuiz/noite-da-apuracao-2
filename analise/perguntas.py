@@ -169,6 +169,23 @@ def comparecimento(pasta, lista, t1):
     return (round(c / (c + a) * 100, 2) if c + a else None), round(c1 / e1 * 100, 2)
 
 
+def segmentos_ultimos():
+    """Capital x Grande SP x interior (e Rio, BH) na última coleta, com o 1º turno ao lado."""
+    arq, h1 = PASTA / "segmentos.csv", PASTA / "historico" / "2026-t1-segmentos.csv"
+    if not arq.exists() or not h1.exists():
+        return []
+    linhas = list(csv.DictReader(arq.open(encoding="utf-8")))
+    t1 = {r["segmento"]: r for r in csv.DictReader(h1.open(encoding="utf-8"))}
+    out = []
+    for r in (r for r in linhas if r["coleta_id"] == linhas[-1]["coleta_id"]):
+        l, f, el, ap = int(r["lula"]), int(r["flavio"]), int(r["eleitorado"]), int(r["apurado_eleit"])
+        a = t1[r["segmento"]]
+        out.append({"segmento": r["segmento"], "apurado": round(ap / el * 100, 1), "faltam": el - ap,
+                    "pct_lula": round(l / (l + f) * 100, 2) if l + f else None,
+                    "pct_lula_1t": round(int(a["lula"]) / (int(a["lula"]) + int(a["flavio"])) * 100, 2)})
+    return out
+
+
 def main():
     t1, v22 = ler_1t(), ler_2022()
     coletas = sorted(d for d in BRUTOS.iterdir() if (d / "br-u.json").exists())
@@ -216,6 +233,7 @@ def main():
         "total": somar(est, list(NOMES)), "erro_esperado": round(erro_esperado(br["secoes"]), 2), "estados": est, "regioes": regioes, "serie": linhas,
         "v2022": {uf: {"lula": v.get("13", 0), "bolsonaro": v.get("22", 0)} for uf, v in v22.items()},
         "topo": json.loads((PASTA / "br-estados.topo.json").read_text(encoding="utf-8")),
+        "segmentos": segmentos_ultimos(),
         "pesquisas": list(csv.DictReader((PASTA / "pesquisas.csv").open(encoding="utf-8"))) if (PASTA / "pesquisas.csv").exists() else [],
         "palpites": list(csv.DictReader((PASTA / "palpites.csv").open(encoding="utf-8"))),
     }

@@ -93,7 +93,7 @@ def baixar_uol():
 
 
 def gerar_painel():
-    for script in ("painel/painel.py", "analise/banco.py", "analise/exportar.py", "analise/perguntas.py"):  # painel, banco, exportação, perguntas
+    for script in ("painel/painel.py", "analise/banco.py", "analise/exportar.py", "coleta/municipios.py", "analise/perguntas.py"):  # painel, banco, exportação, municípios, perguntas
         try:
             subprocess.run([sys.executable, str(RAIZ / script)], timeout=60, capture_output=True)
         except Exception as e:
