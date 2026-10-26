@@ -8,8 +8,7 @@ Para amanhã, na ordem:
 1. 🙋 Revisar e publicar o post do LinkedIn (`notas/post-linkedin.md`), com prints do mapa de Curitiba por bairro, dos mini mapas 2002–2026, da previsão olhando para trás e das ilhas.
 2. ⚙️ Testar as hipóteses das ilhas com o Censo 2022 (% indígena, já baixável por município) e a área de soja (`analise/municipios.py`).
 3. ⚙️ Testar o método "mesmo ponto do 1º turno" no 1º turno de 2026 (contra 2022), para ver se não foi sorte.
-4. ⚙️ Por que a abstenção subiu no Norte (Amapá +8 pts).
-5. Depois: Sprint 2 (R/Quarto), com os CSVs de `dados/` já prontos.
+4. Depois: Sprint 2 (R/Quarto), com os CSVs de `dados/` já prontos.
 
 Como atualizar o site: está no README, seção "O site".
 
@@ -43,7 +42,8 @@ A lista vai crescendo conforme as dúvidas aparecem. O painel `painel/perguntas.
 - [x] ⚙️ Conferir os palpites com o resultado final (em `notas/notas.md`, com 99,99% apurado)
 - [x] ⚙️ Olhar para trás: o erro da previsão em cada momento e de onde veio (`analise/retroativo.py`: o modelo previu menos Lula a noite toda, por causa de SP; o método "mesmo ponto do 1º turno" errava menos)
 - [ ] ⚙️ Testar o método "mesmo ponto" em outras noites (1º turno de 2026 contra 2022), para ver se não foi sorte de uma noite só
-- [ ] ⚙️ Entender por que a abstenção subiu no Norte (Amapá, Pará, Acre e Amazonas) quando caiu no resto do país
+- [x] ⚙️ Entender por que a abstenção subiu no Norte: lá ela sempre sobe no 2º turno (média de 2002 a 2022); em 2026 só o Amapá e Roraima ficaram acima do próprio normal (`analise/acesso.py`)
+- [x] ⚙️ As denúncias de transporte, chuva e horário nos dados (`analise/acesso.py`): a prorrogação até as 19h chegou a poucas urnas, e a abstenção caiu mais que o normal até nos estados e cidades com denúncia
 - [ ] ⚙️ Testar as hipóteses das ilhas (`dados/ilhas.csv`): a diferença de cada cidade para as vizinhas x % de população indígena (Censo 2022), área de soja e se tem universidade
 - [x] 🙋 Publicar as páginas no GitHub Pages: https://arrualuiz.github.io/noite-da-apuracao-2/ (25/10, 23h59)
 - [x] ⚙️ Curitiba com a divisa de cada bairro (malha de bairros do IPPUC), pintando o bairro inteiro, e o voto da cidade desde 2002 (`painel/curitiba.html`)

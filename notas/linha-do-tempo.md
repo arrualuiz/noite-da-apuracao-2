@@ -69,6 +69,8 @@ do projeto aberta.
 - **00h19** · O Pablo Marçal disse que o resultado é uma "aberração matemática". Às 00h27 terminei de conferir com `auditoria.py`: as 4.056 urnas de Curitiba fecham voto a voto e somam exatamente o total do TSE; nos 5.757 municípios, todas as contas fecham, e a soma deles dá o total do Brasil (Lula 64.256.232 x Flávio 59.826.041). Nenhuma inconsistência.
 - **00h28** · **Renda, cor e voto por bairro em Curitiba, de 2002 a 2026** (`curitiba_historia.py`, com o Censo 2022 por bairro do IBGE): de 2002 a 2014, quanto mais rico o bairro, menos PT (correlação de −0,9); em 2018 isso quebrou, e em 2026 a renda quase não explica mais o voto (−0,17). O Batel foi de 10,4% de PT (2014) a 36,4% (2026); a CIC, de 75,7% (2002) a 26,8% (2018).
 
+- **02h39** · As denúncias de transporte, chuva e horário nos dados (`acesso.py`): pelo boletim de urna, a prorrogação até as 19h chegou a poucas seções (nenhuma em Curitiba); a abstenção caiu mais que o normal até onde houve denúncia; e o Norte sempre tem abstenção maior no 2º turno.
+
 ## Como fecharam os palpites
 
 - Quem ganha: **acertei, Lula** (a média das pesquisas dava Flávio).

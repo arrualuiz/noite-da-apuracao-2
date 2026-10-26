@@ -87,6 +87,16 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 - **O peso de 10% não foi o problema.** Com 2% ou 25%, o erro mudava pouco (média de 0,86 e 0,72 ponto, contra 0,76). O problema estava no "1º turno + ganho da região": o ganho era medido nas primeiras seções, que não são parecidas com as últimas.
 - **O método que teria funcionado:** comparar cada estado com ele mesmo **no mesmo % apurado do 1º turno** e somar essa diferença ao 1º turno final do estado. Ele erra de +0,2 a +0,4 ponto desde os 20% (às 19h57, quando o placar ainda mostrava o Flávio na frente) e tem erro médio de 0,46 ponto, contra 0,76 do meu modelo. Ele não tem nenhum parâmetro para ajustar, o que é bom, mas eu testei depois de saber o resultado e numa noite só. Para confiar nele, preciso testar no 1º turno de 2026 com 2022 e nos turnos de 2022 com 2018.
 
+## Madrugada de 26/10 · As denúncias de transporte, chuva e horário aparecem nos dados?
+
+No 2º turno houve denúncias de falta de ônibus em 8 estados (BA, SP, PI, SE, PA, AL, RJ, PB, segundo o Ministério da Justiça), um pedido da campanha do Flávio por causa da chuva no PR, em SC e em SP, e uma decisão do ministro Zanin (STF) estendendo a votação até as 19h. Fui ver nos dados (`analise/acesso.py`):
+
+- **Horário:** pelo boletim de urna, a prorrogação chegou a poucas seções. No 2º turno, fecharam às 19h ou depois 36 de 150 urnas sorteadas em João Pessoa, 23 de 148 em Salvador, 22 de 149 no Rio e 7 de 150 em São Paulo. Em Teresina, Belém, Maceió, Florianópolis e nas 4.056 de Curitiba, nenhuma: quase todas fecharam entre 17h e 17h30.
+- **Estados:** do 1º para o 2º turno, a abstenção costuma subir (+1,78 ponto no Brasil, na média de 2002 a 2022). Em 2026 ela caiu 1,86 ponto (2,96 milhões de pessoas a mais votando), 3,6 pontos melhor que o normal. Os estados com denúncia de transporte não foram piores que os outros: a Bahia teve a 2ª maior melhora do país.
+- **Cidades:** em todas as cidades citadas nas denúncias, a abstenção caiu mais do que tinha caído em 2022 (São Paulo −3,0 pontos contra −0,4; Salvador −4,4 contra −1,8). Nenhuma cidade com 100 mil eleitores ou mais piorou mais de 1 ponto em relação a 2022. A abstenção caiu em 4.436 das 5.570 cidades; em 2022, em 3.601.
+- **O Norte que eu achei estranho não é novidade:** no Acre, no Amapá, em Roraima, no Amazonas e no Pará a abstenção sempre sobe no 2º turno (no Acre, +7,7 pontos na média de 2002 a 2022). Em 2026, só o Amapá (+2,4) e Roraima (+1,1) ficaram acima do próprio normal.
+- **Conclusão honesta:** os problemas de transporte foram reais (estão nas notícias e nas decisões dos TREs), mas não aparecem como abstenção maior: a mobilização geral foi mais forte. O que os dados não dizem é se, sem os problemas, a abstenção teria caído ainda mais.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.
