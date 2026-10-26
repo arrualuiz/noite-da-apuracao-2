@@ -12,6 +12,8 @@ editar o template (ou o comum.*), rodar este script e fazer o commit e o push; o
                                          e os 75 bairros, dados/curitiba-bairros.topo.json (malha do IPPUC, pelo
                                          repositório github.com/gustavokira/geo-curitiba)
   - Curitiba e as capitais desde 2002     dados/historico/capitais_presidente.csv (analise/capitais_historia.py)
+  - Curitiba por bairro, 2002 a 2026, e o Censo 2022 por bairro: dados/curitiba_bairros_historia.csv e
+                                         dados/curitiba_bairros_censo.csv (analise/curitiba_historia.py)
   - do 1º para o 2º turno, 2002 a 2026     dados/crescimento.csv (analise/crescimento.py): crescimento.html e Curitiba
   - ilhas: cidades x vizinhas            dados/ilhas.csv (analise/ilhas.py)
   - a previsão olhando para trás         dados/retroativo.csv (analise/retroativo.py)
@@ -73,7 +75,10 @@ def curitiba():
     malha = json.loads((PASTA / "curitiba-bairros.topo.json").read_text(encoding="utf-8"))
     for g in malha["objects"]["bairros"]["geometries"]:
         g["properties"] = {"nome": nome_proprio(g["properties"]["nome"])}
-    return {"escolas": lista, "fora_do_mapa": fora, "bairros": bairros, "contorno": contorno, "malha": malha}
+    hist = [{k: v if k == "bairro" else num(v) for k, v in r.items()} for r in ler("curitiba_bairros_historia.csv")]
+    censo = [{k: v if k == "bairro" else num(v) for k, v in r.items()} for r in ler("curitiba_bairros_censo.csv")]
+    return {"escolas": lista, "fora_do_mapa": fora, "bairros": bairros, "contorno": contorno, "malha": malha,
+            "hist": hist, "censo": censo}
 
 
 def historia():

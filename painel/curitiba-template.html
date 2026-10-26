@@ -17,7 +17,7 @@
 <main>
   <h1>Curitiba na eleição</h1>
   <div class="sub">2º turno de 2026, Lula x Flávio Bolsonaro, e o voto da cidade desde 2002. Fontes: TSE (boletins de urna, locais de votação, dados abertos), IBGE e IPPUC. Gerado em <span id="gerado"></span>.</div>
-  <nav><a href="../index.html">Início</a><a href="#curitiba">O 2º turno</a><a href="#eleicoes">Eleição a eleição</a><a href="#historia">Por que Curitiba vota assim</a><a href="depois.html">O Brasil</a><a href="perguntas.html">Painel da noite</a></nav>
+  <nav><a href="../index.html">Início</a><a href="#curitiba">O 2º turno</a><a href="#eleicoes">Eleição a eleição</a><a href="#renda">Renda e voto por bairro</a><a href="#historia">Por que Curitiba vota assim</a><a href="depois.html">O Brasil</a><a href="perguntas.html">Painel da noite</a></nav>
 
   <!-- CURITIBA -->
   <section class="cartao" id="curitiba">
@@ -62,6 +62,39 @@
     <div class="grade" id="cwb-eleicoes" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr))"></div>
   </section>
 
+  <section class="cartao" id="renda">
+    <h2>Renda, cor e voto, bairro por bairro, de 2002 a 2026</h2>
+    <div class="sub">O voto no PT no 2º turno em cada bairro, em todas as eleições, cruzado com o Censo 2022 por bairro (IBGE). Cada seção eleitoral foi posta no bairro oficial pelo seu local de votação.</div>
+
+    <h3>Curitiba, eleição a eleição, no mapa</h3>
+    <div class="sub">% do PT entre os dois finalistas em cada bairro. Passe o mouse para ver o bairro.</div>
+    <div id="mini-mapas" style="display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:8px"></div>
+    <div class="legenda"><span>rival 80%</span><span class="escala" id="mini-escala"></span><span>PT 80%</span><span>· cinza = empate</span></div>
+
+    <h3>Quanto mais rico o bairro, menos PT? Depende do ano</h3>
+    <div class="botoes" id="renda-anos"></div>
+    <div class="botoes" id="renda-var" style="margin-top:0">
+      <button type="button" class="botao ativo" data-modo="renda_media">Renda média do responsável pelo domicílio</button>
+      <button type="button" class="botao" data-modo="pct_brancos">% de pessoas brancas</button>
+    </div>
+    <div id="renda-dispersao"></div>
+    <div class="sub" id="renda-r"></div>
+
+    <h3>A relação entre renda e voto, ao longo do tempo</h3>
+    <div class="sub">Correlação entre a característica do bairro e o % do PT no 2º turno (ponderada pelos votos; −1 = quanto mais rico ou mais branco, menos PT, numa linha reta; 0 = nenhuma relação).</div>
+    <div id="renda-tempo"></div>
+    <div class="legenda"><span><i class="linha" style="background:var(--modelo)"></i>renda média (escala log)</span><span><i class="linha" style="background:var(--mesmo)"></i>% de pessoas brancas</span></div>
+
+    <h3>O que isso mostra</h3>
+    <ol class="texto">
+      <li><b>De 2002 a 2014, a renda explicava quase todo o voto.</b> A correlação ficou entre −0,90 e −0,94: os bairros ricos votavam muito menos no PT do que os pobres. Em 2014, o Batel deu 10,4% à Dilma, e a CIC, 38,4%.</li>
+      <li><b>Em 2018, isso quebrou.</b> A periferia foi para o Bolsonaro como os bairros ricos: a CIC caiu de 75,7% de PT em 2002 para 26,8%, quase o mesmo que o Batel (17,2%). A correlação caiu para −0,60.</li>
+      <li><b>Em 2022 e 2026, os bairros ricos voltaram a subir para o PT</b> (o Batel foi a 30,9% e depois 36,4%), e a periferia subiu menos. Em 2026, a correlação é −0,17: <b>em Curitiba, a renda do bairro quase não diz mais como ele vota.</b></li>
+      <li><b>Renda e cor andam juntas nos bairros de Curitiba</b> (correlação de 0,94 entre a renda e o % de brancos). Com dados por bairro, não dá para separar uma da outra.</li>
+    </ol>
+    <p class="nota">Limites: o Censo é de 2022 e foi usado para todas as eleições, mas os bairros mudaram em 24 anos (o Tatuquara e o Campo de Santana cresceram muito). A escolaridade completa do Censo 2022 só sai por área de ponderação, que é maior que um bairro; por bairro existe a alfabetização, e ela fica entre 99,9% e 100% em todos, então não serve para comparar. É correlação entre bairros, não comportamento de pessoas (falácia ecológica). 2002 e 2006 não têm o arquivo de locais de votação; as seções entraram pelo bairro do mesmo local nos anos seguintes (98% dos votos).</p>
+  </section>
+
   <section class="cartao" id="historia">
     <h2>Por que Curitiba vota assim?</h2>
     <div class="sub">O PT no 2º turno de cada eleição desde 2002 (% entre os dois finalistas): Curitiba, o Paraná, o Brasil e, em cinza, as outras 26 capitais.</div>
@@ -87,10 +120,10 @@
     <ul class="texto">
       <li><b>Lava Jato e a "República de Curitiba".</b> A operação, a prisão do Lula na Polícia Federal de Curitiba (2018) e o Sergio Moro deram à cidade uma identidade anti-PT. A Tribuna do Paraná chamou o resultado de 2018 de <a href="https://www.tribunapr.com.br/noticias/politica/base-da-lava-jato-curitiba-da-vitoria-expressiva-a-bolsonaro/">"base da Lava Jato dá vitória expressiva a Bolsonaro"</a>. <span class="sub">O problema: a queda começou em 2006, quase dez anos antes da operação (2014). A Lava Jato aprofundou uma coisa que já existia.</span></li>
       <li><b>Um eleitorado bolsonarista estável.</b> O cientista político Emerson Cervi (UFPR) estimou que <a href="https://www.bandab.com.br/politica/eleicoes-2024/eduardo-cristina-disputam-voto-luciano/amp/">cerca de 30% do eleitorado de Curitiba é bolsonarista radical</a> (eleição municipal de 2024).</li>
-      <li><b>Classe média e antipetismo.</b> A literatura sobre o antipetismo nacional liga o fenômeno à classe média urbana, à crise econômica e aos escândalos de corrupção (<a href="https://ppgcom.uff.br/wp-content/uploads/sites/200/2020/04/tese_mestrado_2016_marcelo_alves.pdf">Alves, UFF, 2016</a>). Nos meus dados, dá para ver uma pista disso: em 10 bairros, quase todos da regional Matriz (Juvevê, Bigorrilho, Cabral, Ahú, Bom Retiro, Mercês, Jardim Social) e também Água Verde, Santo Inácio e Jardim das Américas, o Flávio ganhou mais votos novos que o Lula. Na periferia (CIC, Sítio Cercado, Tatuquara) foi o contrário. <span class="sub">Hipótese: falta cruzar com a renda de cada bairro (Censo 2022).</span></li>
+      <li><b>Classe média e antipetismo.</b> A literatura sobre o antipetismo nacional liga o fenômeno à classe média urbana, à crise econômica e aos escândalos de corrupção (<a href="https://ppgcom.uff.br/wp-content/uploads/sites/200/2020/04/tese_mestrado_2016_marcelo_alves.pdf">Alves, UFF, 2016</a>). Nos meus dados, dá para ver uma pista disso: em 10 bairros, quase todos da regional Matriz (Juvevê, Bigorrilho, Cabral, Ahú, Bom Retiro, Mercês, Jardim Social) e também Água Verde, Santo Inácio e Jardim das Américas, o Flávio ganhou mais votos novos que o Lula. Na periferia (CIC, Sítio Cercado, Tatuquara) foi o contrário. <span class="sub">Testado com o Censo 2022 (veja <a href="#renda">renda e voto por bairro</a>): até 2014, a renda do bairro explicava quase todo o voto; a partir de 2018, cada vez menos. A virada de 2006 aconteceu em todos os bairros, ricos e pobres.</span></li>
       <li><b>O imaginário de um "Paraná branco" e da imigração europeia</b> (poloneses, italianos, alemães, ucranianos), estudado pela historiografia regional (<a href="https://anpuh.org.br/uploads/anais-simposios/pdf/2019-01/1548856711_0795c8a8c0dd34cf8acb77810511d7dd.pdf">ANPUH</a>). <span class="sub">Hipótese: não achei estudo que meça isso no voto. E não explica a virada de 2002 para 2006, porque a imigração é a mesma.</span></li>
     </ul>
-    <p class="nota">Resumo honesto: os dados mostram <b>quando</b> Curitiba mudou (2006, e mais forte a partir de 2010) e <b>onde</b> o Lula cresce hoje (periferia mais que bairros ricos). O <b>porquê</b> ainda é uma soma de hipóteses. Para testar: renda e escolaridade por bairro (Censo 2022) x voto por bairro, de 2006 a 2026.</p>
+    <p class="nota">Resumo honesto: os dados mostram <b>quando</b> Curitiba mudou (2006, e mais forte a partir de 2010) e <b>onde</b> o Lula cresce hoje (periferia mais que bairros ricos). O <b>porquê</b> ainda é uma soma de hipóteses. A da renda eu testei: ela explicava o voto até 2014 e deixou de explicar a partir de 2018.</p>
     <p class="nota">Fontes dos números: TSE, dados abertos (votacao_partido_munzona, 2002 a 2022) e resultados de 2026; conferidos com a Tribuna do Paraná (Bolsonaro 76,54% em Curitiba em 2018) e com o PT (Lula 50,1% no Paraná no 1º turno de 2002).</p>
   </section>
 </main>
@@ -355,7 +388,84 @@ function historia() {
   }).join("");
 })();
 
-function tudo() { mapaCuritiba(); halteres(); dispersao(); tabelaCwb(); historia(); }
+// ===================== RENDA E VOTO POR BAIRRO =====================
+const CENSO = new Map(C.censo.map(c => [c.bairro, c]));
+const ANOS_B = [...new Set(C.hist.map(h => h.ano))].sort();
+const HB = new Map(C.hist.filter(h => h.pt_2t + h.rival_2t > 0).map(h => [`${h.ano}|${h.bairro}`, { ...h, p: h.pt_2t / (h.pt_2t + h.rival_2t) * 100, n: h.pt_2t + h.rival_2t }]));
+let anoRenda = 2026, varRenda = "renda_media";
+document.getElementById("renda-anos").innerHTML = ANOS_B.map(a => `<button type="button" class="botao${a === anoRenda ? " ativo" : ""}" data-modo="${a}">${a}</button>`).join("");
+botoes("renda-anos", m => { anoRenda = +m; dispRenda(); });
+botoes("renda-var", m => { varRenda = m; dispRenda(); tempoRenda(); });
+const nomesPT = { 2002: "Lula x Serra", 2006: "Lula x Alckmin", 2010: "Dilma x Serra", 2014: "Dilma x Aécio", 2018: "Haddad x Bolsonaro", 2022: "Lula x Bolsonaro", 2026: "Lula x Flávio" };
+function pontos(ano, v) {
+  return [...CENSO.values()].map(c => ({ c, h: HB.get(`${ano}|${c.bairro}`) }))
+    .filter(x => x.h && x.h.n > 500 && x.c[v] != null).map(x => ({ bairro: x.c.bairro, x: v === "renda_media" ? Math.log(x.c[v]) : x.c[v], v: x.c[v], y: x.h.p, w: x.h.n, h: x.h }));
+}
+function regressao(P) {
+  const sw = d3.sum(P, p => p.w), mx = d3.sum(P, p => p.w * p.x) / sw, my = d3.sum(P, p => p.w * p.y) / sw;
+  const sxy = d3.sum(P, p => p.w * (p.x - mx) * (p.y - my)), sxx = d3.sum(P, p => p.w * (p.x - mx) ** 2), syy = d3.sum(P, p => p.w * (p.y - my) ** 2);
+  return { b: sxy / sxx, a: my - sxy / sxx * mx, r: sxy / Math.sqrt(sxx * syy) };
+}
+function miniMapas() {
+  const caixa = document.getElementById("mini-mapas");
+  caixa.innerHTML = ANOS_B.map(a => `<div><div class="rotulo" style="text-align:center">${a}</div><div class="sub" style="text-align:center;font-size:11px">${nomesPT[a]}</div><div id="mini-${a}"></div></div>`).join("");
+  const cor = divergente(20, 80);
+  for (const a of ANOS_B) {
+    const W = document.getElementById(`mini-${a}`).clientWidth, H = W * 1.35;
+    const proj = d3.geoMercator().fitExtent([[2, 2], [W - 2, H - 2]], contornoCwb), cam = d3.geoPath(proj);
+    const svg = d3.select(`#mini-${a}`).append("svg").attr("width", W).attr("height", H);
+    svg.selectAll("path").data(malhaB.features).join("path").attr("d", cam).attr("stroke", css("--cartao")).attr("stroke-width", .5)
+      .attr("fill", f => { const h = HB.get(`${a}|${f.properties.nome}`); return h && h.n > 200 ? cor(h.p) : css("--abst"); })
+      .on("mousemove", (ev, f) => { const h = HB.get(`${a}|${f.properties.nome}`); mostrar(ev, `<b>${f.properties.nome} · ${a}</b><br>${h ? `${nomesPT[a].split(" x ")[0]} ${pc(h.p)} · ${br(h.pt_2t)} x ${br(h.rival_2t)}` : "sem local de votação"}`); })
+      .on("mouseleave", esconder);
+    const tot = [...HB.values()].filter(h => h.ano === a), pt = d3.sum(tot, h => h.pt_2t), rv = d3.sum(tot, h => h.rival_2t);
+    svg.append("text").attr("class", "rot").attr("x", W / 2).attr("y", H - 4).attr("text-anchor", "middle").style("font-weight", 700).text(`PT ${pc(pt / (pt + rv) * 100)}`);
+  }
+  document.getElementById("mini-escala").style.background = gradiente(cor, [20, 35, 50, 65, 80]);
+}
+function dispRenda() {
+  const P = pontos(anoRenda, varRenda), R = regressao(P);
+  const W = largura("renda-dispersao"), H = Math.min(440, W * 0.65), M = { t: 14, r: 20, b: 40, l: 50 };
+  const x = d3.scaleLinear().domain(d3.extent(P, p => p.x)).nice().range([M.l, W - M.r]);
+  const y = d3.scaleLinear().domain([0, 80]).range([H - M.b, M.t]);
+  const r = d3.scaleSqrt().domain([0, d3.max(P, p => p.w)]).range([0, 14]);
+  const svg = d3.select("#renda-dispersao").html("").append("svg").attr("width", W).attr("height", H);
+  const fx = varRenda === "renda_media" ? d => "R$ " + br(Math.exp(d)) : d => d + "%";
+  const ticks = varRenda === "renda_media" ? [1500, 2500, 4000, 6000, 10000, 15000].map(Math.log).filter(t => t >= x.domain()[0] && t <= x.domain()[1]) : null;
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${H - M.b})`).call((ticks ? d3.axisBottom(x).tickValues(ticks) : d3.axisBottom(x).ticks(6)).tickFormat(fx));
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(${M.l},0)`).call(d3.axisLeft(y).ticks(8).tickSize(-(W - M.l - M.r)).tickFormat(d => d + "%"))
+    .call(g => g.selectAll(".tick line").attr("stroke-opacity", .5)).call(g => g.select(".domain").remove());
+  svg.append("line").attr("x1", M.l).attr("x2", W - M.r).attr("y1", y(50)).attr("y2", y(50)).attr("stroke", css("--texto")).attr("stroke-opacity", .4).attr("stroke-dasharray", "4 3");
+  svg.append("text").attr("x", W - M.r).attr("y", H - 6).attr("text-anchor", "end").text(varRenda === "renda_media" ? "renda média do responsável (Censo 2022) →" : "% de pessoas brancas (Censo 2022) →");
+  svg.append("text").attr("x", M.l + 4).attr("y", M.t + 4).text(`↑ ${nomesPT[anoRenda].split(" x ")[0]} (PT) no 2º turno`);
+  const [x0, x1] = x.domain();
+  svg.append("line").attr("x1", x(x0)).attr("x2", x(x1)).attr("y1", y(R.a + R.b * x0)).attr("y2", y(R.a + R.b * x1)).attr("stroke", css("--suave")).attr("stroke-width", 2);
+  svg.append("g").selectAll("circle").data(P.sort((a, b) => b.w - a.w)).join("circle").attr("cx", p => x(p.x)).attr("cy", p => y(p.y)).attr("r", p => Math.max(3, r(p.w)))
+    .attr("fill", css("--modelo")).attr("fill-opacity", .75).attr("stroke", css("--cartao")).attr("stroke-width", 1.2)
+    .on("mousemove", (ev, p) => mostrar(ev, `<b>${p.bairro}</b> · ${anoRenda}<br>${nomesPT[anoRenda].split(" x ")[0]} ${pc(p.y)} · ${br(p.h.pt_2t)} x ${br(p.h.rival_2t)}<br>
+      renda média: R$ ${br(CENSO.get(p.bairro).renda_media)} · mediana R$ ${br(CENSO.get(p.bairro).renda_mediana)}<br>pessoas brancas: ${pc(CENSO.get(p.bairro).pct_brancos)}`)).on("mouseleave", esconder);
+  const rot = new Set(["Batel", "Cidade Industrial de Curitiba", "Centro", "Tatuquara", "Mossunguê", "Sítio Cercado", "Caximba", "Umbará"]);
+  svg.append("g").style("pointer-events", "none").selectAll("text").data(P.filter(p => rot.has(p.bairro))).join("text").attr("class", "rot")
+    .attr("x", p => x(p.x) + Math.max(3, r(p.w)) + 3).attr("y", p => y(p.y) + 4).text(p => p.bairro.replace("Cidade Industrial de Curitiba", "CIC"));
+  document.getElementById("renda-r").innerHTML = `${anoRenda} (${nomesPT[anoRenda]}): correlação <b>${R.r.toFixed(2).replace(".", ",")}</b> entre ${P.length} bairros.`;
+}
+function tempoRenda() {
+  const W = largura("renda-tempo"), H = 220, M = { t: 12, r: 70, b: 26, l: 40 };
+  const x = d3.scalePoint().domain(ANOS_B).range([M.l, W - M.r]).padding(.1), y = d3.scaleLinear().domain([-1, 0]).range([H - M.b, M.t]);
+  const svg = d3.select("#renda-tempo").html("").append("svg").attr("width", W).attr("height", H);
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${H - M.b})`).call(d3.axisBottom(x).tickSize(0)).call(g => g.select(".domain").remove());
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(${M.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - M.l - M.r)).tickFormat(d => d.toFixed(1).replace(".", ",")))
+    .call(g => g.selectAll(".tick line").attr("stroke-opacity", .5)).call(g => g.select(".domain").remove());
+  for (const [v, cor, nome] of [["renda_media", "--modelo", "renda"], ["pct_brancos", "--mesmo", "% brancos"]]) {
+    const S = ANOS_B.map(a => ({ a, r: regressao(pontos(a, v)).r }));
+    svg.append("path").datum(S).attr("fill", "none").attr("stroke", css(cor)).attr("stroke-width", v === varRenda ? 3 : 2).attr("d", d3.line().x(d => x(d.a)).y(d => y(d.r)));
+    svg.append("g").selectAll("circle").data(S).join("circle").attr("cx", d => x(d.a)).attr("cy", d => y(d.r)).attr("r", 4).attr("fill", css(cor))
+      .on("mousemove", (ev, d) => mostrar(ev, `<b>${d.a}</b> · ${nome}: ${d.r.toFixed(2).replace(".", ",")}`)).on("mouseleave", esconder);
+    svg.append("text").attr("class", "rot").attr("x", x(ANOS_B.at(-1)) + 8).attr("y", y(S.at(-1).r) + (v === "renda_media" ? -4 : 12)).text(`${nome} ${S.at(-1).r.toFixed(2).replace(".", ",")}`);
+  }
+}
+
+function tudo() { mapaCuritiba(); halteres(); dispersao(); tabelaCwb(); historia(); miniMapas(); dispRenda(); tempoRenda(); }
 tudo();
 let espera; addEventListener("resize", () => { clearTimeout(espera); espera = setTimeout(tudo, 150); });
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", tudo);
