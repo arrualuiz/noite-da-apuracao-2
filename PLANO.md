@@ -33,6 +33,9 @@ A lista vai crescendo conforme as dúvidas aparecem. O painel `painel/perguntas.
 - [x] ⚙️ Olhar para trás: o erro da previsão em cada momento e de onde veio (`analise/retroativo.py`: o modelo previu menos Lula a noite toda, por causa de SP; o método "mesmo ponto do 1º turno" errava menos)
 - [ ] ⚙️ Testar o método "mesmo ponto" em outras noites (1º turno de 2026 contra 2022), para ver se não foi sorte de uma noite só
 - [ ] ⚙️ Entender por que a abstenção subiu no Norte (Amapá, Pará, Acre e Amazonas) quando caiu no resto do país
+- [ ] ⚙️ Testar as hipóteses das ilhas (`dados/ilhas.csv`): a diferença de cada cidade para as vizinhas x % de população indígena (Censo 2022), área de soja e se tem universidade
+- [ ] 🙋 Decidir se publico as páginas no GitHub Pages (link público para o LinkedIn)
+- [ ] ⚙️ Curitiba com a divisa de cada bairro (malha de bairros do IPPUC), pintando o bairro inteiro
 - [ ] ⚙️ Fechar o case 17 do 1º turno: o Lula precisava de ~65% dos outros, quanto ele levou?
 - [ ] ⚙️ Adaptar o painel para o 2º turno (hoje ele ainda tem textos do 1º)
 - [ ] ⚙️ README e CONTEXTO com a linha do tempo da noite
