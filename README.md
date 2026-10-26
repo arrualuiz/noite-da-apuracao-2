@@ -2,6 +2,8 @@
 
 A noite do 2º turno da eleição para Presidente (25/10/2026), Lula x Flávio Bolsonaro, contada com dados coletados direto da API pública do TSE enquanto a apuração acontecia.
 
+**Resultado: Lula reeleito.** Na versão das 21:09 do TSE, com 97,69% das seções apuradas, o resultado ficou matematicamente definido: Lula 51,74% x Flávio Bolsonaro 48,26%. A virada no placar veio às 20h25, com 48% apurado.
+
 É a continuação do [noite-do-primeiro-turno-2026](https://github.com/arrualuiz/noite-do-primeiro-turno-2026), com o mesmo código e a mesma fonte de dados. Comecei às 19h15, com 2% das seções apuradas.
 
 ## Meus palpites (19h16, antes do resultado)

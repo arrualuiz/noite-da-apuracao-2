@@ -158,7 +158,7 @@ const mil = n => (n / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 0 }
 const T = D.total;
 document.getElementById("status").textContent =
   `TSE ${D.versao_tse} · ${pc(D.secoes)} das seções apuradas · atualizado ${D.gerado}` +
-  (D.md === "s" ? " · resultado matematicamente definido" : "") + (D.tf === "s" ? " · totalização final" : "");
+  (D.md && D.md !== "n" ? " · LULA ELEITO (matematicamente definido pelo TSE)" : "") + (D.tf === "s" ? " · totalização final" : "");
 
 function barra(l) {
   return `<div class="barra"><i style="width:${l}%;background:var(--lula)"></i><i style="width:${100 - l}%;background:var(--flavio)"></i><span class="meio"></span></div>`;
@@ -175,7 +175,7 @@ document.getElementById("cartoes").innerHTML =
   cartao("Previsão para 100%", T.prev_pct_lula, `${dif >= 0 ? "Lula" : "Flávio"} por ~${mil(Math.abs(dif))} votos`) +
   (() => {
     const m = Math.abs(T.prev_pct_lula - (100 - T.prev_pct_lula)), e = D.erro_esperado, lider = T.prev_pct_lula >= 50 ? "Lula" : "Flávio";
-    const [txt, cor] = D.md === "s" ? ["Sim: matematicamente definido", "var(--ok)"]
+    const [txt, cor] = D.md && D.md !== "n" ? ["Sim: Lula eleito (definido pelo TSE)", "var(--ok)"]
       : m > 2 * e ? [`Sim, com segurança: ${lider}`, "var(--ok)"]
       : m > e ? [`Provável: ${lider}`, "var(--destaque)"] : ["Ainda não", "var(--suave)"];
     return `<div class="cartao"><div class="rotulo">Dá para afirmar o resultado?</div><div class="grande" style="color:${cor};font-size:21px">${txt}</div>

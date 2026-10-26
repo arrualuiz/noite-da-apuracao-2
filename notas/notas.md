@@ -46,6 +46,15 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - **21h08 · em pessoas** (`analise/transferencia.py`, 95% apurado, levado a 100%): 3,15 milhões de pessoas a mais foram votar (125,3 → 128,4 milhões; abstenção 21,08% → 19,10%). Brancos −871 mil e nulos −964 mil. Para onde foram os eleitores dos outros candidatos, por regressão de Goodman nas 4.718 cidades 100% apuradas, com restrição (cada linha entre 0 e 100%, somando 100%): Cury ~62% Lula e ~36% branco/nulo; Renan ~83% Flávio; Caiado dividido, ~40% Lula e ~55% Flávio. Sem a restrição, 5 dos 32 coeficientes saíam impossíveis (até −77%). E quantas pessoas trocaram Lula por Flávio, ou o contrário, os dados agregados não conseguem separar: o modelo cola em 0% porque não distingue trocar de lado de outras mudanças.
 
+## 🎉 21h09 · LULA ELEITO
+
+**Na versão das 21:09:01 do TSE, com 97,69% das seções apuradas, o resultado ficou matematicamente definido: Luiz Inácio Lula da Silva está reeleito presidente.** Lula 62.641.973 votos (51,74%) x Flávio Bolsonaro 58.436.437 (48,26%), uma diferença de 4,2 milhões de votos.
+
+- O Lula abriu na frente (19h18), o Flávio passou às 19h46 e liderou o placar de ~17% a ~48% apurado. **A virada veio às 20h25**, com 48,1%.
+- A previsão para 100% deu Lula o tempo todo, de 50,5% (com 30% apurado) a 51,6% (com 90%). E subiu sem parar: sinal de viés.
+- Minas, o termômetro, foi para o Lula por ~46 mil votos, depois de 9 trocas de liderança. Quem venceu em Minas venceu no Brasil de novo.
+- **A conta dos meus palpites:** errei a margem (achei que seria menor que a de 2022, mas foi ~3,5 pontos contra 1,8) e errei a abstenção (achei que seria maior ou igual à de 2022, mas caiu para ~19%). Errei o número das 20h14 (50,2%) por ~1,5 ponto. A média das 11 pesquisas (Lula 49,2%) errou por ~2,5 pontos e apontava o Flávio na frente; eu acertei quem ganhava.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.
