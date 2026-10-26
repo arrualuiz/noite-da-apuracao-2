@@ -39,6 +39,10 @@ python3 analise/retroativo.py                        # depois do resultado: o er
 
 Só usa a biblioteca padrão do Python.
 
+## A noite, hora a hora
+
+O que fiz na noite, na ordem e com onde ver cada coisa: [`notas/linha-do-tempo.md`](notas/linha-do-tempo.md).
+
 ## Próximos passos
 
 O projeto está organizado em sprints no [`PLANO.md`](PLANO.md): a noite, o fechamento, a análise em R, o pipeline em Databricks, o relatório em Fabric/Power BI e o case no LinkedIn. O site (`site/index.html`) ainda conta a noite do 1º turno.
