@@ -30,6 +30,7 @@ python3 analise/trajetoria.py                        # o caminho provável do pl
 python3 analise/abstencao.py                         # abstenção de todas as cidades nos dois turnos
 python3 analise/curiosidades.py                      # números absurdos: empates, extremos, cidades que viraram
 python3 analise/transferencia.py                     # em pessoas: quem foi votar e para onde foram os votos do 1º turno
+python3 analise/extremos.py                          # mínimos e máximos de cada parâmetro, e quem é cada registro
 python3 analise/retroativo.py                        # depois do resultado: o erro da previsão em cada momento e de onde ele veio
 ```
 

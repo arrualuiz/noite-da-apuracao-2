@@ -1,0 +1,110 @@
+parametro,grupo,tipo,registro,valor,pessoas,eleitorado,empatados
+Eleitorado,cidades,mínimo,Borá (SP),1094,1094,1094,0
+Eleitorado,cidades,máximo,São Paulo (SP),9145969,9145969,9145969,0
+Eleitorado,estados,mínimo,RR,401540,401540,401540,0
+Eleitorado,estados,máximo,SP,34123591,34123591,34123591,0
+Comparecimento (%),cidades,mínimo,Itaubal (AP),58.9911,5239,8881,0
+Comparecimento (%),cidades,máximo,Bela Vista Do Piauí (PI),93.1234,3223,3461,0
+Comparecimento (%),cidades com 50.000+ eleitores,mínimo,Coari (AM),71.3811,36762,51501,0
+Comparecimento (%),cidades com 50.000+ eleitores,máximo,Maracanaú (CE),89.2509,160183,179475,0
+Comparecimento (%),estados,mínimo,AC,73.9193,453654,613715,0
+Comparecimento (%),estados,máximo,CE,86.112,6024843,6996521,0
+Abstenção (%),cidades,mínimo,Bela Vista Do Piauí (PI),6.8766,238,3461,0
+Abstenção (%),cidades,máximo,Itaubal (AP),41.0089,3642,8881,0
+Abstenção (%),cidades com 50.000+ eleitores,mínimo,Maracanaú (CE),10.7491,19292,179475,0
+Abstenção (%),cidades com 50.000+ eleitores,máximo,Coari (AM),28.6189,14739,51501,0
+Abstenção (%),estados,mínimo,CE,13.888,971678,6996521,0
+Abstenção (%),estados,máximo,AC,26.0807,160061,613715,0
+Abstenção: variação do 1º para o 2º turno (pts),cidades,mínimo,Tacuru (MS),-8.1536,-571,7003,0
+Abstenção: variação do 1º para o 2º turno (pts),cidades,máximo,Itaubal (AP),23.8149,2115,8881,0
+Abstenção: variação do 1º para o 2º turno (pts),cidades,mais perto de zero,Ingaí (MG),0.0,0,2824,2
+Abstenção: variação do 1º para o 2º turno (pts),cidades com 50.000+ eleitores,mínimo,Lauro De Freitas (BA),-5.6436,-9248,163872,0
+Abstenção: variação do 1º para o 2º turno (pts),cidades com 50.000+ eleitores,máximo,Cruzeiro Do Sul (AC),6.6369,4251,63902,0
+Abstenção: variação do 1º para o 2º turno (pts),cidades com 50.000+ eleitores,mais perto de zero,Altamira (PA),-0.0291,-25,86744,0
+Abstenção: variação do 1º para o 2º turno (pts),estados,mínimo,BA,-3.2556,-368334,11312891,0
+Abstenção: variação do 1º para o 2º turno (pts),estados,máximo,AP,8.0641,46509,576910,0
+Abstenção: variação do 1º para o 2º turno (pts),estados,mais perto de zero,PI,0.037,990,2704695,0
+Brancos (% de quem foi votar),cidades,mínimo,Santa Cruz Dos Milagres (PI),0.0643,2,3971,0
+Brancos (% de quem foi votar),cidades,máximo,Santana Da Boa Vista (RS),3.096,157,6600,0
+Brancos (% de quem foi votar),cidades com 50.000+ eleitores,mínimo,Breves (PA),0.4164,239,77299,0
+Brancos (% de quem foi votar),cidades com 50.000+ eleitores,máximo,Suzano (SP),1.7925,3358,235579,0
+Brancos (% de quem foi votar),estados,mínimo,RR,0.7051,2176,401540,0
+Brancos (% de quem foi votar),estados,máximo,SP,1.4238,389606,34123591,0
+Nulos (% de quem foi votar),cidades,mínimo,Quatro Irmãos (RS),0.2801,4,1733,0
+Nulos (% de quem foi votar),cidades,máximo,Goiatins (TO),7.4637,575,8812,0
+Nulos (% de quem foi votar),cidades com 50.000+ eleitores,mínimo,Sorriso (MT),0.7266,447,76042,0
+Nulos (% de quem foi votar),cidades com 50.000+ eleitores,máximo,Itaguaí (RJ),3.9911,3179,100544,0
+Nulos (% de quem foi votar),estados,mínimo,RR,1.0502,3241,401540,0
+Nulos (% de quem foi votar),estados,máximo,TO,3.7523,35826,1182041,0
+Brancos + nulos: variação do 1º para o 2º turno (pts),cidades,mínimo,Murici (AL),-6.0814,-1023,20646,0
+Brancos + nulos: variação do 1º para o 2º turno (pts),cidades,máximo,Goiatins (TO),3.5906,294,8812,0
+Brancos + nulos: variação do 1º para o 2º turno (pts),cidades com 50.000+ eleitores,mínimo,Mariana (MG),-3.7755,-1441,52427,0
+Brancos + nulos: variação do 1º para o 2º turno (pts),cidades com 50.000+ eleitores,máximo,Gurupi (TO),1.1922,590,61242,0
+Brancos + nulos: variação do 1º para o 2º turno (pts),estados,mínimo,AL,-3.357,-64701,2442081,0
+Brancos + nulos: variação do 1º para o 2º turno (pts),estados,máximo,TO,0.9962,9136,1182041,0
+Lula (% dos válidos),cidades,mínimo,Nova Pádua (RS),9.4394,197,2410,0
+Lula (% dos válidos),cidades,máximo,Carnaubeira Da Penha (PE),92.3392,9474,12560,0
+Lula (% dos válidos),cidades com 50.000+ eleitores,mínimo,Ariquemes (RO),21.8332,12003,72523,0
+Lula (% dos válidos),cidades com 50.000+ eleitores,máximo,Candeias (BA),83.5957,43433,64832,0
+Lula (% dos válidos),estados,mínimo,RR,27.543,83505,401540,0
+Lula (% dos válidos),estados,máximo,PI,75.8763,1653989,2704695,0
+Flávio (% dos válidos),cidades,mínimo,Carnaubeira Da Penha (PE),7.6608,786,12560,0
+Flávio (% dos válidos),cidades,máximo,Nova Pádua (RS),90.5606,1890,2410,0
+Flávio (% dos válidos),cidades com 50.000+ eleitores,mínimo,Candeias (BA),16.4043,8523,64832,0
+Flávio (% dos válidos),cidades com 50.000+ eleitores,máximo,Ariquemes (RO),78.1668,42973,72523,0
+Flávio (% dos válidos),estados,mínimo,PI,24.1237,525859,2704695,0
+Flávio (% dos válidos),estados,máximo,RR,72.457,219675,401540,0
+Diferença Lula - Flávio (pts),cidades,mínimo,Nova Pádua (RS),-81.1212,-1693,2410,0
+Diferença Lula - Flávio (pts),cidades,máximo,Carnaubeira Da Penha (PE),84.6784,8688,12560,0
+Diferença Lula - Flávio (pts),cidades,mais perto de zero,Marquinho (PR),0.0,0,3875,0
+Diferença Lula - Flávio (pts),cidades com 50.000+ eleitores,mínimo,Ariquemes (RO),-56.3337,-30970,72523,0
+Diferença Lula - Flávio (pts),cidades com 50.000+ eleitores,máximo,Candeias (BA),67.1915,34910,64832,0
+Diferença Lula - Flávio (pts),cidades com 50.000+ eleitores,mais perto de zero,Teixeira De Freitas (BA),-0.1123,-93,105057,0
+Diferença Lula - Flávio (pts),estados,mínimo,RR,-44.9139,-136170,401540,0
+Diferença Lula - Flávio (pts),estados,máximo,PI,51.7527,1128130,2704695,0
+Diferença Lula - Flávio (pts),estados,mais perto de zero,MG,0.8475,106640,16372144,0
+Lula: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades,mínimo,Porto Walter (AC),-24.5324,-787,8022,0
+Lula: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades,máximo,Hidrolândia (GO),55.4361,2682,23576,0
+Lula: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades com 50.000+ eleitores,mínimo,Parintins (AM),1.8826,825,73032,0
+Lula: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades com 50.000+ eleitores,máximo,Luziânia (GO),40.4077,12945,136719,0
+Lula: votos ganhos do 1º para o 2º turno (% sobre o 1º),estados,mínimo,AP,4.9246,10465,576910,0
+Lula: votos ganhos do 1º para o 2º turno (% sobre o 1º),estados,máximo,GO,33.3654,396675,5080385,0
+Flávio: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades,mínimo,Pracuúba (AP),-31.9265,-469,4022,0
+Flávio: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades,máximo,Guarani De Goiás (GO),38.856,394,4797,0
+Flávio: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades com 50.000+ eleitores,mínimo,Coari (AM),-8.4861,-1190,51501,0
+Flávio: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades com 50.000+ eleitores,máximo,Trindade (GO),20.4714,7261,95911,0
+Flávio: votos ganhos do 1º para o 2º turno (% sobre o 1º),estados,mínimo,AP,-6.4086,-13604,576910,0
+Flávio: votos ganhos do 1º para o 2º turno (% sobre o 1º),estados,máximo,GO,14.3013,293446,5080385,0
+"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",cidades,mínimo,Belo Monte (AL),-8.753,,6033,0
+"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",cidades,máximo,Rafael Godeiro (RN),10.1887,,3668,0
+"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",cidades,mais perto de zero,Ribeirão Do Largo (BA),-0.0,,8796,0
+"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",cidades com 50.000+ eleitores,mínimo,Crateús (CE),-0.2832,,60109,0
+"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",cidades com 50.000+ eleitores,máximo,Campos Dos Goytacazes (RJ),5.9366,,370463,0
+"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",cidades com 50.000+ eleitores,mais perto de zero,Crateús (CE),-0.2832,,60109,0
+"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",estados,mínimo,PI,1.2117,,2704695,0
+"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",estados,máximo,RJ,4.2543,,12857526,0
+"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",estados,mais perto de zero,PI,1.2117,,2704695,0
+Cury no 1º turno (% dos válidos),cidades,mínimo,Uirapuru (GO),0.3656,8,3080,0
+Cury no 1º turno (% dos válidos),cidades,máximo,Colina (SP),17.3103,1784,14048,0
+Cury no 1º turno (% dos válidos),cidades com 50.000+ eleitores,mínimo,Luziânia (GO),1.0494,1077,136719,0
+Cury no 1º turno (% dos válidos),cidades com 50.000+ eleitores,máximo,Conselheiro Lafaiete (MG),5.2848,3882,94227,0
+Cury no 1º turno (% dos válidos),estados,mínimo,GO,1.4068,53849,5080385,0
+Cury no 1º turno (% dos válidos),estados,máximo,AP,4.0995,19057,576910,0
+Renan no 1º turno (% dos válidos),cidades,mínimo,Tupiratins (TO),0.2155,3,1797,0
+Renan no 1º turno (% dos válidos),cidades,máximo,Lagoa Dourada (MG),4.4874,362,10424,0
+Renan no 1º turno (% dos válidos),cidades com 50.000+ eleitores,mínimo,Casa Nova (BA),0.9326,420,57194,0
+Renan no 1º turno (% dos válidos),cidades com 50.000+ eleitores,máximo,São Caetano Do Sul (SP),4.3977,5168,147795,0
+Renan no 1º turno (% dos válidos),estados,mínimo,BA,1.3728,117518,11312891,0
+Renan no 1º turno (% dos válidos),estados,máximo,SP,3.2324,804310,34123591,0
+Caiado no 1º turno (% dos válidos),cidades,mínimo,Desterro (PB),0.1029,6,7716,0
+Caiado no 1º turno (% dos válidos),cidades,máximo,Guarani De Goiás (GO),32.2564,1228,4797,0
+Caiado no 1º turno (% dos válidos),cidades com 50.000+ eleitores,mínimo,Cametá (PA),0.3381,302,106189,0
+Caiado no 1º turno (% dos válidos),cidades com 50.000+ eleitores,máximo,Trindade (GO),16.6614,12022,95911,0
+Caiado no 1º turno (% dos válidos),estados,mínimo,PB,0.7762,19511,3248434,0
+Caiado no 1º turno (% dos válidos),estados,máximo,GO,12.3318,472041,5080385,0
+"Outros candidatos no 1º turno, somados (% dos válidos)",cidades,mínimo,Uiramutã (RR),1.1931,93,9119,0
+"Outros candidatos no 1º turno, somados (% dos válidos)",cidades,máximo,Guarani De Goiás (GO),33.1757,1263,4797,0
+"Outros candidatos no 1º turno, somados (% dos válidos)",cidades com 50.000+ eleitores,mínimo,Cametá (PA),2.8535,2549,106189,0
+"Outros candidatos no 1º turno, somados (% dos válidos)",cidades com 50.000+ eleitores,máximo,Trindade (GO),19.5496,14106,95911,0
+"Outros candidatos no 1º turno, somados (% dos válidos)",estados,mínimo,AL,4.8206,87679,2442081,0
+"Outros candidatos no 1º turno, somados (% dos válidos)",estados,máximo,GO,15.3365,587055,5080385,0
