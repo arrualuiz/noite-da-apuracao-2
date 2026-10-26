@@ -34,11 +34,13 @@ A lista vai crescendo conforme as dúvidas aparecem. O painel `painel/perguntas.
 - [ ] ⚙️ Testar o método "mesmo ponto" em outras noites (1º turno de 2026 contra 2022), para ver se não foi sorte de uma noite só
 - [ ] ⚙️ Entender por que a abstenção subiu no Norte (Amapá, Pará, Acre e Amazonas) quando caiu no resto do país
 - [ ] ⚙️ Testar as hipóteses das ilhas (`dados/ilhas.csv`): a diferença de cada cidade para as vizinhas x % de população indígena (Censo 2022), área de soja e se tem universidade
-- [ ] 🙋 Decidir se publico as páginas no GitHub Pages (link público para o LinkedIn)
-- [ ] ⚙️ Curitiba com a divisa de cada bairro (malha de bairros do IPPUC), pintando o bairro inteiro
+- [x] 🙋 Publicar as páginas no GitHub Pages: https://arrualuiz.github.io/noite-da-apuracao-2/ (25/10, 23h59)
+- [x] ⚙️ Curitiba com a divisa de cada bairro (malha de bairros do IPPUC), pintando o bairro inteiro, e o voto da cidade desde 2002 (`painel/curitiba.html`)
 - [ ] ⚙️ Fechar o case 17 do 1º turno: o Lula precisava de ~65% dos outros, quanto ele levou?
 - [ ] ⚙️ Adaptar o painel para o 2º turno (hoje ele ainda tem textos do 1º)
-- [ ] ⚙️ README e CONTEXTO com a linha do tempo da noite
+- [x] ⚙️ README com a linha do tempo da noite (`notas/linha-do-tempo.md`)
+- [ ] 🙋 Revisar e publicar o post do LinkedIn (`notas/post-linkedin.md`), com as imagens do mapa de Curitiba, da previsão e das ilhas
+- [ ] ⚙️ Testar as hipóteses de Curitiba: renda e escolaridade por bairro (Censo 2022) x voto por bairro, de 2006 a 2026
 
 ## Sprint 2 · Análise em R (28/10 a 02/11)
 
