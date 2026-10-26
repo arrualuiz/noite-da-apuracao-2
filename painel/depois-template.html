@@ -60,6 +60,8 @@ svg .rot { fill: var(--texto); font-size: 11px; paint-order: stroke; stroke: var
   border-radius: 8px; padding: 8px 10px; font-size: 13px; line-height: 1.4; box-shadow: 0 4px 14px rgba(0,0,0,.12); display: none; max-width: 300px; }
 #dica b { font-weight: 600; }
 nav { margin: 6px 0 0; font-size: 13px; }
+.busca input { font: inherit; font-size: 14px; color: var(--texto); background: var(--fundo); border: 1px solid var(--linha); border-radius: 8px; padding: 6px 10px; width: min(420px, 100%); }
+#cwb-escola-info:not(:empty) { border: 1px solid var(--linha); border-left: 3px solid var(--texto); border-radius: 8px; padding: 8px 12px; margin: 8px 0; font-size: 13.5px; }
 nav a { margin-right: 14px; color: var(--suave); }
 </style>
 </head>
@@ -81,6 +83,8 @@ nav a { margin-right: 14px; color: var(--suave); }
       <button type="button" class="botao ativo" data-modo="pct">Lula no 2º turno</button>
       <button type="button" class="botao" data-modo="swing">Quanto o Lula cresceu do 1º para o 2º turno</button>
     </div>
+    <div class="busca"><input id="cwb-busca" list="cwb-escolas" placeholder="Procure uma escola (ex.: Narciso Mendes)" autocomplete="off"><datalist id="cwb-escolas"></datalist></div>
+    <div id="cwb-escola-info"></div>
     <div id="cwb-mapa"></div>
     <div class="legenda" id="cwb-legenda"></div>
     <p class="nota" id="cwb-nota-mapa"></p>
@@ -221,7 +225,31 @@ const E = C.escolas.map(e => ({ ...e,
 // passa de meia esfera e o anel é invertido
 const contornoCwb = C.contorno.features[0];
 if (d3.geoArea(contornoCwb) > 2 * Math.PI) contornoCwb.geometry.coordinates.forEach(anel => anel.reverse());
-let modoCwb = "pct";
+let modoCwb = "pct", marcada = null;
+const chave = e => `${e.nome} · ${e.bairro}`;
+document.getElementById("cwb-escolas").innerHTML = [...E].sort((a, b) => a.nome.localeCompare(b.nome)).map(e => `<option value="${chave(e)}">`).join("");
+function marcar(e) {
+  marcada = e;
+  const info = document.getElementById("cwb-escola-info");
+  if (!e) { info.innerHTML = ""; mapaCuritiba(); return; }
+  const rank = (k, rev) => [...E].filter(x => x.aptos_2t >= 1000).sort((a, b) => rev ? b[k] - a[k] : a[k] - b[k]).indexOf(e) + 1;
+  const n = E.filter(x => x.aptos_2t >= 1000).length;
+  const b = B.find(b => b.bairro === e.bairro);
+  const bt = (k1, k2) => B.reduce((s, x) => s + x[k1], 0) / B.reduce((s, x) => s + x[k1] + x[k2], 0) * 100;
+  const cw1 = bt("lula_1t", "flavio_1t"), cw2 = bt("lula_2t", "flavio_2t");
+  const a1 = (e.aptos_1t - e.comparecimento_1t) / e.aptos_1t * 100, a2 = (e.aptos_2t - e.comparecimento_2t) / e.aptos_2t * 100;
+  info.innerHTML = `<b>${e.nome}</b> · ${e.bairro} · ${e.secoes} seções · ${br(e.aptos_2t)} eleitores<br>
+    Lula ${pc(e.pct1)} → <b>${pc(e.pct)}</b> (${pts(e.swing)}) · 2º turno: Lula ${br(e.lula_2t)} x Flávio ${br(e.flavio_2t)} ·
+    votos ganhos: Lula ${sn(e.lula_2t - e.lula_1t, br)}, Flávio ${sn(e.flavio_2t - e.flavio_1t, br)}<br>
+    abstenção ${pc(a1)} → ${pc(a2)} (${sn((e.aptos_2t - e.comparecimento_2t) - (e.aptos_1t - e.comparecimento_1t), br)} pessoas)<br>
+    <span class="sub">Comparando: ${e.bairro} ${b ? `${pc(b.pct_lula_1t)} → ${pc(b.pct_lula_2t)} (${pts(b.swing)})` : "–"} · Curitiba ${pc(cw1)} → ${pc(cw2)} (${pts(cw2 - cw1)}).
+    Entre as ${n} escolas com mil eleitores ou mais, é a ${rank("swing", true)}ª em que o Lula mais cresceu e a ${rank("pct", true)}ª em % do Lula.</span>`;
+  mapaCuritiba();
+}
+document.getElementById("cwb-busca").addEventListener("change", ev => {
+  const v = ev.target.value.trim().toLowerCase();
+  marcar(E.find(e => chave(e).toLowerCase() === v) || E.find(e => e.nome.toLowerCase().includes(v)) || null);
+});
 function mapaCuritiba() {
   const W = largura("cwb-mapa"), H = Math.min(640, Math.max(380, W * 0.95));
   const proj = d3.geoMercator().fitExtent([[10, 10], [W - 10, H - 10]], contornoCwb);
@@ -239,8 +267,9 @@ function mapaCuritiba() {
     .attr("fill", e => cor(modoCwb === "pct" ? e.pct : e.swing)).attr("stroke", css("--cartao")).attr("stroke-width", 1)
     .on("mousemove", (ev, e) => mostrar(ev, `<b>${e.nome}</b><br>${e.bairro} · ${br(e.aptos_2t)} eleitores · ${e.secoes} seções<br>
       Lula ${pc(e.pct1)} → <b>${pc(e.pct)}</b> (${pts(e.swing)})<br>2º turno: Lula ${br(e.lula_2t)} x Flávio ${br(e.flavio_2t)}<br>
-      votos ganhos: Lula ${sn(e.lula_2t - e.lula_1t, br)} · Flávio ${sn(e.flavio_2t - e.flavio_1t, br)}`))
-    .on("mouseleave", esconder);
+      votos ganhos: Lula ${sn(e.lula_2t - e.lula_1t, br)} · Flávio ${sn(e.flavio_2t - e.flavio_1t, br)}<br><span class="sub">clique para marcar</span>`))
+    .on("mouseleave", esconder).style("cursor", "pointer")
+    .on("click", (ev, e) => { document.getElementById("cwb-busca").value = chave(e); marcar(e); });
   svg.append("g").style("pointer-events", "none").selectAll("text").data(porBairro).join("text").attr("class", "rot")
     .attr("x", d => proj([d[1].lon, d[1].lat])[0]).attr("y", d => proj([d[1].lon, d[1].lat])[1])
     .attr("text-anchor", "middle").style("font-weight", 600).style("font-size", "12px").text(d => d[0]);
@@ -251,6 +280,14 @@ function mapaCuritiba() {
   svg.append("g").selectAll("text").data(ext).join("text").attr("class", "rot")
     .attr("x", e => proj([e.lon, e.lat])[0] + 9).attr("y", e => proj([e.lon, e.lat])[1] + 4)
     .text(e => `${e.nome.length > 34 ? e.nome.slice(0, 33) + "…" : e.nome} · ${pc(modoCwb === "pct" ? e.pct : e.swing, 1).replace("%", modoCwb === "pct" ? "%" : " pts")}`);
+  if (marcada) {
+    const [mx, my] = proj([marcada.lon, marcada.lat]);
+    svg.append("circle").attr("cx", mx).attr("cy", my).attr("r", Math.max(2.5, r(marcada.aptos_2t)) + 5)
+      .attr("fill", "none").attr("stroke", css("--texto")).attr("stroke-width", 2.5).style("pointer-events", "none");
+    svg.append("text").attr("class", "rot").attr("x", mx + Math.max(2.5, r(marcada.aptos_2t)) + 9).attr("y", my + 4)
+      .style("font-weight", 700).style("font-size", "13px").style("pointer-events", "none")
+      .text(`${marcada.nome} · ${modoCwb === "pct" ? pc(marcada.pct) : pts(marcada.swing)}`);
+  }
   const ticks = modoCwb === "pct" ? [20, 35, 50, 65, 80] : [0, 3.5, 7];
   document.getElementById("cwb-legenda").innerHTML = modoCwb === "pct"
     ? `<span>Flávio 80%</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>Lula 80%</span><span>· cinza = empate</span>`
