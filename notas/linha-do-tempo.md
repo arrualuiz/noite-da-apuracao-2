@@ -64,9 +64,9 @@ do projeto aberta.
 ## Depois da meia-noite (26/10)
 
 - **00h01** · Rascunho do post do LinkedIn ([post-linkedin.md](post-linkedin.md)).
-- **00h07** · `crescimento.py` e a página **Do 1º para o 2º turno** (`painel/crescimento.html`): quanto o PT e o rival cresceram entre os turnos em cada estado e capital, em todas as eleições de 2002 a 2026, com o mapa de calor lugar x eleição. Em Curitiba, um quadro por eleição, como o de Minas: Curitiba só concordou com o Brasil em 2002 e 2018.
-- **00h13** · Painel consolidado (`painel/admin.html`, só no PC): as quatro páginas em abas, a tabela mestra com filtros e a lista dos arquivos.
-- **00h19** · O Pablo Marçal disse que o resultado é uma "aberração matemática". Fui conferir com `auditoria.py`: as 4.056 urnas de Curitiba fecham voto a voto e somam exatamente o total do TSE; nos 5.757 municípios, todas as contas fecham, e a soma deles dá o total do Brasil (Lula 64.256.232 x Flávio 59.826.041). Nenhuma inconsistência.
+- **00h08** · `crescimento.py` e a página **Do 1º para o 2º turno** (`painel/crescimento.html`): quanto o PT e o rival cresceram entre os turnos em cada estado e capital, em todas as eleições de 2002 a 2026, com o mapa de calor lugar x eleição. Em Curitiba, um quadro por eleição, como o de Minas: Curitiba só concordou com o Brasil em 2002 e 2018.
+- **00h09** · Painel consolidado (`painel/admin.html`, só no PC): as quatro páginas em abas, a tabela mestra com filtros e a lista dos arquivos.
+- **00h19** · O Pablo Marçal disse que o resultado é uma "aberração matemática". Às 00h27 terminei de conferir com `auditoria.py`: as 4.056 urnas de Curitiba fecham voto a voto e somam exatamente o total do TSE; nos 5.757 municípios, todas as contas fecham, e a soma deles dá o total do Brasil (Lula 64.256.232 x Flávio 59.826.041). Nenhuma inconsistência.
 - **00h28** · **Renda, cor e voto por bairro em Curitiba, de 2002 a 2026** (`curitiba_historia.py`, com o Censo 2022 por bairro do IBGE): de 2002 a 2014, quanto mais rico o bairro, menos PT (correlação de −0,9); em 2018 isso quebrou, e em 2026 a renda quase não explica mais o voto (−0,17). O Batel foi de 10,4% de PT (2014) a 36,4% (2026); a CIC, de 75,7% (2002) a 26,8% (2018).
 
 ## Como fecharam os palpites
