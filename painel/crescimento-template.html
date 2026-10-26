@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Do 1º para o 2º turno</title>
+<meta name="description" content="Quanto o PT e o rival cresceram do 1º para o 2º turno em cada estado e capital, em todas as eleições de 2002 a 2026.">
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<link rel="stylesheet" href="comum.css">
+<style>
+tr.grupo td { font-weight: 700; background: var(--fundo); }
+tr.destaque td { font-weight: 700; }
+td.l { color: var(--lula); } td.f { color: var(--flavio); }
+.calor td { text-align: center; padding: 3px 4px; font-size: 12.5px; cursor: default; }
+.calor td:first-child { text-align: left; }
+.calor td.cel { color: var(--texto); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Do 1º para o 2º turno</h1>
+  <div class="sub">Quanto o PT e o rival cresceram entre os dois turnos, em cada lugar, em todas as eleições em que o PT foi ao 2º turno (2002 a 2026). Fonte: TSE (dados abertos e resultados de 2026). Gerado em <span id="gerado"></span>.</div>
+  <nav><a href="../index.html">Início</a><a href="#tabela">A tabela</a><a href="#barras">Quem ganhou mais votos</a><a href="#calor">Todas as eleições</a><a href="curitiba.html">Curitiba</a><a href="depois.html">O Brasil</a></nav>
+
+  <section class="cartao" id="tabela">
+    <div class="botoes" id="anos"></div>
+    <div class="botoes" id="niveis" style="margin-top:0">
+      <button type="button" class="botao ativo" data-modo="Estado">Estados (com as regiões)</button>
+      <button type="button" class="botao" data-modo="Capital">Capitais</button>
+    </div>
+    <h2 id="titulo"></h2>
+    <div class="grade" id="tiles"></div>
+    <div class="sub">Clique no nome de uma coluna para ordenar (clicando de novo, inverte). "Dos votos novos, PT" = dos votos que o PT e o rival ganharam juntos do 1º para o 2º turno, quantos foram do PT. Abstenção: diferença em pessoas do 1º para o 2º turno.</div>
+    <div class="rolar" style="margin-top:8px"><table id="t-cresc"></table></div>
+  </section>
+
+  <section class="cartao" id="barras">
+    <h2>Quem ganhou mais votos do 1º para o 2º turno</h2>
+    <div class="sub" id="barras-sub"></div>
+    <div class="legenda"><span><i style="background:var(--lula)"></i>votos ganhos pelo PT</span><span><i style="background:var(--flavio)"></i>votos ganhos pelo rival</span></div>
+    <div id="g-barras"></div>
+  </section>
+
+  <section class="cartao" id="calor">
+    <h2>Todas as eleições de uma vez</h2>
+    <div class="sub">Cada célula é um lugar numa eleição. Passe o mouse para ver os números em pessoas.</div>
+    <div class="botoes" id="metricas">
+      <button type="button" class="botao ativo" data-modo="swing">Mudança do PT entre os dois (pts)</button>
+      <button type="button" class="botao" data-modo="novos">Dos votos novos, % do PT</button>
+      <button type="button" class="botao" data-modo="pt2">PT no 2º turno (%)</button>
+      <button type="button" class="botao" data-modo="abst">Abstenção do 1º para o 2º (pts)</button>
+    </div>
+    <div class="botoes" id="niveis-calor" style="margin-top:0">
+      <button type="button" class="botao ativo" data-modo="Estado">Estados</button>
+      <button type="button" class="botao" data-modo="Capital">Capitais</button>
+    </div>
+    <div class="rolar"><table class="calor" id="t-calor"></table></div>
+    <div class="legenda" id="calor-legenda"></div>
+    <p class="nota">Mudança do PT = % do PT entre os dois no 2º turno menos o mesmo % no 1º turno: positivo, o PT ganhou mais com o 2º turno do que o rival. Em 2002 a 2014 o rival é o PSDB (Serra, Alckmin, Serra, Aécio); em 2018 e 2022, Bolsonaro; em 2026, Flávio Bolsonaro. A abstenção de 2002 a 2022 vem do detalhe da votação por município e zona do TSE.</p>
+  </section>
+</main>
+<div id="dica"></div>
+<script src="comum.js"></script>
+<script>
+const D = /*DADOS*/null;
+document.getElementById("gerado").textContent = D.gerado;
+const L = D.linhas.map(l => {
+  const d1 = l.pt_1t + l.rival_1t, d2 = l.pt_2t + l.rival_2t;
+  const p1 = l.pt_1t / d1 * 100, p2 = l.pt_2t / d2 * 100;
+  const dpt = l.pt_2t - l.pt_1t, driv = l.rival_2t - l.rival_1t;
+  const ab1 = l.abstencoes_1t === "" ? null : l.abstencoes_1t / l.aptos_1t * 100, ab2 = l.abstencoes_2t === "" ? null : l.abstencoes_2t / l.aptos_2t * 100;
+  return { ...l, p1, p2, swing: p2 - p1, dpt, driv, dpt_pct: dpt / l.pt_1t * 100, driv_pct: driv / l.rival_1t * 100,
+    // dos votos que os dois ganharam juntos, quanto foi do PT (só faz sentido se nenhum dos dois perdeu votos)
+    novos: dpt >= 0 && driv >= 0 && dpt + driv > 0 ? dpt / (dpt + driv) * 100 : null,
+    dabst: ab1 == null || ab2 == null ? null : l.abstencoes_2t - l.abstencoes_1t, dabst_pts: ab1 == null || ab2 == null ? null : ab2 - ab1,
+    pt1_validos: l.pt_1t / (d1 + l.outros_1t) * 100 };
+});
+const ANOS = [...new Set(L.map(l => l.ano))].sort();
+let ano = 2026, nivel = "Estado", ordem = null, metrica = "swing", nivelCalor = "Estado";
+document.getElementById("anos").innerHTML = ANOS.map(a => `<button type="button" class="botao${a === ano ? " ativo" : ""}" data-modo="${a}">${a}</button>`).join("");
+botoes("anos", m => { ano = +m; ordem = null; tudo(); });
+botoes("niveis", m => { nivel = m; ordem = null; tudo(); });
+botoes("metricas", m => { metrica = m; calor(); });
+botoes("niveis-calor", m => { nivelCalor = m; calor(); });
+
+function tiles() {
+  const b = L.find(l => l.lugar === "BR" && l.ano === ano);
+  document.getElementById("titulo").textContent = `${ano}: ${b.pt} (PT) x ${b.rival}`;
+  const t = (rot, val, sub) => `<div class="tile"><div class="rotulo">${rot}</div><div class="grande">${val}</div><div class="sub">${sub}</div></div>`;
+  document.getElementById("tiles").innerHTML =
+    t(`${b.pt} no Brasil`, sn(b.dpt, mi), `${mi(b.pt_1t)} → ${mi(b.pt_2t)} votos (${sn(b.dpt_pct, x => pc(x))})`) +
+    t(`${b.rival} no Brasil`, sn(b.driv, mi), `${mi(b.rival_1t)} → ${mi(b.rival_2t)} votos (${sn(b.driv_pct, x => pc(x))})`) +
+    t("Os outros candidatos", mi(b.outros_1t), `votos no 1º turno. ${b.novos != null ? `Dos votos novos, ${pc(b.novos)} foram do PT` : b.driv < 0 ? `O ${b.rival} perdeu votos no 2º turno` : `O ${b.pt} perdeu votos no 2º turno`}`) +
+    t("Abstenção", b.dabst == null ? "–" : sn(b.dabst, mi), b.dabst == null ? "" : `pessoas do 1º para o 2º turno (${pts(b.dabst_pts, 2)})`) +
+    t("Resultado", `${pc(b.p2)} x ${pc(100 - b.p2)}`, `${b.p2 > 50 ? b.pt : b.rival} venceu. No 1º turno, entre os dois: ${pc(b.p1)}`);
+}
+
+const COLS = [["nome", "Lugar"], ["pt_1t", "PT 1º"], ["pt_2t", "PT 2º"], ["dpt", "Δ PT"], ["dpt_pct", "Δ PT %"],
+  ["rival_1t", "Rival 1º"], ["rival_2t", "Rival 2º"], ["driv", "Δ rival"], ["driv_pct", "Δ rival %"],
+  ["outros_1t", "Outros no 1º"], ["novos", "Dos votos novos, PT"], ["dabst", "Abstenção"], ["p2", "PT no 2º"], ["swing", "Mudança"]];
+const novosTxt = l => l.novos != null ? pc(l.novos) : l.driv < 0 ? '<span class="sub">o rival perdeu votos</span>' : '<span class="sub">o PT perdeu votos</span>';
+function celulas(l) {
+  return `<td>${l.nome}${l.nivel === "Capital" ? ` <span class="sub">${l.uf}</span>` : ""}</td><td>${mi(l.pt_1t)}</td><td>${mi(l.pt_2t)}</td>
+    <td class="l">${sn(l.dpt, mi)}</td><td class="l">${sn(l.dpt_pct, x => pc(x))}</td><td>${mi(l.rival_1t)}</td><td>${mi(l.rival_2t)}</td>
+    <td class="f">${sn(l.driv, mi)}</td><td class="f">${sn(l.driv_pct, x => pc(x))}</td><td>${mi(l.outros_1t)}</td>
+    <td>${novosTxt(l)}</td><td>${l.dabst == null ? "–" : sn(l.dabst, mi)}</td><td>${pc(l.p2)}</td><td>${pts(l.swing)}</td>`;
+}
+function tabela() {
+  const doAno = L.filter(l => l.ano === ano);
+  const lista = doAno.filter(l => l.nivel === nivel);
+  let corpo;
+  if (!ordem) {
+    // agrupado: Brasil, e cada região seguida dos seus estados (ou das suas capitais)
+    corpo = `<tr class="grupo">${celulas(doAno.find(l => l.lugar === "BR"))}</tr>`;
+    for (const r of ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul"]) {
+      corpo += `<tr class="grupo">${celulas(doAno.find(l => l.lugar === r))}</tr>`;
+      corpo += lista.filter(l => l.regiao === r).sort((a, b) => b.pt_1t + b.rival_1t - a.pt_1t - a.rival_1t)
+        .map(l => `<tr${l.lugar === "75353" || l.lugar === "PR" ? ' class="destaque"' : ""}>${celulas(l)}</tr>`).join("");
+    }
+  } else {
+    corpo = [...lista].sort((a, b) => ((a[ordem[0]] ?? -1e12) > (b[ordem[0]] ?? -1e12) ? 1 : -1) * ordem[1])
+      .map(l => `<tr${l.lugar === "75353" || l.lugar === "PR" ? ' class="destaque"' : ""}>${celulas(l)}</tr>`).join("");
+  }
+  document.getElementById("t-cresc").innerHTML =
+    `<tr>${COLS.map(([k, n]) => `<th class="ord" data-k="${k}">${n}${ordem && ordem[0] === k ? (ordem[1] > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}</tr>` + corpo;
+}
+document.getElementById("t-cresc").addEventListener("click", e => {
+  const th = e.target.closest("th"); if (!th) return;
+  const k = th.dataset.k;
+  ordem = ordem && ordem[0] === k ? [k, -ordem[1]] : [k, k === "nome" ? 1 : -1]; tabela();
+});
+
+function barras() {
+  const lista = L.filter(l => l.ano === ano && l.nivel === nivel).sort((a, b) => b.dpt - a.dpt);
+  const b = L.find(l => l.lugar === "BR" && l.ano === ano);
+  document.getElementById("barras-sub").textContent = `${ano}: ${b.pt} (PT) x ${b.rival}, em pessoas. ${nivel === "Estado" ? "Estados" : "Capitais"}, do que o PT mais ganhou para o que menos ganhou.`;
+  const W = largura("g-barras"), linha = 22, M = { t: 22, r: 70, b: 6, l: 150 };
+  const H = M.t + lista.length * linha + M.b;
+  const ext = d3.extent(lista.flatMap(l => [l.dpt, l.driv, 0]));
+  const x = d3.scaleLinear().domain(ext).nice().range([M.l, W - M.r]);
+  const svg = d3.select("#g-barras").html("").append("svg").attr("width", W).attr("height", H);
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${M.t - 6})`).call(d3.axisTop(x).ticks(6).tickFormat(d => mi(d)).tickSize(0)).call(g => g.select(".domain").remove());
+  svg.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", M.t - 4).attr("y2", H).attr("stroke", css("--suave"));
+  lista.forEach((l, i) => {
+    const y = M.t + i * linha;
+    svg.append("text").attr("x", M.l - 8).attr("y", y + linha / 2 + 4).attr("text-anchor", "end").style("fill", css("--texto"))
+      .style("font-weight", l.lugar === "75353" || l.lugar === "PR" ? 700 : 400).text(l.nivel === "Capital" ? `${l.nome} (${l.uf})` : l.nome);
+    for (const [k, cor, dy] of [["dpt", "--lula", 2], ["driv", "--flavio", linha / 2]]) {
+      const v = l[k];
+      svg.append("rect").attr("x", Math.min(x(0), x(v))).attr("y", y + dy).attr("width", Math.max(1, Math.abs(x(v) - x(0)))).attr("height", linha / 2 - 3).attr("rx", 2).attr("fill", css(cor))
+        .on("mousemove", ev => mostrar(ev, `<b>${l.nome} · ${ano}</b><br>${l.pt}: ${mi(l.pt_1t)} → ${mi(l.pt_2t)} (${sn(l.dpt, br)})<br>${l.rival}: ${mi(l.rival_1t)} → ${mi(l.rival_2t)} (${sn(l.driv, br)})<br>
+          outros no 1º turno: ${br(l.outros_1t)} · dos votos novos, PT: ${novosTxt(l)}${l.dabst == null ? "" : `<br>abstenção: ${sn(l.dabst, br)} pessoas`}`)).on("mouseleave", esconder);
+    }
+    svg.append("text").attr("x", Math.max(x(l.dpt), x(l.driv), x(0)) + 6).attr("y", y + linha / 2 + 4).text(`${sn(l.dpt, mi)} · ${sn(l.driv, mi)}`);
+  });
+}
+
+function calor() {
+  const fmt = { swing: v => pts(v), novos: v => pc(v, 0), pt2: v => pc(v, 0), abst: v => pts(v) };
+  const escala = { swing: divergente(-15, 15), novos: divergente(0, 100), pt2: divergente(20, 80),
+    abst: d3.scaleLinear().domain([-6, 0, 6]).range([css("--mesmo"), css("--meio"), css("--modelo")]).interpolate(d3.interpolateLab).clamp(true) }[metrica];
+  const valor = l => ({ swing: l.swing, novos: l.novos, pt2: l.p2, abst: l.dabst_pts })[metrica];
+  const lugares = [...new Map(L.filter(l => ["Brasil", "Região"].includes(l.nivel) || l.nivel === nivelCalor).map(l => [l.lugar, l])).values()];
+  const linhas = [lugares.find(l => l.lugar === "BR")];
+  for (const r of ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul"]) {
+    linhas.push(lugares.find(l => l.lugar === r));
+    linhas.push(...lugares.filter(l => l.nivel === nivelCalor && l.regiao === r).sort((a, b) => a.nome.localeCompare(b.nome)));
+  }
+  const t = document.getElementById("t-calor");
+  t.innerHTML = `<tr><th>Lugar</th>${ANOS.map(a => `<th style="text-align:center">${a}<br><span class="sub">${L.find(l => l.ano === a).pt} x ${L.find(l => l.ano === a).rival.replace("Flávio Bolsonaro", "Flávio")}</span></th>`).join("")}</tr>` +
+    linhas.map(lg => `<tr${lg.nivel === "Brasil" || lg.nivel === "Região" ? ' class="grupo"' : lg.lugar === "75353" || lg.lugar === "PR" ? ' class="destaque"' : ""}><td>${lg.nome}${lg.nivel === "Capital" ? ` <span class="sub">${lg.uf}</span>` : ""}</td>` +
+      ANOS.map(a => {
+        const l = L.find(x => x.lugar === lg.lugar && x.ano === a), v = l ? valor(l) : null;
+        return v == null ? "<td>–</td>" : `<td class="cel" data-l="${lg.lugar}" data-a="${a}" style="background:${escala(v)}">${fmt[metrica](v)}</td>`;
+      }).join("") + "</tr>").join("");
+  t.onmousemove = ev => {
+    const td = ev.target.closest("td.cel"); if (!td) return esconder();
+    const l = L.find(x => x.lugar === td.dataset.l && x.ano === +td.dataset.a);
+    mostrar(ev, `<b>${l.nome} · ${l.ano}</b> · ${l.pt} x ${l.rival}<br>1º turno: ${l.pt} ${br(l.pt_1t)} · ${l.rival} ${br(l.rival_1t)} · outros ${br(l.outros_1t)}<br>
+      2º turno: ${l.pt} ${br(l.pt_2t)} · ${l.rival} ${br(l.rival_2t)} → ${pc(l.p2)} x ${pc(100 - l.p2)}<br>
+      votos ganhos: ${l.pt} ${sn(l.dpt, br)} · ${l.rival} ${sn(l.driv, br)}<br>mudança do PT entre os dois: ${pts(l.swing)}` +
+      (l.dabst == null ? "" : `<br>abstenção: ${sn(l.dabst, br)} pessoas (${pts(l.dabst_pts, 2)})`));
+  };
+  t.onmouseleave = esconder;
+  const ticks = { swing: [-15, 0, 15], novos: [0, 50, 100], pt2: [20, 50, 80], abst: [-6, 0, 6] }[metrica];
+  const rot = { swing: ["o rival ganhou mais (−15 pts)", "o PT ganhou mais (+15 pts)"], novos: ["0% do PT", "100% do PT"],
+    pt2: ["rival 80%", "PT 80%"], abst: ["caiu 6 pts", "subiu 6 pts"] }[metrica];
+  document.getElementById("calor-legenda").innerHTML = `<span>${rot[0]}</span><span class="escala" style="background:${gradiente(escala, d3.range(ticks[0], ticks[2] + 0.001, (ticks[2] - ticks[0]) / 4))}"></span><span>${rot[1]}</span>`;
+}
+
+function tudo() { tiles(); tabela(); barras(); calor(); }
+tudo();
+let espera; addEventListener("resize", () => { clearTimeout(espera); espera = setTimeout(tudo, 150); });
+</script>
+</body>
+</html>

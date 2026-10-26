@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""As páginas com o resultado final, em gráficos: painel/depois.html (o Brasil) e painel/curitiba.html.
+"""As páginas com o resultado final, em gráficos: painel/depois.html (o Brasil), painel/curitiba.html e
+painel/crescimento.html (do 1º para o 2º turno, em todas as eleições desde 2002).
 
 Junta os CSVs gerados pelos outros scripts e grava cada página a partir do seu template
 (painel/depois-template.html e painel/curitiba-template.html), trocando /*DADOS*/null pelo JSON.
@@ -11,6 +12,7 @@ editar o template (ou o comum.*), rodar este script e fazer o commit e o push; o
                                          e os 75 bairros, dados/curitiba-bairros.topo.json (malha do IPPUC, pelo
                                          repositório github.com/gustavokira/geo-curitiba)
   - Curitiba e as capitais desde 2002     dados/historico/capitais_presidente.csv (analise/capitais_historia.py)
+  - do 1º para o 2º turno, 2002 a 2026     dados/crescimento.csv (analise/crescimento.py): crescimento.html e Curitiba
   - ilhas: cidades x vizinhas            dados/ilhas.csv (analise/ilhas.py)
   - a previsão olhando para trás         dados/retroativo.csv (analise/retroativo.py)
   - para onde foram os votos do 1º turno dados/transferencia.csv (analise/transferencia.py)
@@ -125,7 +127,9 @@ def gravar(nome, dados):
 def main():
     gerado = datetime.now().strftime("%d/%m/%Y %H:%M")
     c = curitiba()
-    n = gravar("curitiba", {"gerado": gerado, "curitiba": c, "historia": historia()})
+    cresc = [{k: v if k == "lugar" else num(v) for k, v in r.items()} for r in ler("crescimento.csv")]
+    n = gravar("curitiba", {"gerado": gerado, "curitiba": c, "historia": historia(),
+                            "eleicoes": [r for r in cresc if r["lugar"] in ("75353", "PR", "BR")]})
     print(f"painel/curitiba.html: {len(c['escolas'])} escolas no mapa ({c['fora_do_mapa']} com coordenada errada,"
           f" fora do mapa) · {len(c['bairros'])} bairros com votos · {n / 1e6:.1f} MB")
     dados = {
@@ -139,6 +143,8 @@ def main():
     }
     n = gravar("depois", dados)
     print(f"painel/depois.html: {len(dados['ilhas'])} cidades · {n / 1e6:.1f} MB")
+    n = gravar("crescimento", {"gerado": gerado, "linhas": cresc})
+    print(f"painel/crescimento.html: {len(cresc)} linhas (lugar x eleição) · {n / 1e6:.2f} MB")
 
 
 if __name__ == "__main__":
