@@ -33,6 +33,7 @@ python3 analise/transferencia.py                     # em pessoas: quem foi vota
 python3 analise/extremos.py                          # mínimos e máximos de cada parâmetro, e quem é cada registro
 python3 analise/bairros.py                           # Curitiba por bairro e por escola, pelo boletim de cada urna (outra cidade: uf código nome)
 python3 analise/ilhas.py                             # cidades que votaram muito diferente das 10 vizinhas (ilhas)
+python3 analise/depois.py                            # a página painel/depois.html com todas as análises depois do resultado, em gráficos
 python3 analise/retroativo.py                        # depois do resultado: o erro da previsão em cada momento e de onde ele veio
 ```
 

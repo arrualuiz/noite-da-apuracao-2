@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Depois da apuração</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<style>
+:root {
+  --fundo: #f6f5f2; --cartao: #ffffff; --texto: #1d1d1f; --suave: #6b6b70; --linha: #e3e1dc; --meio: #cfcdc8;
+  --lula: #d62f3a; --flavio: #4f3fd6; --modelo: #d95926; --mesmo: #1baf7a; --branco: #a9a7a2; --abst: #dedcd6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fundo: #141416; --cartao: #1e1e22; --texto: #ececef; --suave: #9a9aa2; --linha: #33333a; --meio: #4a4a52;
+    --lula: #f05a63; --flavio: #8a7dff; --modelo: #d95926; --mesmo: #199e70; --branco: #77777f; --abst: #3a3a42;
+  }
+}
+:root[data-theme="dark"] {
+  --fundo: #141416; --cartao: #1e1e22; --texto: #ececef; --suave: #9a9aa2; --linha: #33333a; --meio: #4a4a52;
+  --lula: #f05a63; --flavio: #8a7dff; --modelo: #d95926; --mesmo: #199e70; --branco: #77777f; --abst: #3a3a42;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fundo); color: var(--texto); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; }
+h1 { font-size: 24px; margin: 0 0 4px; }
+h2 { font-size: 20px; margin: 0 0 2px; }
+h3 { font-size: 15px; margin: 18px 0 2px; }
+a { color: inherit; }
+.sub { color: var(--suave); font-size: 13px; }
+.cartao { background: var(--cartao); border: 1px solid var(--linha); border-radius: 10px; padding: 16px; margin-top: 18px; }
+.grade { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin: 12px 0; }
+.tile { border: 1px solid var(--linha); border-radius: 8px; padding: 10px 12px; }
+.rotulo { font-size: 12px; color: var(--suave); text-transform: uppercase; letter-spacing: .04em; }
+.grande { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.nota { color: var(--suave); font-size: 13px; margin: 8px 0 0; }
+.botoes { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 6px; }
+.botao { font: inherit; font-size: 13px; color: var(--texto); background: var(--fundo); border: 1px solid var(--linha); border-radius: 14px; padding: 4px 12px; cursor: pointer; }
+.botao.ativo { border-color: var(--texto); font-weight: 600; }
+.legenda { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--suave); margin-top: 6px; }
+.legenda i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
+.legenda i.linha { height: 2px; width: 16px; border-radius: 1px; vertical-align: 4px; }
+.escala { width: 220px; height: 8px; border-radius: 4px; }
+.duas { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 13.5px; }
+th, td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--linha); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 12px; color: var(--suave); font-weight: 600; }
+th.ord { cursor: pointer; } th.ord:hover { color: var(--texto); }
+td.quebra { white-space: normal; text-align: left; }
+.rolar { overflow-x: auto; }
+.alta { max-height: 420px; overflow-y: auto; }
+svg { display: block; overflow: visible; }
+svg text { fill: var(--suave); font-size: 11px; }
+svg .eixo line, svg .eixo path { stroke: var(--linha); }
+svg .eixo text { fill: var(--suave); }
+svg .rot { fill: var(--texto); font-size: 11px; paint-order: stroke; stroke: var(--cartao); stroke-width: 3px; stroke-linejoin: round; }
+#dica { position: fixed; pointer-events: none; z-index: 10; background: var(--cartao); color: var(--texto); border: 1px solid var(--linha);
+  border-radius: 8px; padding: 8px 10px; font-size: 13px; line-height: 1.4; box-shadow: 0 4px 14px rgba(0,0,0,.12); display: none; max-width: 300px; }
+#dica b { font-weight: 600; }
+nav { margin: 6px 0 0; font-size: 13px; }
+nav a { margin-right: 14px; color: var(--suave); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Depois da apuração</h1>
+  <div class="sub">2º turno de 2026, Lula x Flávio Bolsonaro, com o resultado final. Fonte: TSE (resultados por município, boletins de urna e locais de votação) e IBGE. Gerado em <span id="gerado"></span>.</div>
+  <nav><a href="#curitiba">Curitiba</a><a href="#ilhas">Ilhas</a><a href="#previsao">A previsão</a><a href="#transferencia">Transferência</a><a href="#abstencao">Abstenção</a><a href="#extremos">Mínimos e máximos</a><a href="perguntas.html">Painel da noite</a></nav>
+
+  <!-- CURITIBA -->
+  <section class="cartao" id="curitiba">
+    <h2>Curitiba, escola por escola</h2>
+    <div class="sub">Pelo boletim de cada uma das 4.056 urnas, nos dois turnos, ligado ao local de votação e ao bairro.</div>
+    <div class="grade" id="cwb-tiles"></div>
+
+    <h3>O mapa das escolas</h3>
+    <div class="sub">Cada bolinha é um local de votação; o tamanho é o número de eleitores.</div>
+    <div class="botoes" id="cwb-modo">
+      <button type="button" class="botao ativo" data-modo="pct">Lula no 2º turno</button>
+      <button type="button" class="botao" data-modo="swing">Quanto o Lula cresceu do 1º para o 2º turno</button>
+    </div>
+    <div id="cwb-mapa"></div>
+    <div class="legenda" id="cwb-legenda"></div>
+    <p class="nota" id="cwb-nota-mapa"></p>
+
+    <h3>Bairro por bairro: do 1º para o 2º turno</h3>
+    <div class="sub">% do Lula entre Lula e Flávio. Bairros com 5 mil eleitores ou mais, do mais Lula para o mais Flávio.</div>
+    <div class="legenda"><span><i style="background:var(--meio);border-radius:6px"></i>1º turno</span><span><i style="background:var(--lula);border-radius:6px"></i>2º turno</span></div>
+    <div id="cwb-halteres"></div>
+
+    <h3>Quem ganhou mais votos novos em cada bairro?</h3>
+    <div class="sub">Votos ganhos do 1º para o 2º turno, em pessoas. Acima da linha, o Flávio ganhou mais votos que o Lula no bairro; abaixo, o Lula ganhou mais. Escala logarítmica.</div>
+    <div id="cwb-dispersao"></div>
+
+    <h3>A tabela dos bairros</h3>
+    <div class="sub">Clique no nome de uma coluna para ordenar.</div>
+    <div class="rolar alta"><table id="cwb-tabela"></table></div>
+  </section>
+
+  <!-- ILHAS -->
+  <section class="cartao" id="ilhas">
+    <h2>Ilhas: cidades que votaram muito diferente das vizinhas</h2>
+    <div class="sub">Cada cidade comparada com as 10 mais próximas (% do Lula entre Lula e Flávio, ponderado pelos votos). Posição: centroide do município na malha do IBGE.</div>
+    <div class="botoes" id="ilhas-modo">
+      <button type="button" class="botao ativo" data-modo="fora">Diferença para as vizinhas</button>
+      <button type="button" class="botao" data-modo="pct">Lula no 2º turno</button>
+    </div>
+    <div id="ilhas-mapa"></div>
+    <div class="legenda" id="ilhas-legenda"></div>
+    <div class="duas" style="margin-top:12px">
+      <div><div class="rotulo">Ilhas vermelhas num mar azul</div><div class="sub">o Lula ganhou; as vizinhas deram Flávio</div><div class="rolar"><table id="ilhas-vermelhas"></table></div></div>
+      <div><div class="rotulo">Ilhas azuis num mar vermelho</div><div class="sub">o Flávio ganhou; as vizinhas deram Lula</div><div class="rolar"><table id="ilhas-azuis"></table></div></div>
+    </div>
+    <p class="nota">"Votos a mais" = quantos votos o Lula teve além do que a cidade daria se votasse igual às vizinhas, com o mesmo número de votos. Quase todas as ilhas já eram ilhas no 1º turno: é algo do lugar, não da campanha. O porquê (terra indígena, universidade, polo do agronegócio, colônia europeia) ainda é hipótese: o próximo passo é testar com dados do Censo e da produção agrícola.</p>
+  </section>
+
+  <!-- PREVISÃO -->
+  <section class="cartao" id="previsao">
+    <h2>A minha previsão, olhando para trás</h2>
+    <div class="sub">Quanto cada número errou o resultado final do Lula, coleta a coleta (pontos; abaixo de zero = previa menos Lula do que deu).</div>
+    <div id="prev-grafico"></div>
+    <div class="legenda">
+      <span><i class="linha" style="background:var(--suave)"></i>placar do TSE na hora</span>
+      <span><i class="linha" style="background:var(--modelo)"></i>meu modelo da noite</span>
+      <span><i class="linha" style="background:var(--mesmo)"></i>"mesmo ponto do 1º turno" (testado depois)</span>
+    </div>
+    <p class="nota">O modelo da noite errou sempre para o mesmo lado: com 20% a 50% apurado, previa 1 a 1,3 ponto menos Lula (1,2 a 1,6 milhão de votos). O erro veio sobretudo de São Paulo, que tinha pouco apurado. Comparar cada estado com ele mesmo no mesmo % apurado do 1º turno teria errado menos desde os 20%, mas foi testado depois de saber o resultado e numa noite só.</p>
+  </section>
+
+  <!-- TRANSFERÊNCIA -->
+  <section class="cartao" id="transferencia">
+    <h2>Para onde foram os votos do 1º turno</h2>
+    <div class="sub">De cada 100 eleitores de cada opção no 1º turno, quantos foram para cada opção no 2º. Estimativa por regressão de Goodman nas 5.562 cidades, com cada linha entre 0% e 100%.</div>
+    <div id="transf-grafico"></div>
+    <div class="legenda">
+      <span><i style="background:var(--lula)"></i>Lula</span><span><i style="background:var(--flavio)"></i>Flávio</span>
+      <span><i style="background:var(--branco)"></i>branco ou nulo</span><span><i style="background:var(--abst)"></i>não foi votar</span>
+    </div>
+    <p class="nota">É inferência ecológica: supõe que os eleitores de um candidato se comportam igual em todas as cidades. Ela não vê quem trocou de lado entre Lula e Flávio, e o "branco/nulo → Lula" pode ser viés de agregação. Com mais ou menos cidades, os números mudam (o Renan foi de 83% para 71% Flávio).</p>
+  </section>
+
+  <!-- ABSTENÇÃO -->
+  <section class="cartao" id="abstencao">
+    <h2>Abstenção por estado: do 1º para o 2º turno</h2>
+    <div class="sub">Mudança em pontos percentuais. A abstenção caiu em quase todo o país; subiu no Norte.</div>
+    <div id="abst-grafico"></div>
+  </section>
+
+  <!-- EXTREMOS -->
+  <section class="cartao" id="extremos">
+    <h2>Mínimos e máximos</h2>
+    <div class="sub">Para cada coisa medida, quem tem o menor e o maior valor: cidades com 50 mil eleitores ou mais e estados. As cidades pequenas ficam em dados/extremos.csv.</div>
+    <div class="rolar"><table id="extremos-tabela"></table></div>
+  </section>
+</main>
+<div id="dica"></div>
+
+<script>
+const D = /*DADOS*/null;
+document.getElementById("gerado").textContent = D.gerado;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const br = n => n == null ? "–" : Math.round(n).toLocaleString("pt-BR");
+const pc = (n, c = 1) => n == null ? "–" : n.toFixed(c).replace(".", ",") + "%";
+const sn = (n, f) => (n > 0 ? "+" : n < 0 ? "−" : "") + f(Math.abs(n));
+const pts = (n, c = 1) => sn(n, x => x.toFixed(c).replace(".", ",")) + " pts";
+const mi = n => Math.abs(n) >= 1e6 ? (n / 1e6).toFixed(2).replace(".", ",") + " mi" : br(n);
+
+// dica (tooltip) única
+const dica = document.getElementById("dica");
+function mostrar(ev, html) {
+  dica.innerHTML = html; dica.style.display = "block";
+  const w = dica.offsetWidth, h = dica.offsetHeight;
+  let x = ev.clientX + 14, y = ev.clientY + 14;
+  if (x + w > innerWidth - 8) x = ev.clientX - w - 14;
+  if (y + h > innerHeight - 8) y = ev.clientY - h - 14;
+  dica.style.left = x + "px"; dica.style.top = y + "px";
+}
+const esconder = () => { dica.style.display = "none"; };
+
+// escalas: divergente (Flávio · cinza · Lula) e sequencial (cinza → Lula)
+const divergente = (min, max) => d3.scaleLinear().domain([min, (min + max) / 2, max])
+  .range([css("--flavio"), css("--meio"), css("--lula")]).interpolate(d3.interpolateLab).clamp(true);
+const sequencial = (min, max) => d3.scaleLinear().domain([min, max]).range([css("--meio"), css("--lula")]).interpolate(d3.interpolateLab).clamp(true);
+const gradiente = (esc, ticks) => `linear-gradient(90deg, ${ticks.map(t => esc(t)).join(",")})`;
+
+function botoes(id, aoMudar) {
+  const caixa = document.getElementById(id);
+  caixa.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    caixa.querySelectorAll("button").forEach(x => x.classList.toggle("ativo", x === b));
+    aoMudar(b.dataset.modo);
+  });
+}
+const largura = id => document.getElementById(id).clientWidth;
+
+// ===================== CURITIBA =====================
+const C = D.curitiba;
+const B = C.bairros.map(b => ({ ...b,
+  swing: b.pct_lula_2t - b.pct_lula_1t, d_lula: b.lula_2t - b.lula_1t, d_flavio: b.flavio_2t - b.flavio_1t,
+  d_abst: b.abstencao_2t - b.abstencao_1t }));
+const E = C.escolas.map(e => ({ ...e,
+  pct: e.lula_2t / (e.lula_2t + e.flavio_2t) * 100, pct1: e.lula_1t / (e.lula_1t + e.flavio_1t) * 100 }))
+  .map(e => ({ ...e, swing: e.pct - e.pct1 }));
+
+(function tiles() {
+  const s = k => B.reduce((a, b) => a + b[k], 0);
+  const L1 = s("lula_1t"), L2 = s("lula_2t"), F1 = s("flavio_1t"), F2 = s("flavio_2t");
+  const A1 = s("abstencao_1t"), A2 = s("abstencao_2t");
+  const lider = B.filter(b => b.pct_lula_2t > 50);
+  const t = (rot, val, sub) => `<div class="tile"><div class="rotulo">${rot}</div><div class="grande">${val}</div><div class="sub">${sub}</div></div>`;
+  document.getElementById("cwb-tiles").innerHTML =
+    t("Lula", `+${br(L2 - L1)}`, `votos a mais: ${br(L1)} → ${br(L2)} (${pc(L1 / (L1 + F1) * 100)} → ${pc(L2 / (L2 + F2) * 100)} entre os dois)`) +
+    t("Flávio", `+${br(F2 - F1)}`, `votos a mais: ${br(F1)} → ${br(F2)}. Venceu a cidade por ${br(F2 - L2)} votos`) +
+    t("Abstenção", `−${br(A1 - A2)}`, `pessoas a menos sem votar: ${br(A1)} → ${br(A2)}`) +
+    t("Bairros com o Lula na frente", `${lider.length} de ${B.length}`, lider.map(b => b.bairro).join(", "));
+})();
+
+let modoCwb = "pct";
+function mapaCuritiba() {
+  const W = largura("cwb-mapa"), H = Math.min(640, Math.max(380, W * 0.95));
+  const pontos = { type: "MultiPoint", coordinates: E.map(e => [e.lon, e.lat]) };
+  const proj = d3.geoMercator().fitExtent([[10, 10], [W - 10, H - 10]], pontos);
+  const cor = modoCwb === "pct" ? divergente(20, 80) : sequencial(0, 7);
+  const r = d3.scaleSqrt().domain([0, d3.max(E, e => e.aptos_2t)]).range([0, 11]);
+  const svg = d3.select("#cwb-mapa").html("").append("svg").attr("width", W).attr("height", H);
+  // nomes dos bairros grandes, no centro das suas escolas (atrás das bolinhas)
+  const porBairro = d3.rollups(E, v => ({ lat: d3.mean(v, e => e.lat), lon: d3.mean(v, e => e.lon), n: d3.sum(v, e => e.aptos_2t) }), e => e.bairro)
+    .filter(([, v]) => v.n >= 40000);
+  svg.append("g").selectAll("circle").data([...E].sort((a, b) => b.aptos_2t - a.aptos_2t)).join("circle")
+    .attr("cx", e => proj([e.lon, e.lat])[0]).attr("cy", e => proj([e.lon, e.lat])[1])
+    .attr("r", e => Math.max(2.5, r(e.aptos_2t)))
+    .attr("fill", e => cor(modoCwb === "pct" ? e.pct : e.swing)).attr("stroke", css("--cartao")).attr("stroke-width", 1)
+    .on("mousemove", (ev, e) => mostrar(ev, `<b>${e.nome}</b><br>${e.bairro} · ${br(e.aptos_2t)} eleitores · ${e.secoes} seções<br>
+      Lula ${pc(e.pct1)} → <b>${pc(e.pct)}</b> (${pts(e.swing)})<br>2º turno: Lula ${br(e.lula_2t)} x Flávio ${br(e.flavio_2t)}<br>
+      votos ganhos: Lula ${sn(e.lula_2t - e.lula_1t, br)} · Flávio ${sn(e.flavio_2t - e.flavio_1t, br)}`))
+    .on("mouseleave", esconder);
+  svg.append("g").style("pointer-events", "none").selectAll("text").data(porBairro).join("text").attr("class", "rot")
+    .attr("x", d => proj([d[1].lon, d[1].lat])[0]).attr("y", d => proj([d[1].lon, d[1].lat])[1])
+    .attr("text-anchor", "middle").style("font-weight", 600).style("font-size", "12px").text(d => d[0]);
+  // as escolas mais Lula e mais Flávio, com nome
+  const ext = modoCwb === "pct"
+    ? [...E].filter(e => e.aptos_2t >= 1000).sort((a, b) => b.pct - a.pct).slice(0, 2).concat([...E].filter(e => e.aptos_2t >= 1000).sort((a, b) => a.pct - b.pct).slice(0, 2))
+    : [...E].filter(e => e.aptos_2t >= 1000).sort((a, b) => b.swing - a.swing).slice(0, 3);
+  svg.append("g").selectAll("text").data(ext).join("text").attr("class", "rot")
+    .attr("x", e => proj([e.lon, e.lat])[0] + 9).attr("y", e => proj([e.lon, e.lat])[1] + 4)
+    .text(e => `${e.nome.length > 34 ? e.nome.slice(0, 33) + "…" : e.nome} · ${pc(modoCwb === "pct" ? e.pct : e.swing, 1).replace("%", modoCwb === "pct" ? "%" : " pts")}`);
+  const ticks = modoCwb === "pct" ? [20, 35, 50, 65, 80] : [0, 3.5, 7];
+  document.getElementById("cwb-legenda").innerHTML = modoCwb === "pct"
+    ? `<span>Flávio 80%</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>Lula 80%</span><span>· cinza = empate</span>`
+    : `<span>0 pts</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>+7 pts ou mais</span>`;
+  document.getElementById("cwb-nota-mapa").textContent = `${E.length} locais de votação no mapa.` +
+    (C.fora_do_mapa ? ` ${C.fora_do_mapa === 1 ? "1 ficou" : C.fora_do_mapa + " ficaram"} de fora porque a coordenada no cadastro do TSE cai fora de Curitiba.` : "");
+}
+botoes("cwb-modo", m => { modoCwb = m; mapaCuritiba(); });
+
+function halteres() {
+  const dados = B.filter(b => b.aptos_2t >= 5000).sort((a, b) => b.pct_lula_2t - a.pct_lula_2t);
+  const W = largura("cwb-halteres"), linha = 17, M = { t: 22, r: 60, b: 8, l: 150 };
+  const H = M.t + dados.length * linha + M.b;
+  const x = d3.scaleLinear().domain([25, 55]).range([M.l, W - M.r]);
+  const svg = d3.select("#cwb-halteres").html("").append("svg").attr("width", W).attr("height", H);
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${M.t - 6})`)
+    .call(d3.axisTop(x).ticks(6).tickFormat(d => d + "%").tickSize(0)).call(g => g.select(".domain").remove());
+  svg.append("line").attr("x1", x(50)).attr("x2", x(50)).attr("y1", M.t - 4).attr("y2", H - M.b).attr("stroke", css("--suave")).attr("stroke-dasharray", "3 3");
+  svg.append("text").attr("x", x(50) + 4).attr("y", H - 2).text("50%: empate");
+  const g = svg.append("g").selectAll("g").data(dados).join("g").attr("transform", (d, i) => `translate(0,${M.t + i * linha + linha / 2})`);
+  g.append("rect").attr("x", 0).attr("y", -linha / 2).attr("width", W).attr("height", linha).attr("fill", "transparent")
+    .on("mousemove", (ev, b) => mostrar(ev, `<b>${b.bairro}</b> · ${br(b.aptos_2t)} eleitores<br>Lula ${pc(b.pct_lula_1t)} → <b>${pc(b.pct_lula_2t)}</b> (${pts(b.swing)})<br>
+      votos ganhos: Lula ${sn(b.d_lula, br)} · Flávio ${sn(b.d_flavio, br)}<br>abstenção: ${sn(b.d_abst, br)} pessoas`)).on("mouseleave", esconder);
+  g.append("text").attr("x", M.l - 8).attr("y", 4).attr("text-anchor", "end").style("fill", css("--texto")).text(b => b.bairro);
+  g.append("line").attr("x1", b => x(b.pct_lula_1t)).attr("x2", b => x(b.pct_lula_2t)).attr("stroke", css("--meio")).attr("stroke-width", 2).style("pointer-events", "none");
+  g.append("circle").attr("cx", b => x(b.pct_lula_1t)).attr("r", 4).attr("fill", css("--meio")).style("pointer-events", "none");
+  g.append("circle").attr("cx", b => x(b.pct_lula_2t)).attr("r", 5).attr("fill", css("--lula")).attr("stroke", css("--cartao")).attr("stroke-width", 1.5).style("pointer-events", "none");
+  g.append("text").attr("x", b => x(b.pct_lula_2t) + 9).attr("y", 4).text(b => pc(b.pct_lula_2t)).style("pointer-events", "none");
+}
+
+function dispersao() {
+  const dados = B.filter(b => b.aptos_2t >= 5000 && b.d_lula > 0 && b.d_flavio > 0);
+  const W = largura("cwb-dispersao"), H = Math.min(460, W * 0.7), M = { t: 14, r: 20, b: 40, l: 56 };
+  const lim = [d3.min(dados, b => Math.min(b.d_lula, b.d_flavio)) * 0.8, d3.max(dados, b => Math.max(b.d_lula, b.d_flavio)) * 1.15];
+  const x = d3.scaleLog().domain(lim).range([M.l, W - M.r]), y = d3.scaleLog().domain(lim).range([H - M.b, M.t]);
+  const r = d3.scaleSqrt().domain([0, d3.max(dados, b => b.aptos_2t)]).range([0, 14]);
+  const svg = d3.select("#cwb-dispersao").html("").append("svg").attr("width", W).attr("height", H);
+  const marcas = [200, 300, 500, 1000, 2000, 3000, 5000, 10000];
+  const fmt = d => d >= 1000 ? (d / 1000).toLocaleString("pt-BR") + " mil" : d;
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${H - M.b})`).call(d3.axisBottom(x).tickValues(marcas.filter(m => m >= lim[0] && m <= lim[1])).tickFormat(fmt));
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(${M.l},0)`).call(d3.axisLeft(y).tickValues(marcas.filter(m => m >= lim[0] && m <= lim[1])).tickFormat(fmt));
+  svg.append("text").attr("x", W - M.r).attr("y", H - 6).attr("text-anchor", "end").text("votos ganhos pelo Lula →");
+  svg.append("text").attr("x", M.l + 4).attr("y", M.t + 4).text("↑ votos ganhos pelo Flávio");
+  svg.append("line").attr("x1", x(lim[0])).attr("y1", y(lim[0])).attr("x2", x(lim[1])).attr("y2", y(lim[1])).attr("stroke", css("--suave")).attr("stroke-dasharray", "4 3");
+  svg.append("text").attr("x", x(lim[1]) - 4).attr("y", y(lim[1]) + 14).attr("text-anchor", "end").text("os dois ganharam igual");
+  svg.append("g").selectAll("circle").data(dados.sort((a, b) => b.aptos_2t - a.aptos_2t)).join("circle")
+    .attr("cx", b => x(b.d_lula)).attr("cy", b => y(b.d_flavio)).attr("r", b => Math.max(3, r(b.aptos_2t)))
+    .attr("fill", b => b.d_flavio > b.d_lula ? css("--flavio") : css("--lula")).attr("fill-opacity", .8).attr("stroke", css("--cartao")).attr("stroke-width", 1.5)
+    .on("mousemove", (ev, b) => mostrar(ev, `<b>${b.bairro}</b> · ${br(b.aptos_2t)} eleitores<br>votos ganhos: Lula <b>${sn(b.d_lula, br)}</b> · Flávio <b>${sn(b.d_flavio, br)}</b><br>
+      dos votos novos, ${pc(b.d_lula / (b.d_lula + b.d_flavio) * 100)} foram para o Lula<br>Lula ${pc(b.pct_lula_1t)} → ${pc(b.pct_lula_2t)}`)).on("mouseleave", esconder);
+  const rotular = new Set(dados.filter(b => b.aptos_2t >= 50000 || b.d_flavio > b.d_lula).map(b => b.bairro));
+  svg.append("g").selectAll("text").data(dados.filter(b => rotular.has(b.bairro))).join("text").attr("class", "rot")
+    .attr("x", b => x(b.d_lula) + Math.max(3, r(b.aptos_2t)) + 3).attr("y", b => y(b.d_flavio) + 4).text(b => b.bairro);
+}
+
+const colunas = [["bairro", "Bairro", v => v], ["aptos_2t", "Eleitores", br], ["pct_lula_1t", "Lula 1º", v => pc(v)], ["pct_lula_2t", "Lula 2º", v => pc(v)],
+  ["swing", "Mudança", v => pts(v)], ["d_lula", "Votos Lula", v => sn(v, br)], ["d_flavio", "Votos Flávio", v => sn(v, br)],
+  ["d_abst", "Abstenção", v => sn(v, br)], ["pct_abstencao_2t", "Abst. 2º", v => pc(v)]];
+let ordem = ["aptos_2t", -1];
+function tabelaCwb() {
+  const dados = [...B].sort((a, b) => (a[ordem[0]] > b[ordem[0]] ? 1 : -1) * ordem[1]);
+  document.getElementById("cwb-tabela").innerHTML = `<tr>${colunas.map(([k, n]) => `<th class="ord" data-k="${k}">${n}${ordem[0] === k ? (ordem[1] > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}</tr>` +
+    dados.map(b => `<tr>${colunas.map(([k, , f]) => `<td>${f(b[k])}</td>`).join("")}</tr>`).join("");
+}
+document.getElementById("cwb-tabela").addEventListener("click", e => {
+  const th = e.target.closest("th"); if (!th) return;
+  ordem = [th.dataset.k, ordem[0] === th.dataset.k ? -ordem[1] : (th.dataset.k === "bairro" ? 1 : -1)]; tabelaCwb();
+});
+
+// ===================== ILHAS =====================
+const I = D.ilhas.map(([municipio, uf, lat, lon, eleitorado, lula, flavio, pct, viz, fora, fora_votos, pct1, fora1]) =>
+  ({ municipio, uf, lat, lon, eleitorado, lula, flavio, pct, viz, fora, fora_votos, pct1, fora1 }));
+let modoIlhas = "fora";
+const estados = topojson.feature(D.topo, D.topo.objects[Object.keys(D.topo.objects)[0]]);
+function mapaIlhas() {
+  const W = largura("ilhas-mapa"), H = Math.min(760, W * 1.0);
+  const proj = d3.geoMercator().fitExtent([[6, 6], [W - 6, H - 6]], estados);
+  const caminho = d3.geoPath(proj);
+  const svg = d3.select("#ilhas-mapa").html("").append("svg").attr("width", W).attr("height", H);
+  svg.append("g").selectAll("path").data(estados.features).join("path").attr("d", caminho)
+    .attr("fill", "none").attr("stroke", css("--suave")).attr("stroke-opacity", .45).attr("stroke-width", .8);
+  const cor = modoIlhas === "fora" ? divergente(-30, 30) : divergente(20, 80);
+  const r = d3.scaleSqrt().domain([0, 2e6]).range([0, 10]).clamp(true);
+  const ordenadas = [...I].sort((a, b) => modoIlhas === "fora" ? Math.abs(a.fora) - Math.abs(b.fora) : b.eleitorado - a.eleitorado);
+  svg.append("g").selectAll("circle").data(ordenadas).join("circle")
+    .attr("cx", c => proj([c.lon, c.lat])[0]).attr("cy", c => proj([c.lon, c.lat])[1])
+    .attr("r", c => Math.max(1.8, r(c.eleitorado))).attr("fill", c => cor(modoIlhas === "fora" ? c.fora : c.pct))
+    .attr("fill-opacity", c => modoIlhas === "fora" && Math.abs(c.fora) < 8 ? .3 : 1)
+    .attr("stroke", css("--cartao")).attr("stroke-width", .3)
+    .on("mousemove", (ev, c) => mostrar(ev, `<b>${c.municipio} (${c.uf})</b> · ${br(c.eleitorado)} eleitores<br>
+      Lula <b>${pc(c.pct)}</b> · vizinhas ${pc(c.viz)} → <b>${pts(c.fora)}</b><br>${sn(c.fora_votos, br)} votos do Lula em relação à vizinhança<br>
+      1º turno: ${pc(c.pct1)}, ${pts(c.fora1)} em relação às vizinhas<br>2º turno: Lula ${br(c.lula)} x Flávio ${br(c.flavio)}`))
+    .on("mouseleave", esconder);
+  if (modoIlhas === "fora") {
+    const rot = vermelhas.slice(0, 5).concat(azuis.slice(0, 5));
+    svg.append("g").selectAll("text").data(rot).join("text").attr("class", "rot")
+      .attr("x", c => proj([c.lon, c.lat])[0] + 5).attr("y", c => proj([c.lon, c.lat])[1] + 4).text(c => `${c.municipio} ${pts(c.fora, 0)}`);
+  }
+  const ticks = [-1, -.5, 0, .5, 1].map(t => modoIlhas === "fora" ? t * 30 : 50 + t * 30);
+  document.getElementById("ilhas-legenda").innerHTML = modoIlhas === "fora"
+    ? `<span>mais Flávio que as vizinhas (−30 pts)</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>mais Lula (+30 pts)</span><span>· tamanho = eleitores · apagadas: menos de 8 pts de diferença</span>`
+    : `<span>Flávio 80%</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>Lula 80%</span><span>· tamanho = eleitores</span>`;
+}
+const vermelhas = I.filter(c => c.pct > 50 && c.viz < 50).sort((a, b) => b.fora - a.fora);
+const azuis = I.filter(c => c.pct < 50 && c.viz > 50).sort((a, b) => a.fora - b.fora);
+function tabelaIlhas(id, lista) {
+  document.getElementById(id).innerHTML = `<tr><th>Cidade</th><th>Lula</th><th>Vizinhas</th><th>Diferença</th><th>Votos a mais</th></tr>` +
+    lista.slice(0, 12).map(c => `<tr><td>${c.municipio} (${c.uf})</td><td>${pc(c.pct)}</td><td>${pc(c.viz)}</td><td>${pts(c.fora)}</td><td>${sn(c.fora_votos, br)}</td></tr>`).join("");
+}
+tabelaIlhas("ilhas-vermelhas", vermelhas);
+tabelaIlhas("ilhas-azuis", azuis);
+botoes("ilhas-modo", m => { modoIlhas = m; mapaIlhas(); });
+
+// ===================== PREVISÃO =====================
+function previsao() {
+  const R = D.retroativo, W = largura("prev-grafico"), H = 340, M = { t: 14, r: 24, b: 36, l: 52 };
+  const x = d3.scaleLinear().domain([0, 100]).range([M.l, W - M.r]);
+  const y = d3.scaleLinear().domain([-3, 3]).range([H - M.b, M.t]).clamp(true);
+  const series = [["placar", "--suave", "placar do TSE"], ["modelo", "--modelo", "meu modelo"], ["mesmo_ponto", "--mesmo", "mesmo ponto do 1º turno"]];
+  const svg = d3.select("#prev-grafico").html("").append("svg").attr("width", W).attr("height", H);
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${H - M.b})`).call(d3.axisBottom(x).ticks(10).tickFormat(d => d + "%"));
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(${M.l},0)`).call(d3.axisLeft(y).ticks(6).tickSize(-(W - M.l - M.r)).tickFormat(d => (d > 0 ? "+" : "") + d))
+    .call(g => g.selectAll(".tick line").attr("stroke-opacity", .5)).call(g => g.select(".domain").remove());
+  svg.append("text").attr("x", W - M.r).attr("y", H - 4).attr("text-anchor", "end").text("seções apuradas →");
+  svg.append("line").attr("x1", M.l).attr("x2", W - M.r).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", css("--texto")).attr("stroke-opacity", .6);
+  svg.append("text").attr("x", x(88)).attr("y", y(0) + 16).text("zero = acertou o final");
+  for (const [k, cor] of series) {
+    svg.append("path").datum(R).attr("fill", "none").attr("stroke", css(cor)).attr("stroke-width", 2)
+      .attr("d", d3.line().x(r => x(r.secoes_pct)).y(r => y(r[k] - r.final)));
+  }
+  // rótulos diretos perto dos 35%
+  const em = R.find(r => r.secoes_pct >= 35) || R[0];
+  for (const [k, cor, nome] of series) {
+    svg.append("text").attr("class", "rot").attr("x", x(em.secoes_pct) + 6).attr("y", y(em[k] - em.final) + (k === "placar" ? 14 : -6)).text(nome);
+  }
+  const guia = svg.append("line").attr("y1", M.t).attr("y2", H - M.b).attr("stroke", css("--suave")).style("display", "none");
+  svg.append("rect").attr("x", M.l).attr("y", M.t).attr("width", W - M.l - M.r).attr("height", H - M.t - M.b).attr("fill", "transparent")
+    .on("mousemove", ev => {
+      const sx = x.invert(d3.pointer(ev)[0]);
+      const r = R.reduce((a, b) => Math.abs(b.secoes_pct - sx) < Math.abs(a.secoes_pct - sx) ? b : a);
+      guia.attr("x1", x(r.secoes_pct)).attr("x2", x(r.secoes_pct)).style("display", null);
+      mostrar(ev, `<b>${r.coleta_id.slice(9, 11)}:${r.coleta_id.slice(11, 13)} · ${pc(r.secoes_pct)} apurado</b><br>` +
+        series.map(([k, , n]) => `${n}: ${pc(r[k], 2)} (${pts(r[k] - r.final, 2)})`).join("<br>") + `<br>final: ${pc(r.final, 2)}`);
+    }).on("mouseleave", () => { guia.style("display", "none"); esconder(); });
+}
+
+// ===================== TRANSFERÊNCIA =====================
+function transferencia() {
+  const origens = ["Cury", "Renan", "Caiado", "Demais candidatos", "Branco/nulo", "Abstenção"];
+  const destinos = [["Lula", "--lula"], ["Flávio", "--flavio"], ["Branco/nulo", "--branco"], ["Abstenção", "--abst"]];
+  const T = D.transferencia;
+  const W = largura("transf-grafico"), linha = 34, M = { t: 6, r: 110, b: 6, l: 130 };
+  const H = M.t + origens.length * linha + M.b;
+  const x = d3.scaleLinear().domain([0, 100]).range([M.l, W - M.r]);
+  const svg = d3.select("#transf-grafico").html("").append("svg").attr("width", W).attr("height", H);
+  origens.forEach((o, i) => {
+    const y = M.t + i * linha, rows = T.filter(t => t.origem === o);
+    svg.append("text").attr("x", M.l - 8).attr("y", y + linha / 2 + 4).attr("text-anchor", "end").style("fill", css("--texto")).text(o === "Abstenção" ? "Não foi votar" : o);
+    svg.append("text").attr("x", W - M.r + 8).attr("y", y + linha / 2 + 4).text(`${mi(rows[0].eleitores_1t)} eleitores`);
+    let acum = 0;
+    for (const [d, cor] of destinos) {
+      const r = rows.find(t => t.destino === d); if (!r || r.pct <= 0.05) continue;
+      const x0 = x(acum), w = Math.max(0, x(acum + r.pct) - x0 - 2);
+      svg.append("rect").attr("x", x0).attr("y", y + 4).attr("width", w).attr("height", linha - 10).attr("rx", 3).attr("fill", css(cor))
+        .on("mousemove", ev => mostrar(ev, `<b>${o} no 1º turno → ${d}</b><br>${pc(r.pct)} · ~${mi(r.pessoas)} pessoas`)).on("mouseleave", esconder);
+      if (r.pct >= 9) svg.append("text").attr("x", x0 + w / 2).attr("y", y + linha / 2 + 4).attr("text-anchor", "middle")
+        .style("fill", d === "Lula" || d === "Flávio" ? "#fff" : css("--texto")).style("font-weight", 600).style("pointer-events", "none").text(pc(r.pct, 0));
+      acum += r.pct;
+    }
+  });
+}
+
+// ===================== ABSTENÇÃO =====================
+function abstencao() {
+  const A = D.abstencao.map(a => ({ ...a, d: a.pct_2t - a.pct_1t, dn: a.abst_2t - a.abst_1t })).sort((a, b) => a.d - b.d);
+  const W = largura("abst-grafico"), linha = 17, M = { t: 20, r: 150, b: 6, l: 40 };
+  const H = M.t + A.length * linha + M.b;
+  const ext = d3.max(A, a => Math.abs(a.d));
+  const x = d3.scaleLinear().domain([-ext, ext]).nice().range([M.l, W - M.r]);
+  const svg = d3.select("#abst-grafico").html("").append("svg").attr("width", W).attr("height", H);
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${M.t - 6})`).call(d3.axisTop(x).ticks(8).tickFormat(d => (d > 0 ? "+" : "") + d).tickSize(0)).call(g => g.select(".domain").remove());
+  svg.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", M.t - 4).attr("y2", H).attr("stroke", css("--suave"));
+  A.forEach((a, i) => {
+    const y = M.t + i * linha;
+    svg.append("text").attr("x", M.l - 6).attr("y", y + linha / 2 + 4).attr("text-anchor", "end").style("fill", css("--texto")).text(a.uf);
+    const x0 = Math.min(x(0), x(a.d)), w = Math.abs(x(a.d) - x(0));
+    svg.append("rect").attr("x", x0).attr("y", y + 2).attr("width", Math.max(1, w)).attr("height", linha - 4).attr("rx", 2)
+      .attr("fill", a.d > 0 ? css("--modelo") : css("--mesmo"))
+      .on("mousemove", ev => mostrar(ev, `<b>${a.uf}</b><br>abstenção ${pc(a.pct_1t, 2)} → <b>${pc(a.pct_2t, 2)}</b> (${pts(a.d, 2)})<br>${br(a.abst_1t)} → ${br(a.abst_2t)} pessoas (${sn(a.dn, br)})`))
+      .on("mouseleave", esconder);
+    svg.append("text").attr("x", a.d > 0 ? x(a.d) + 6 : x(0) + 6).attr("y", y + linha / 2 + 4).text(`${pts(a.d, 2)} · ${sn(a.dn, br)} pessoas`);
+  });
+}
+
+// ===================== EXTREMOS =====================
+(function extremos() {
+  const X = D.extremos, pars = [...new Set(X.map(r => r.parametro))];
+  const cel = (p, g, t) => {
+    const r = X.find(r => r.parametro === p && r.grupo === g && r.tipo === t); if (!r) return "<td>–</td>";
+    const v = p === "Eleitorado" ? br(r.valor) : p.includes("(pts)") ? pts(r.valor, 2) : pc(r.valor, 2);
+    const muda = /variação|ganhos|Diferença/.test(p);
+    const pes = r.pessoas === "" || r.pessoas == null || p === "Eleitorado" ? "" : ` · ${muda ? sn(r.pessoas, br) : br(r.pessoas)} pessoas`;
+    return `<td class="quebra"><b>${r.registro}</b><br><span class="sub">${v}${pes}</span></td>`;
+  };
+  const g1 = "cidades com 50.000+ eleitores";
+  document.getElementById("extremos-tabela").innerHTML =
+    `<tr style="text-align:left"><th>Parâmetro</th><th style="text-align:left">Menor · cidade grande</th><th style="text-align:left">Maior · cidade grande</th><th style="text-align:left">Menor · estado</th><th style="text-align:left">Maior · estado</th></tr>` +
+    pars.map(p => `<tr><td class="quebra" style="max-width:200px">${p}</td>${p === "Eleitorado" ? cel(p, "cidades", "mínimo") + cel(p, "cidades", "máximo") : cel(p, g1, "mínimo") + cel(p, g1, "máximo")}${cel(p, "estados", "mínimo")}${cel(p, "estados", "máximo")}</tr>`).join("");
+})();
+
+function tudo() { mapaCuritiba(); halteres(); dispersao(); tabelaCwb(); mapaIlhas(); previsao(); transferencia(); abstencao(); }
+tudo();
+let espera; addEventListener("resize", () => { clearTimeout(espera); espera = setTimeout(tudo, 150); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", tudo);
+</script>
+</body>
+</html>

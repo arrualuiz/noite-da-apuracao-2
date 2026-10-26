@@ -11,10 +11,12 @@ o erro de cada um no % do Lula (entre Lula e Flávio):
                    Isso tira o efeito da ordem de apuração (as primeiras seções de cada estado não
                    são iguais às últimas, e a ordem se repete de um turno para o outro).
 Depois mostra, num ponto do meio da noite, de quais estados veio o erro do modelo, em votos.
+Grava a noite inteira, coleta a coleta, em dados/retroativo.csv.
 
 Uso: python3 analise/retroativo.py
 """
 import bisect
+import csv
 import json
 from datetime import datetime
 from pathlib import Path
@@ -124,6 +126,17 @@ def main():
     print(f"\n  {'média |erro|':13}" + "".join(f"{sum(abs(r[n] - final) for _, _, r in linhas) / len(linhas):14.2f}" for n in nomes))
     print("\n  Negativo = previa menos Lula do que deu. Em pessoas, 1 ponto ≈ "
           f"{mil((L + F) / 100)} votos.")
+
+    # a noite inteira, coleta a coleta, para o gráfico (dados/retroativo.csv)
+    with (P.PASTA / "retroativo.csv").open("w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["coleta_id", "secoes_pct", "final", "placar", "modelo", "mesmo_ponto"])
+        for pasta in coletas:
+            ufs, br = P.ler_coleta(pasta)
+            l, f = sum(x["l"] for x in ufs.values()), sum(x["f"] for x in ufs.values())
+            if l + f:
+                w.writerow([pasta.name, br["secoes"], round(final, 3), round(l / (l + f) * 100, 3),
+                            round(modelo(pasta, t1, 0.10)[0], 3), round(mesmo_ponto(pasta, t1, curvas), 3)])
 
     # de onde veio o erro do modelo no meio da noite
     pasta, sec, _ = next(x for x in linhas if x[1] >= 30)

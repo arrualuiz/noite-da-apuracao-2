@@ -10,8 +10,11 @@
    (gradiente projetado). Sem a restrição, a regressão dá valores impossíveis (ex.: -77%).
    É uma estimativa: supõe que os eleitores de um candidato se comportam igual em todas as cidades.
 
+Grava a tabela da parte 2 em dados/transferencia.csv.
+
 Uso: python3 analise/abstencao.py && python3 analise/transferencia.py
 """
+import csv
 import json
 from pathlib import Path
 
@@ -146,6 +149,12 @@ def main():
             c = coef[d][i]
             linha += f"{mil(c * tot1[o]):>12} ({c * 100:5.1f}%)"
         print(linha)
+    with (PASTA / "transferencia.csv").open("w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["origem", "eleitores_1t", "destino", "pct", "pessoas"])
+        for i, o in enumerate(ORIGENS):
+            for d in DESTINOS:
+                w.writerow([o, tot1[o], d, round(coef[d][i] * 100, 2), round(coef[d][i] * tot1[o])])
     print(f"\n   Sem a restrição, {fora} dos {len(ORIGENS) * len(DESTINOS)} coeficientes saíam abaixo de 0% ou acima de 100%.")
     print("\n   Lê-se assim: de cada 100 eleitores do Cury no 1º turno, a coluna mostra quantos foram para o Lula,")
     print("   para o Flávio, votaram branco/nulo ou não foram votar no 2º. Os números em pessoas são essa")
