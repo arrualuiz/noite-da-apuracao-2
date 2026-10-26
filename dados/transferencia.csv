@@ -1,0 +1,33 @@
+origem,eleitores_1t,destino,pct,pessoas
+Lula,53879538,Lula,100.0,53879538
+Lula,53879538,Flávio,0,0
+Lula,53879538,Branco/nulo,0,0
+Lula,53879538,Abstenção,0,0
+Flávio,56104503,Lula,0,0
+Flávio,56104503,Flávio,100.0,56104503
+Flávio,56104503,Branco/nulo,0,0
+Flávio,56104503,Abstenção,0,0
+Cury,3448569,Lula,55.36,1909112
+Cury,3448569,Flávio,3.33,114750
+Cury,3448569,Branco/nulo,41.31,1424706
+Cury,3448569,Abstenção,0,0
+Renan,2675887,Lula,29.28,783603
+Renan,2675887,Flávio,70.72,1892284
+Renan,2675887,Branco/nulo,0,0
+Renan,2675887,Abstenção,0,0
+Caiado,2605148,Lula,37.67,981265
+Caiado,2605148,Flávio,56.03,1459623
+Caiado,2605148,Branco/nulo,6.31,164260
+Caiado,2605148,Abstenção,0,0
+Demais candidatos,587143,Lula,27.05,158824
+Demais candidatos,587143,Flávio,60.84,357247
+Demais candidatos,587143,Branco/nulo,12.1,71072
+Demais candidatos,587143,Abstenção,0,0
+Branco/nulo,5975047,Lula,84.39,5042451
+Branco/nulo,5975047,Flávio,0,0
+Branco/nulo,5975047,Branco/nulo,15.61,932596
+Branco/nulo,5975047,Abstenção,0,0
+Abstenção,33469244,Lula,4.32,1445346
+Abstenção,33469244,Flávio,0,0
+Abstenção,33469244,Branco/nulo,4.57,1529271
+Abstenção,33469244,Abstenção,91.11,30494627
