@@ -6,8 +6,10 @@
    dados/historico/tse/bu/<pleito>/<uf><cidade>/ (fora do git; só baixa o que ainda não tem).
 2. Lê cada boletim (ASN.1/DER, lido aqui sem biblioteca): aptos, quem foi votar, votos de cada
    candidato a presidente, brancos e nulos.
-3. Liga cada seção ao bairro do local de votação, pelos dados abertos do TSE
-   (eleitorado_local_votacao_2026, em dados/historico/tse/locais/).
+3. Liga cada seção ao local de votação, pelos dados abertos do TSE (eleitorado_local_votacao_2026,
+   em dados/historico/tse/locais/), e o local ao bairro oficial: o polígono do bairro onde cai a
+   coordenada do local (dados/<nome>-bairros.topo.json; o de Curitiba é a malha do IPPUC, pelo
+   repositório github.com/gustavokira/geo-curitiba). Sem malha, vale o bairro escrito no cadastro do TSE.
 
 Gera dados/<nome>_secoes.csv e dados/<nome>_bairros.csv.
 
@@ -18,6 +20,7 @@ import csv
 import io
 import json
 import sys
+import unicodedata
 import urllib.request
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
@@ -156,6 +159,59 @@ def locais(uf, mun):
     return out
 
 
+def malha(nome):
+    """Bairros oficiais da cidade, se houver dados/<nome>-bairros.topo.json (TopoJSON em lat/lon).
+    Devolve [(bairro, regional, [anéis])], cada anel uma lista de (lon, lat)."""
+    arq = PASTA / f"{nome}-bairros.topo.json"
+    if not arq.exists():
+        return []
+    topo = json.loads(arq.read_text(encoding="utf-8"))
+    (sx, sy), (tx, ty) = topo["transform"]["scale"], topo["transform"]["translate"]
+    arcos = []
+    for arco in topo["arcs"]:  # coordenadas quantizadas e em diferença: soma e volta para lon/lat
+        x = y = 0
+        pts = []
+        for dx, dy in arco:
+            x, y = x + dx, y + dy
+            pts.append((x * sx + tx, y * sy + ty))
+        arcos.append(pts)
+
+    def anel(ids):
+        pts = []
+        for i in ids:
+            a = arcos[i] if i >= 0 else arcos[~i][::-1]
+            pts += a if not pts else a[1:]
+        return pts
+
+    out = []
+    for g in next(iter(topo["objects"].values()))["geometries"]:
+        poligonos = g["arcs"] if g["type"] == "MultiPolygon" else [g["arcs"]]
+        aneis = [anel(ids) for pol in poligonos for ids in pol]
+        regional = g["properties"].get("nome_regional", "").replace("REGIONAL ", "")
+        regional = regional if len(regional) <= 3 else nome_proprio(regional)
+        out.append((nome_proprio(g["properties"]["nome"]), regional, aneis))
+    return out
+
+
+def nome_proprio(s):
+    """CIDADE INDUSTRIAL DE CURITIBA -> Cidade Industrial de Curitiba."""
+    miudas = {"de", "da", "do", "das", "dos", "e"}
+    return " ".join(w.lower() if i and w.lower() in miudas else w.capitalize() for i, w in enumerate(s.split()))
+
+
+def dentro(lon, lat, aneis):
+    """Ponto no polígono (regra par-ímpar, que também trata os buracos)."""
+    fora = True
+    for pts in aneis:
+        j = len(pts) - 1
+        for i in range(len(pts)):
+            (xi, yi), (xj, yj) = pts[i], pts[j]
+            if (yi > lat) != (yj > lat) and lon < (xj - xi) * (lat - yi) / (yj - yi) + xi:
+                fora = not fora
+            j = i
+    return not fora
+
+
 def main():
     uf, mun, nome = (sys.argv[1:4] if len(sys.argv) >= 4 else ("pr", "75353", "curitiba"))
     loc = locais(uf, mun)
@@ -180,10 +236,39 @@ def main():
         if 1 not in t or 2 not in t:
             continue
         lv = loc.get((2, zona, sec)) or loc.get((1, zona, sec)) or {"local_votacao": "", "bairro": "(sem local)", "lat": "", "lon": ""}
-        linha = {"zona": zona, "secao": sec, **lv}
+        linha = {"zona": zona, "secao": sec, **lv, "bairro_tse": lv["bairro"], "regional": ""}
         linha.update({f"{k}_1t": t[1][k] for k in campos_1t})
         linha.update({f"{k}_2t": t[2][k] for k in campos})
         linhas.append(linha)
+    # bairro oficial: o polígono onde cai a coordenada do local de votação. Sem coordenada (ou fora de
+    # todos os polígonos), vale o bairro escrito no cadastro do TSE, se ele bater com um nome oficial.
+    bairros = malha(nome)
+    if bairros:
+        sem_acento = lambda s: unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().upper()
+        por_nome = {sem_acento(b): (b, r) for b, r, _ in bairros}
+        achados = cadastro = sem = diferente = 0
+        cache = {}
+        for l in linhas:
+            k = (l["lat"], l["lon"])
+            if k not in cache:
+                try:
+                    lon, lat = float(l["lon"]), float(l["lat"])
+                    cache[k] = next(((b, r) for b, r, an in bairros if dentro(lon, lat, an)), None)
+                except ValueError:
+                    cache[k] = None
+            achou = cache[k]
+            if achou:
+                achados += 1
+            elif any(k.startswith(sem_acento(l["bairro_tse"])) for k in por_nome):  # "Cidade Industrial" -> "... de Curitiba"
+                achou = next(v for k, v in por_nome.items() if k.startswith(sem_acento(l["bairro_tse"])))
+                cadastro += 1
+            else:
+                sem += 1
+            if achou:
+                diferente += sem_acento(achou[0]) != sem_acento(l["bairro_tse"])
+                l["bairro"], l["regional"] = achou
+        print(f"Bairro oficial ({len(bairros)} bairros): {achados} seções pelo mapa, {cadastro} pelo nome do cadastro,"
+              f" {sem} sem bairro. Em {diferente} seções o bairro do cadastro do TSE era outro.")
     with (PASTA / f"{nome}_secoes.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(linhas[0]))
         w.writeheader()
@@ -191,7 +276,7 @@ def main():
 
     somas = {}
     for l in linhas:
-        s = somas.setdefault(l["bairro"], {"bairro": l["bairro"], "secoes": 0})
+        s = somas.setdefault(l["bairro"], {"bairro": l["bairro"], "regional": l["regional"], "secoes": 0})
         s["secoes"] += 1
         for k in [f"{c}_1t" for c in campos_1t] + [f"{c}_2t" for c in campos]:
             s[k] = s.get(k, 0) + l[k]

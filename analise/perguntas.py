@@ -297,6 +297,8 @@ def main():
         "espelho": espelho_minas(ultima),
     }
     html = TEMPLATE.read_text(encoding="utf-8").replace("/*DADOS*/null", json.dumps(dados, ensure_ascii=False))
+    if br["tf"] == "s":  # totalização final: a página para de recarregar sozinha
+        html = html.replace('<meta http-equiv="refresh" content="60">\n', "")
     SAIDA_HTML.write_text(html, encoding="utf-8")
     t = dados["total"]
     print(f"perguntas: {br['secoes']:.2f}% | placar Lula {t['pct_lula']}% | previsão Lula {t['prev_pct_lula']}% "

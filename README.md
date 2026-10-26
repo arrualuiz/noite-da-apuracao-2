@@ -39,6 +39,32 @@ python3 analise/retroativo.py                        # depois do resultado: o er
 
 Só usa a biblioteca padrão do Python.
 
+## O site
+
+No ar pelo GitHub Pages: **https://arrualuiz.github.io/noite-da-apuracao-2/**
+
+| Página | Arquivo | De onde vem |
+|---|---|---|
+| Capa | `index.html` | escrita à mão |
+| Curitiba na eleição | `painel/curitiba.html` | `painel/curitiba-template.html` + `analise/depois.py` |
+| O Brasil depois da apuração | `painel/depois.html` | `painel/depois-template.html` + `analise/depois.py` |
+| O painel da noite | `painel/perguntas.html` | `painel/perguntas-template.html` + `analise/perguntas.py` |
+
+O estilo e as funções comuns de Curitiba e do Brasil ficam em `painel/comum.css` e `painel/comum.js`.
+
+**Para mudar o site:**
+
+```bash
+git pull                          # pega o que mudou no GitHub (se editei por lá)
+# editar o template, o comum.css/comum.js ou o index.html
+python3 analise/depois.py         # refaz curitiba.html e depois.html (perguntas.html: analise/perguntas.py)
+# conferir em http://127.0.0.1:5500/ (Live Server do VS Code)
+git add -A && git commit -m "o que mudou"
+git push                          # o GitHub Pages publica em ~1 minuto
+```
+
+Os HTML gerados também vão para o git, porque é deles que o GitHub Pages lê. Os dados vêm dos CSVs em `dados/`, que os scripts de `analise/` refazem.
+
 ## A noite, hora a hora
 
 O que fiz na noite, na ordem e com onde ver cada coisa: [`notas/linha-do-tempo.md`](notas/linha-do-tempo.md).

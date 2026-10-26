@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noite da apuração 2026</title>
+<meta name="description" content="O 2º turno de 2026, Lula x Flávio Bolsonaro, acompanhado ao vivo com os dados do TSE: previsão, Minas, Curitiba bairro por bairro e as cidades que votam diferente das vizinhas.">
+<meta property="og:title" content="Noite da apuração 2026">
+<meta property="og:description" content="O 2º turno acompanhado ao vivo com os dados do TSE: a previsão, Minas, Curitiba bairro por bairro e as ilhas.">
+<link rel="stylesheet" href="painel/comum.css">
+<style>
+.capa h1 { font-size: 30px; margin-bottom: 6px; }
+.lead { font-size: 16.5px; line-height: 1.55; max-width: 760px; margin: 10px 0 0; }
+.paginas { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 18px; }
+.pagina { display: block; text-decoration: none; color: inherit; background: var(--cartao); border: 1px solid var(--linha); border-radius: 10px; padding: 16px; }
+.pagina:hover { border-color: var(--texto); }
+.pagina h2 { font-size: 18px; margin: 0 0 6px; }
+.pagina p { margin: 0; color: var(--suave); font-size: 14px; line-height: 1.5; }
+.achados { padding-left: 20px; line-height: 1.6; } .achados li { margin: 6px 0; }
+</style>
+</head>
+<body>
+<main>
+  <section class="capa">
+    <h1>Noite da apuração 2026</h1>
+    <div class="sub">2º turno, 25 de outubro de 2026 · Lula x Flávio Bolsonaro · Luiz Arrua</div>
+    <p class="lead">Acompanhei a apuração do 2º turno ao vivo, coletando os dados do TSE a cada minuto, com uma previsão do resultado final, os meus palpites registrados antes e perguntas que eu queria responder. Depois do resultado, olhei para trás: onde a previsão errou, como Curitiba votou escola por escola e quais cidades votam muito diferente das vizinhas.</p>
+    <div class="grade">
+      <div class="tile"><div class="rotulo">Resultado</div><div class="grande">51,78% x 48,22%</div><div class="sub">Lula reeleito por 4,43 milhões de votos. Definido às 21h09, com 97,69% das seções.</div></div>
+      <div class="tile"><div class="rotulo">A virada</div><div class="grande">20h25</div><div class="sub">O Flávio liderou de ~17% a 48% apurado; o Lula passou com 48,1%.</div></div>
+      <div class="tile"><div class="rotulo">Minas, o termômetro</div><div class="grande">106,6 mil</div><div class="sub">votos de diferença para o Lula, depois de 9 trocas de liderança. Quem ganhou Minas ganhou o Brasil, de novo.</div></div>
+      <div class="tile"><div class="rotulo">Foram votar</div><div class="grande">+2,96 mi</div><div class="sub">pessoas a mais que no 1º turno. A abstenção caiu de 21,1% para 19,2%.</div></div>
+    </div>
+  </section>
+
+  <div class="paginas">
+    <a class="pagina" href="painel/curitiba.html">
+      <h2>Curitiba na eleição</h2>
+      <p>O mapa dos 75 bairros e das 420 escolas, a partir do boletim de cada urna nos dois turnos. E por que Curitiba, que deu 64,7% ao Lula em 2002, virou uma das capitais que menos votam no PT.</p>
+    </a>
+    <a class="pagina" href="painel/depois.html">
+      <h2>O Brasil depois da apuração</h2>
+      <p>As ilhas (cidades que votam muito diferente das vizinhas), a minha previsão olhando para trás, para onde foram os votos do 1º turno, a abstenção por estado e os mínimos e máximos.</p>
+    </a>
+    <a class="pagina" href="painel/perguntas.html">
+      <h2>O painel da noite</h2>
+      <p>O painel que eu acompanhei ao vivo: a minha expectativa x a apuração, a previsão ao longo da noite, Minas como espelho do Brasil e as perguntas que eu fiz.</p>
+    </a>
+  </div>
+
+  <section class="cartao">
+    <h2>O que eu aprendi</h2>
+    <ul class="achados">
+      <li><b>A previsão errou sempre para o mesmo lado.</b> Com 20% a 50% apurado, previa ~1 ponto menos Lula do que deu (1,2 a 1,6 milhão de votos). O erro veio de São Paulo, que apura tarde. Comparar cada estado com ele mesmo no mesmo ponto do 1º turno teria errado bem menos.</li>
+      <li><b>As pesquisas erraram mais que eu.</b> A média das 11 pesquisas da última semana dava o Flávio na frente (Lula 49,2%). Eu acertei quem ganhava, mas errei a margem e a abstenção.</li>
+      <li><b>Em Curitiba, o Lula cresceu mais na periferia.</b> Na Cidade Industrial, ganhou 10 mil votos novos; em bairros da regional Matriz, o Flávio ganhou mais votos novos que ele.</li>
+      <li><b>As ilhas contam a geografia do Brasil:</b> terras indígenas, universidades e periferias são ilhas vermelhas; polos do agronegócio e colônias europeias, ilhas azuis.</li>
+    </ul>
+  </section>
+
+  <section class="cartao">
+    <h2>Como foi feito</h2>
+    <p class="nota" style="font-size:14px;color:var(--texto)">Python só com a biblioteca padrão: coleta da API de resultados do TSE a cada minuto, leitura dos boletins de urna (formato ASN.1, decodificado à mão), dados abertos do TSE desde 2002, malhas do IBGE e do IPPUC. Gráficos em D3. Todo o código, os dados e o diário da noite estão no GitHub:
+      <a href="https://github.com/arrualuiz/noite-da-apuracao-2">github.com/arrualuiz/noite-da-apuracao-2</a> ·
+      <a href="https://github.com/arrualuiz/noite-da-apuracao-2/blob/main/notas/linha-do-tempo.md">a noite, hora a hora</a> ·
+      <a href="https://github.com/arrualuiz/noite-da-apuracao-2/blob/main/notas/notas.md">o diário com os palpites</a>.</p>
+  </section>
+</main>
+</body>
+</html>

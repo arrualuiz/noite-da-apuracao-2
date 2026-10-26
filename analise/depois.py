@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""A página "Depois da apuração": as análises feitas com o resultado final, em gráficos.
+"""As páginas com o resultado final, em gráficos: painel/depois.html (o Brasil) e painel/curitiba.html.
 
-Junta os CSVs gerados pelos outros scripts e grava painel/depois.html a partir de
-painel/depois-template.html (troca /*DADOS*/null pelo JSON):
+Junta os CSVs gerados pelos outros scripts e grava cada página a partir do seu template
+(painel/depois-template.html e painel/curitiba-template.html), trocando /*DADOS*/null pelo JSON.
+O estilo e as funções comuns ficam em painel/comum.css e painel/comum.js. Para mudar uma página:
+editar o template (ou o comum.*), rodar este script e fazer o commit e o push; o GitHub Pages atualiza.
   - Curitiba por escola e por bairro      dados/curitiba_secoes.csv, dados/curitiba_bairros.csv (analise/bairros.py)
                                          e o contorno do município, dados/curitiba-contorno.geojson (IBGE, malha
                                          municipal: servicodados.ibge.gov.br/api/v3/malhas/municipios/4106902)
+                                         e os 75 bairros, dados/curitiba-bairros.topo.json (malha do IPPUC, pelo
+                                         repositório github.com/gustavokira/geo-curitiba)
+  - Curitiba e as capitais desde 2002     dados/historico/capitais_presidente.csv (analise/capitais_historia.py)
   - ilhas: cidades x vizinhas            dados/ilhas.csv (analise/ilhas.py)
   - a previsão olhando para trás         dados/retroativo.csv (analise/retroativo.py)
   - para onde foram os votos do 1º turno dados/transferencia.csv (analise/transferencia.py)
@@ -16,13 +21,15 @@ Uso: python3 analise/depois.py
 """
 import csv
 import json
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+from bairros import nome_proprio
+
 RAIZ = Path(__file__).resolve().parent.parent
 PASTA = RAIZ / "dados"
-TEMPLATE = RAIZ / "painel" / "depois-template.html"
-SAIDA = RAIZ / "painel" / "depois.html"
+PAINEL = RAIZ / "painel"
 # caixa de Curitiba: fora dela, a coordenada do local de votação está errada no cadastro
 CAIXA_CWB = (-25.65, -25.33, -49.40, -49.18)
 
@@ -61,7 +68,30 @@ def curitiba():
             lista.append(e)
     bairros = [{k: num(v) for k, v in b.items()} for b in ler("curitiba_bairros.csv")]
     contorno = json.loads((PASTA / "curitiba-contorno.geojson").read_text(encoding="utf-8"))
-    return {"escolas": lista, "fora_do_mapa": fora, "bairros": bairros, "contorno": contorno}
+    malha = json.loads((PASTA / "curitiba-bairros.topo.json").read_text(encoding="utf-8"))
+    for g in malha["objects"]["bairros"]["geometries"]:
+        g["properties"] = {"nome": nome_proprio(g["properties"]["nome"])}
+    return {"escolas": lista, "fora_do_mapa": fora, "bairros": bairros, "contorno": contorno, "malha": malha}
+
+
+def historia():
+    """PT no 1º turno (% dos válidos) e no 2º (% entre os dois) em cada capital, no Paraná e no Brasil."""
+    v = {}
+    for r in ler("historico/capitais_presidente.csv"):
+        k = (int(r["ano"]), int(r["turno"]), r["cd_tse"])
+        x = v.setdefault(k, {"municipio": r["municipio"], "uf": r["uf"], "votos": defaultdict(int)})
+        x["votos"][r["partido"]] += int(r["votos"])
+    out = {}
+    for (ano, turno, cd), x in v.items():
+        vt = x["votos"]
+        pt = vt.get("PT", 0)
+        if turno == 1:
+            pct = pt / sum(vt.values()) * 100
+        else:
+            pct = pt / (pt + max(n for p, n in vt.items() if p != "PT")) * 100
+        o = out.setdefault(cd, {"cd": cd, "municipio": x["municipio"], "uf": x["uf"], "t1": {}, "t2": {}})
+        o[f"t{turno}"][ano] = round(pct, 2)
+    return list(out.values())
 
 
 def ilhas():
@@ -85,10 +115,21 @@ def abstencao_uf():
              "abst_1t": s["a1"], "abst_2t": s["a2"]} for s in soma.values()]
 
 
+def gravar(nome, dados):
+    html = (PAINEL / f"{nome}-template.html").read_text(encoding="utf-8").replace(
+        "/*DADOS*/null", json.dumps(dados, ensure_ascii=False, separators=(",", ":")))
+    (PAINEL / f"{nome}.html").write_text(html, encoding="utf-8")
+    return len(html)
+
+
 def main():
+    gerado = datetime.now().strftime("%d/%m/%Y %H:%M")
+    c = curitiba()
+    n = gravar("curitiba", {"gerado": gerado, "curitiba": c, "historia": historia()})
+    print(f"painel/curitiba.html: {len(c['escolas'])} escolas no mapa ({c['fora_do_mapa']} com coordenada errada,"
+          f" fora do mapa) · {len(c['bairros'])} bairros com votos · {n / 1e6:.1f} MB")
     dados = {
-        "gerado": datetime.now().strftime("%d/%m/%Y %H:%M"),
-        "curitiba": curitiba(),
+        "gerado": gerado,
         "ilhas": ilhas(),
         "topo": json.loads((PASTA / "br-estados.topo.json").read_text(encoding="utf-8")),
         "retroativo": [{k: num(v) for k, v in r.items()} for r in ler("retroativo.csv")],
@@ -96,11 +137,8 @@ def main():
         "abstencao": abstencao_uf(),
         "extremos": [{k: num(v) for k, v in r.items()} for r in ler("extremos.csv")],
     }
-    html = TEMPLATE.read_text(encoding="utf-8").replace("/*DADOS*/null", json.dumps(dados, ensure_ascii=False, separators=(",", ":")))
-    SAIDA.write_text(html, encoding="utf-8")
-    c = dados["curitiba"]
-    print(f"painel/depois.html: {len(c['escolas'])} escolas de Curitiba no mapa ({c['fora_do_mapa']} com coordenada errada,"
-          f" fora do mapa) · {len(dados['ilhas'])} cidades · {len(html) / 1e6:.1f} MB")
+    n = gravar("depois", dados)
+    print(f"painel/depois.html: {len(dados['ilhas'])} cidades · {n / 1e6:.1f} MB")
 
 
 if __name__ == "__main__":

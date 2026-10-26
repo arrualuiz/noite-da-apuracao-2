@@ -1,0 +1,57 @@
+/* Estilo comum das páginas depois.html e curitiba.html (cores do Lula e do Flávio iguais às do painel da noite) */
+:root {
+  --fundo: #f6f5f2; --cartao: #ffffff; --texto: #1d1d1f; --suave: #6b6b70; --linha: #e3e1dc; --meio: #cfcdc8;
+  --lula: #d62f3a; --flavio: #4f3fd6; --modelo: #d95926; --mesmo: #1baf7a; --branco: #a9a7a2; --abst: #dedcd6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fundo: #141416; --cartao: #1e1e22; --texto: #ececef; --suave: #9a9aa2; --linha: #33333a; --meio: #4a4a52;
+    --lula: #f05a63; --flavio: #8a7dff; --modelo: #d95926; --mesmo: #199e70; --branco: #77777f; --abst: #3a3a42;
+  }
+}
+:root[data-theme="dark"] {
+  --fundo: #141416; --cartao: #1e1e22; --texto: #ececef; --suave: #9a9aa2; --linha: #33333a; --meio: #4a4a52;
+  --lula: #f05a63; --flavio: #8a7dff; --modelo: #d95926; --mesmo: #199e70; --branco: #77777f; --abst: #3a3a42;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fundo); color: var(--texto); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; }
+h1 { font-size: 24px; margin: 0 0 4px; }
+h2 { font-size: 20px; margin: 0 0 2px; }
+h3 { font-size: 15px; margin: 18px 0 2px; }
+a { color: inherit; }
+.sub { color: var(--suave); font-size: 13px; }
+.cartao { background: var(--cartao); border: 1px solid var(--linha); border-radius: 10px; padding: 16px; margin-top: 18px; }
+.grade { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin: 12px 0; }
+.tile { border: 1px solid var(--linha); border-radius: 8px; padding: 10px 12px; }
+.rotulo { font-size: 12px; color: var(--suave); text-transform: uppercase; letter-spacing: .04em; }
+.grande { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.nota { color: var(--suave); font-size: 13px; margin: 8px 0 0; }
+.botoes { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 6px; }
+.botao { font: inherit; font-size: 13px; color: var(--texto); background: var(--fundo); border: 1px solid var(--linha); border-radius: 14px; padding: 4px 12px; cursor: pointer; }
+.botao.ativo { border-color: var(--texto); font-weight: 600; }
+.legenda { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--suave); margin-top: 6px; }
+.legenda i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
+.legenda i.linha { height: 2px; width: 16px; border-radius: 1px; vertical-align: 4px; }
+.escala { width: 220px; height: 8px; border-radius: 4px; }
+.duas { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 13.5px; }
+th, td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--linha); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 12px; color: var(--suave); font-weight: 600; }
+th.ord { cursor: pointer; } th.ord:hover { color: var(--texto); }
+td.quebra { white-space: normal; text-align: left; }
+.rolar { overflow-x: auto; }
+.alta { max-height: 420px; overflow-y: auto; }
+svg { display: block; overflow: visible; }
+svg text { fill: var(--suave); font-size: 11px; }
+svg .eixo line, svg .eixo path { stroke: var(--linha); }
+svg .eixo text { fill: var(--suave); }
+svg .rot { fill: var(--texto); font-size: 11px; paint-order: stroke; stroke: var(--cartao); stroke-width: 3px; stroke-linejoin: round; }
+#dica { position: fixed; pointer-events: none; z-index: 10; background: var(--cartao); color: var(--texto); border: 1px solid var(--linha);
+  border-radius: 8px; padding: 8px 10px; font-size: 13px; line-height: 1.4; box-shadow: 0 4px 14px rgba(0,0,0,.12); display: none; max-width: 300px; }
+#dica b { font-weight: 600; }
+nav { margin: 6px 0 0; font-size: 13px; }
+.busca input { font: inherit; font-size: 14px; color: var(--texto); background: var(--fundo); border: 1px solid var(--linha); border-radius: 8px; padding: 6px 10px; width: min(420px, 100%); }
+#cwb-escola-info:not(:empty) { border: 1px solid var(--linha); border-left: 3px solid var(--texto); border-radius: 8px; padding: 8px 12px; margin: 8px 0; font-size: 13.5px; }
+nav a { margin-right: 14px; color: var(--suave); }

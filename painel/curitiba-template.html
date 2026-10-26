@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curitiba na eleição</title>
+<meta name="description" content="O 2º turno de 2026 em Curitiba, bairro por bairro e escola por escola, e o voto da cidade desde 2002.">
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<link rel="stylesheet" href="comum.css">
+<style>
+.texto { padding-left: 20px; line-height: 1.55; } .texto li { margin: 6px 0; }
+#cwb-mapa path.bairro { stroke: var(--cartao); stroke-width: 1; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Curitiba na eleição</h1>
+  <div class="sub">2º turno de 2026, Lula x Flávio Bolsonaro, e o voto da cidade desde 2002. Fontes: TSE (boletins de urna, locais de votação, dados abertos), IBGE e IPPUC. Gerado em <span id="gerado"></span>.</div>
+  <nav><a href="../index.html">Início</a><a href="#curitiba">O 2º turno</a><a href="#historia">Por que Curitiba vota assim</a><a href="depois.html">O Brasil</a><a href="perguntas.html">Painel da noite</a></nav>
+
+  <!-- CURITIBA -->
+  <section class="cartao" id="curitiba">
+    <h2>O 2º turno em Curitiba</h2>
+    <div class="sub">Pelo boletim de cada uma das 4.056 urnas, nos dois turnos, ligado ao local de votação e ao bairro oficial (o polígono do IPPUC onde fica a escola).</div>
+    <div class="grade" id="cwb-tiles"></div>
+
+    <h3>O mapa</h3>
+    <div class="sub">Por bairro: a cor é o resultado do bairro inteiro. Por escola: cada bolinha é um local de votação, do tamanho do número de eleitores, com as divisas dos bairros.</div>
+    <div class="botoes" id="cwb-camada">
+      <button type="button" class="botao ativo" data-modo="bairros">Por bairro</button>
+      <button type="button" class="botao" data-modo="escolas">Por escola</button>
+    </div>
+    <div class="botoes" id="cwb-modo" style="margin-top:0">
+      <button type="button" class="botao ativo" data-modo="pct">Lula no 2º turno</button>
+      <button type="button" class="botao" data-modo="swing">Quanto o Lula cresceu do 1º para o 2º turno</button>
+    </div>
+    <div class="busca"><input id="cwb-busca" list="cwb-escolas" placeholder="Procure uma escola (ex.: Narciso Mendes)" autocomplete="off"><datalist id="cwb-escolas"></datalist></div>
+    <div id="cwb-escola-info"></div>
+    <div id="cwb-mapa"></div>
+    <div class="legenda" id="cwb-legenda"></div>
+    <p class="nota" id="cwb-nota-mapa"></p>
+
+    <h3>Bairro por bairro: do 1º para o 2º turno</h3>
+    <div class="sub">% do Lula entre Lula e Flávio. Bairros com 5 mil eleitores ou mais, do mais Lula para o mais Flávio.</div>
+    <div class="legenda"><span><i style="background:var(--meio);border-radius:6px"></i>1º turno</span><span><i style="background:var(--lula);border-radius:6px"></i>2º turno</span></div>
+    <div id="cwb-halteres"></div>
+
+    <h3>Quem ganhou mais votos novos em cada bairro?</h3>
+    <div class="sub">Votos ganhos do 1º para o 2º turno, em pessoas. Acima da linha, o Flávio ganhou mais votos que o Lula no bairro; abaixo, o Lula ganhou mais. Escala logarítmica.</div>
+    <div id="cwb-dispersao"></div>
+
+    <h3>A tabela dos bairros</h3>
+    <div class="sub">Clique no nome de uma coluna para ordenar.</div>
+    <div class="rolar alta"><table id="cwb-tabela"></table></div>
+  </section>
+
+
+  <section class="cartao" id="historia">
+    <h2>Por que Curitiba vota assim?</h2>
+    <div class="sub">O PT no 2º turno de cada eleição desde 2002 (% entre os dois finalistas): Curitiba, o Paraná, o Brasil e, em cinza, as outras 26 capitais.</div>
+    <div id="hist-grafico"></div>
+    <div class="legenda">
+      <span><i class="linha" style="background:var(--modelo)"></i>Curitiba</span>
+      <span><i class="linha" style="background:var(--mesmo)"></i>Paraná</span>
+      <span><i class="linha" style="background:var(--suave)"></i>Brasil</span>
+      <span><i class="linha" style="background:var(--meio)"></i>as outras capitais</span>
+    </div>
+    <div class="rolar" style="margin-top:12px"><table id="hist-tabela"></table></div>
+
+    <h3>O que os números mostram</h3>
+    <ol class="texto">
+      <li><b>Curitiba nem sempre foi assim.</b> Em 2002 deu ao Lula 64,7% no 2º turno, mais que o Brasil (61,3%) e o Paraná (59,2%). No 1º turno, 55%.</li>
+      <li><b>A virada foi em 2006.</b> Curitiba caiu para 47,5% e ficou abaixo do Brasil pela primeira vez, por 13 pontos. Foi a primeira reeleição do Lula, depois do escândalo do mensalão (2005).</li>
+      <li><b>De 2010 a 2014, a distância só cresceu.</b> Em 2014, Curitiba foi <b>a capital que menos votou no PT</b> entre as 27: 27,8%, contra 51,6% no Brasil.</li>
+      <li><b>2018 foi o fundo:</b> 23,5% para o Haddad e 76,5% para o Bolsonaro, na cidade-sede da Lava Jato.</li>
+      <li><b>De 2022 para cá, Curitiba voltou a subir</b> (35,2% e agora 37,7%), mas ainda é a 4ª capital que menos vota no PT. E deixou de ser mais anti-PT que o próprio Paraná: em 2026 votou igual ao estado (37,4%).</li>
+    </ol>
+
+    <h3>As explicações que existem (e o que ainda é hipótese)</h3>
+    <ul class="texto">
+      <li><b>Lava Jato e a "República de Curitiba".</b> A operação, a prisão do Lula na Polícia Federal de Curitiba (2018) e o Sergio Moro deram à cidade uma identidade anti-PT. A Tribuna do Paraná chamou o resultado de 2018 de <a href="https://www.tribunapr.com.br/noticias/politica/base-da-lava-jato-curitiba-da-vitoria-expressiva-a-bolsonaro/">"base da Lava Jato dá vitória expressiva a Bolsonaro"</a>. <span class="sub">O problema: a queda começou em 2006, quase dez anos antes da operação (2014). A Lava Jato aprofundou uma coisa que já existia.</span></li>
+      <li><b>Um eleitorado bolsonarista estável.</b> O cientista político Emerson Cervi (UFPR) estimou que <a href="https://www.bandab.com.br/politica/eleicoes-2024/eduardo-cristina-disputam-voto-luciano/amp/">cerca de 30% do eleitorado de Curitiba é bolsonarista radical</a> (eleição municipal de 2024).</li>
+      <li><b>Classe média e antipetismo.</b> A literatura sobre o antipetismo nacional liga o fenômeno à classe média urbana, à crise econômica e aos escândalos de corrupção (<a href="https://ppgcom.uff.br/wp-content/uploads/sites/200/2020/04/tese_mestrado_2016_marcelo_alves.pdf">Alves, UFF, 2016</a>). Nos meus dados, dá para ver uma pista disso: em 10 bairros, quase todos da regional Matriz (Juvevê, Bigorrilho, Cabral, Ahú, Bom Retiro, Mercês, Jardim Social) e também Água Verde, Santo Inácio e Jardim das Américas, o Flávio ganhou mais votos novos que o Lula. Na periferia (CIC, Sítio Cercado, Tatuquara) foi o contrário. <span class="sub">Hipótese: falta cruzar com a renda de cada bairro (Censo 2022).</span></li>
+      <li><b>O imaginário de um "Paraná branco" e da imigração europeia</b> (poloneses, italianos, alemães, ucranianos), estudado pela historiografia regional (<a href="https://anpuh.org.br/uploads/anais-simposios/pdf/2019-01/1548856711_0795c8a8c0dd34cf8acb77810511d7dd.pdf">ANPUH</a>). <span class="sub">Hipótese: não achei estudo que meça isso no voto. E não explica a virada de 2002 para 2006, porque a imigração é a mesma.</span></li>
+    </ul>
+    <p class="nota">Resumo honesto: os dados mostram <b>quando</b> Curitiba mudou (2006, e mais forte a partir de 2010) e <b>onde</b> o Lula cresce hoje (periferia mais que bairros ricos). O <b>porquê</b> ainda é uma soma de hipóteses. Para testar: renda e escolaridade por bairro (Censo 2022) x voto por bairro, de 2006 a 2026.</p>
+    <p class="nota">Fontes dos números: TSE, dados abertos (votacao_partido_munzona, 2002 a 2022) e resultados de 2026; conferidos com a Tribuna do Paraná (Bolsonaro 76,54% em Curitiba em 2018) e com o PT (Lula 50,1% no Paraná no 1º turno de 2002).</p>
+  </section>
+</main>
+<div id="dica"></div>
+<script src="comum.js"></script>
+<script>
+const D = /*DADOS*/null;
+document.getElementById("gerado").textContent = D.gerado;
+// ===================== CURITIBA =====================
+const C = D.curitiba;
+const B = C.bairros.map(b => ({ ...b,
+  swing: b.pct_lula_2t - b.pct_lula_1t, d_lula: b.lula_2t - b.lula_1t, d_flavio: b.flavio_2t - b.flavio_1t,
+  d_abst: b.abstencao_2t - b.abstencao_1t }));
+const E = C.escolas.map(e => ({ ...e,
+  pct: e.lula_2t / (e.lula_2t + e.flavio_2t) * 100, pct1: e.lula_1t / (e.lula_1t + e.flavio_1t) * 100 }))
+  .map(e => ({ ...e, swing: e.pct - e.pct1 }));
+
+(function tiles() {
+  const s = k => B.reduce((a, b) => a + b[k], 0);
+  const L1 = s("lula_1t"), L2 = s("lula_2t"), F1 = s("flavio_1t"), F2 = s("flavio_2t");
+  const A1 = s("abstencao_1t"), A2 = s("abstencao_2t");
+  const lider = B.filter(b => b.pct_lula_2t > 50);
+  const t = (rot, val, sub) => `<div class="tile"><div class="rotulo">${rot}</div><div class="grande">${val}</div><div class="sub">${sub}</div></div>`;
+  document.getElementById("cwb-tiles").innerHTML =
+    t("Lula", `+${br(L2 - L1)}`, `votos a mais: ${br(L1)} → ${br(L2)} (${pc(L1 / (L1 + F1) * 100)} → ${pc(L2 / (L2 + F2) * 100)} entre os dois)`) +
+    t("Flávio", `+${br(F2 - F1)}`, `votos a mais: ${br(F1)} → ${br(F2)}. Venceu a cidade por ${br(F2 - L2)} votos`) +
+    t("Abstenção", `−${br(A1 - A2)}`, `pessoas a menos sem votar: ${br(A1)} → ${br(A2)}`) +
+    t("Bairros com o Lula na frente", `${lider.length} de ${B.length}`, lider.map(b => b.bairro).join(", "));
+})();
+
+// contorno do município (IBGE). O d3 quer o anel externo no sentido horário; se vier ao contrário, a área
+// passa de meia esfera e o anel é invertido
+const contornoCwb = C.contorno.features[0];
+if (d3.geoArea(contornoCwb) > 2 * Math.PI) contornoCwb.geometry.coordinates.forEach(anel => anel.reverse());
+let modoCwb = "pct", marcada = null;
+const chave = e => `${e.nome} · ${e.bairro}`;
+document.getElementById("cwb-escolas").innerHTML = [...E].sort((a, b) => a.nome.localeCompare(b.nome)).map(e => `<option value="${chave(e)}">`).join("");
+function marcar(e) {
+  marcada = e;
+  const info = document.getElementById("cwb-escola-info");
+  if (!e) { info.innerHTML = ""; mapaCuritiba(); return; }
+  const rank = (k, rev) => [...E].filter(x => x.aptos_2t >= 1000).sort((a, b) => rev ? b[k] - a[k] : a[k] - b[k]).indexOf(e) + 1;
+  const n = E.filter(x => x.aptos_2t >= 1000).length;
+  const b = B.find(b => b.bairro === e.bairro);
+  const bt = (k1, k2) => B.reduce((s, x) => s + x[k1], 0) / B.reduce((s, x) => s + x[k1] + x[k2], 0) * 100;
+  const cw1 = bt("lula_1t", "flavio_1t"), cw2 = bt("lula_2t", "flavio_2t");
+  const a1 = (e.aptos_1t - e.comparecimento_1t) / e.aptos_1t * 100, a2 = (e.aptos_2t - e.comparecimento_2t) / e.aptos_2t * 100;
+  info.innerHTML = `<b>${e.nome}</b> · ${e.bairro} · ${e.secoes} seções · ${br(e.aptos_2t)} eleitores<br>
+    Lula ${pc(e.pct1)} → <b>${pc(e.pct)}</b> (${pts(e.swing)}) · 2º turno: Lula ${br(e.lula_2t)} x Flávio ${br(e.flavio_2t)} ·
+    votos ganhos: Lula ${sn(e.lula_2t - e.lula_1t, br)}, Flávio ${sn(e.flavio_2t - e.flavio_1t, br)}<br>
+    abstenção ${pc(a1)} → ${pc(a2)} (${sn((e.aptos_2t - e.comparecimento_2t) - (e.aptos_1t - e.comparecimento_1t), br)} pessoas)<br>
+    <span class="sub">Comparando: ${e.bairro} ${b ? `${pc(b.pct_lula_1t)} → ${pc(b.pct_lula_2t)} (${pts(b.swing)})` : "–"} · Curitiba ${pc(cw1)} → ${pc(cw2)} (${pts(cw2 - cw1)}).
+    Entre as ${n} escolas com mil eleitores ou mais, é a ${rank("swing", true)}ª em que o Lula mais cresceu e a ${rank("pct", true)}ª em % do Lula.</span>`;
+  mapaCuritiba();
+}
+document.getElementById("cwb-busca").addEventListener("change", ev => {
+  const v = ev.target.value.trim().toLowerCase();
+  marcar(E.find(e => chave(e).toLowerCase() === v) || E.find(e => e.nome.toLowerCase().includes(v)) || null);
+});
+// bairros oficiais (IPPUC). Mesmo cuidado do contorno com o sentido dos anéis
+const malhaB = topojson.feature(C.malha, C.malha.objects.bairros);
+malhaB.features.forEach(f => { if (d3.geoArea(f) > 2 * Math.PI) f.geometry = rebobinar(f.geometry); });
+function rebobinar(g) {
+  const inv = an => an.map(a => [...a].reverse());
+  return g.type === "Polygon" ? { ...g, coordinates: inv(g.coordinates) } : { ...g, coordinates: g.coordinates.map(inv) };
+}
+const porNome = new Map(B.map(b => [b.bairro, b]));
+let camada = "bairros";
+function mapaCuritiba() {
+  const W = largura("cwb-mapa"), H = Math.min(680, Math.max(380, W * 0.95));
+  const proj = d3.geoMercator().fitExtent([[10, 10], [W - 10, H - 10]], contornoCwb);
+  const caminho = d3.geoPath(proj);
+  const cor = modoCwb === "pct" ? divergente(20, 80) : sequencial(0, 7);
+  const valor = x => modoCwb === "pct" ? (x.pct_lula_2t ?? x.pct) : x.swing;
+  const r = d3.scaleSqrt().domain([0, d3.max(E, e => e.aptos_2t)]).range([0, 11]);
+  const svg = d3.select("#cwb-mapa").html("").append("svg").attr("width", W).attr("height", H);
+  const dicaBairro = (ev, f) => {
+    const b = porNome.get(f.properties.nome);
+    mostrar(ev, b ? `<b>${b.bairro}</b> · regional ${b.regional} · ${br(b.aptos_2t)} eleitores · ${b.secoes} seções<br>
+      Lula ${pc(b.pct_lula_1t)} → <b>${pc(b.pct_lula_2t)}</b> (${pts(b.swing)})<br>2º turno: Lula ${br(b.lula_2t)} x Flávio ${br(b.flavio_2t)}<br>
+      votos ganhos: Lula ${sn(b.d_lula, br)} · Flávio ${sn(b.d_flavio, br)}<br>abstenção: ${sn(b.d_abst, br)} pessoas`
+      : `<b>${f.properties.nome}</b><br>sem local de votação no bairro`);
+  };
+  if (camada === "bairros") {
+    svg.append("g").selectAll("path").data(malhaB.features).join("path").attr("class", "bairro").attr("d", caminho)
+      .attr("fill", f => { const b = porNome.get(f.properties.nome); return b ? cor(valor(b)) : css("--abst"); })
+      .on("mousemove", dicaBairro).on("mouseleave", esconder);
+  } else {
+    svg.append("g").selectAll("path").data(malhaB.features).join("path").attr("d", caminho)
+      .attr("fill", css("--fundo")).attr("stroke", css("--meio")).attr("stroke-width", .8)
+      .on("mousemove", dicaBairro).on("mouseleave", esconder);
+  }
+  svg.append("path").datum(contornoCwb).attr("d", caminho).attr("fill", "none").attr("stroke", css("--suave")).attr("stroke-width", 1.5).style("pointer-events", "none");
+  if (camada === "escolas") {
+    svg.append("g").selectAll("circle").data([...E].sort((a, b) => b.aptos_2t - a.aptos_2t)).join("circle")
+      .attr("cx", e => proj([e.lon, e.lat])[0]).attr("cy", e => proj([e.lon, e.lat])[1])
+      .attr("r", e => Math.max(2.5, r(e.aptos_2t)))
+      .attr("fill", e => cor(valor(e))).attr("stroke", css("--cartao")).attr("stroke-width", 1)
+      .on("mousemove", (ev, e) => mostrar(ev, `<b>${e.nome}</b><br>${e.bairro} · ${br(e.aptos_2t)} eleitores · ${e.secoes} seções<br>
+        Lula ${pc(e.pct1)} → <b>${pc(e.pct)}</b> (${pts(e.swing)})<br>2º turno: Lula ${br(e.lula_2t)} x Flávio ${br(e.flavio_2t)}<br>
+        votos ganhos: Lula ${sn(e.lula_2t - e.lula_1t, br)} · Flávio ${sn(e.flavio_2t - e.flavio_1t, br)}<br><span class="sub">clique para marcar</span>`))
+      .on("mouseleave", esconder).style("cursor", "pointer")
+      .on("click", (ev, e) => { document.getElementById("cwb-busca").value = chave(e); marcar(e); });
+    const ext = modoCwb === "pct"
+      ? [...E].filter(e => e.aptos_2t >= 1000).sort((a, b) => b.pct - a.pct).slice(0, 2).concat([...E].filter(e => e.aptos_2t >= 1000).sort((a, b) => a.pct - b.pct).slice(0, 2))
+      : [...E].filter(e => e.aptos_2t >= 1000).sort((a, b) => b.swing - a.swing).slice(0, 3);
+    svg.append("g").style("pointer-events", "none").selectAll("text").data(ext).join("text").attr("class", "rot")
+      .attr("x", e => proj([e.lon, e.lat])[0] + 9).attr("y", e => proj([e.lon, e.lat])[1] + 4)
+      .text(e => `${e.nome.length > 34 ? e.nome.slice(0, 33) + "…" : e.nome} · ${modoCwb === "pct" ? pc(e.pct) : pts(e.swing)}`);
+  }
+  // nomes: os bairros com mais eleitores e os extremos do mapa por bairro
+  const com = malhaB.features.filter(f => porNome.has(f.properties.nome));
+  const ordem = [...com].sort((a, b) => valor(porNome.get(b.properties.nome)) - valor(porNome.get(a.properties.nome)));
+  const nomes = new Set([...com].filter(f => porNome.get(f.properties.nome).aptos_2t >= 45000).map(f => f.properties.nome)
+    .concat(camada === "bairros" ? [ordem[0], ordem[1], ordem.at(-1), ordem.at(-2)].map(f => f.properties.nome) : []));
+  const curto = n => n.replace("Cidade Industrial de Curitiba", "CIC");
+  svg.append("g").style("pointer-events", "none").selectAll("text").data(com.filter(f => nomes.has(f.properties.nome))).join("text").attr("class", "rot")
+    .attr("x", f => caminho.centroid(f)[0]).attr("y", f => caminho.centroid(f)[1]).attr("text-anchor", "middle")
+    .style("font-weight", 600).style("font-size", "11.5px")
+    .text(f => camada === "bairros" ? `${curto(f.properties.nome)} ${modoCwb === "pct" ? pc(valor(porNome.get(f.properties.nome)), 0) : pts(valor(porNome.get(f.properties.nome)))}` : curto(f.properties.nome));
+  if (marcada) {
+    const [mx, my] = proj([marcada.lon, marcada.lat]);
+    const rr = camada === "escolas" ? Math.max(2.5, r(marcada.aptos_2t)) : 3;
+    if (camada === "bairros") svg.append("circle").attr("cx", mx).attr("cy", my).attr("r", 3).attr("fill", css("--texto"));
+    svg.append("circle").attr("cx", mx).attr("cy", my).attr("r", rr + 5)
+      .attr("fill", "none").attr("stroke", css("--texto")).attr("stroke-width", 2.5).style("pointer-events", "none");
+    svg.append("text").attr("class", "rot").attr("x", mx + rr + 9).attr("y", my + 4)
+      .style("font-weight", 700).style("font-size", "13px").style("pointer-events", "none")
+      .text(`${marcada.nome} · ${modoCwb === "pct" ? pc(marcada.pct) : pts(marcada.swing)}`);
+  }
+  const ticks = modoCwb === "pct" ? [20, 35, 50, 65, 80] : [0, 3.5, 7];
+  document.getElementById("cwb-legenda").innerHTML = (modoCwb === "pct"
+    ? `<span>Flávio 80%</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>Lula 80%</span><span>· cinza = empate</span>`
+    : `<span>0 pts</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>+7 pts ou mais</span>`) +
+    (camada === "bairros" ? `<span><i style="background:var(--abst)"></i>sem local de votação</span>` : "");
+  document.getElementById("cwb-nota-mapa").textContent = camada === "bairros"
+    ? `75 bairros oficiais (malha do IPPUC); ${malhaB.features.length - com.length} não têm local de votação. Contorno do município: IBGE.`
+    : `${E.length} locais de votação no mapa.` + (C.fora_do_mapa ? ` ${C.fora_do_mapa === 1 ? "1 ficou" : C.fora_do_mapa + " ficaram"} de fora porque a coordenada no cadastro do TSE cai fora de Curitiba.` : "");
+}
+botoes("cwb-modo", m => { modoCwb = m; mapaCuritiba(); });
+botoes("cwb-camada", m => { camada = m; mapaCuritiba(); });
+
+function halteres() {
+  const dados = B.filter(b => b.aptos_2t >= 5000).sort((a, b) => b.pct_lula_2t - a.pct_lula_2t);
+  const W = largura("cwb-halteres"), linha = 17, M = { t: 22, r: 60, b: 8, l: 150 };
+  const H = M.t + dados.length * linha + M.b;
+  const x = d3.scaleLinear().domain([25, 55]).range([M.l, W - M.r]);
+  const svg = d3.select("#cwb-halteres").html("").append("svg").attr("width", W).attr("height", H);
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${M.t - 6})`)
+    .call(d3.axisTop(x).ticks(6).tickFormat(d => d + "%").tickSize(0)).call(g => g.select(".domain").remove());
+  svg.append("line").attr("x1", x(50)).attr("x2", x(50)).attr("y1", M.t - 4).attr("y2", H - M.b).attr("stroke", css("--suave")).attr("stroke-dasharray", "3 3");
+  svg.append("text").attr("x", x(50) + 4).attr("y", H - 2).text("50%: empate");
+  const g = svg.append("g").selectAll("g").data(dados).join("g").attr("transform", (d, i) => `translate(0,${M.t + i * linha + linha / 2})`);
+  g.append("rect").attr("x", 0).attr("y", -linha / 2).attr("width", W).attr("height", linha).attr("fill", "transparent")
+    .on("mousemove", (ev, b) => mostrar(ev, `<b>${b.bairro}</b> · ${br(b.aptos_2t)} eleitores<br>Lula ${pc(b.pct_lula_1t)} → <b>${pc(b.pct_lula_2t)}</b> (${pts(b.swing)})<br>
+      votos ganhos: Lula ${sn(b.d_lula, br)} · Flávio ${sn(b.d_flavio, br)}<br>abstenção: ${sn(b.d_abst, br)} pessoas`)).on("mouseleave", esconder);
+  g.append("text").attr("x", M.l - 8).attr("y", 4).attr("text-anchor", "end").style("fill", css("--texto")).text(b => b.bairro);
+  g.append("line").attr("x1", b => x(b.pct_lula_1t)).attr("x2", b => x(b.pct_lula_2t)).attr("stroke", css("--meio")).attr("stroke-width", 2).style("pointer-events", "none");
+  g.append("circle").attr("cx", b => x(b.pct_lula_1t)).attr("r", 4).attr("fill", css("--meio")).style("pointer-events", "none");
+  g.append("circle").attr("cx", b => x(b.pct_lula_2t)).attr("r", 5).attr("fill", css("--lula")).attr("stroke", css("--cartao")).attr("stroke-width", 1.5).style("pointer-events", "none");
+  g.append("text").attr("x", b => x(b.pct_lula_2t) + 9).attr("y", 4).text(b => pc(b.pct_lula_2t)).style("pointer-events", "none");
+}
+
+function dispersao() {
+  const dados = B.filter(b => b.aptos_2t >= 5000 && b.d_lula > 0 && b.d_flavio > 0);
+  const W = largura("cwb-dispersao"), H = Math.min(460, W * 0.7), M = { t: 14, r: 20, b: 40, l: 56 };
+  const lim = [d3.min(dados, b => Math.min(b.d_lula, b.d_flavio)) * 0.8, d3.max(dados, b => Math.max(b.d_lula, b.d_flavio)) * 1.15];
+  const x = d3.scaleLog().domain(lim).range([M.l, W - M.r]), y = d3.scaleLog().domain(lim).range([H - M.b, M.t]);
+  const r = d3.scaleSqrt().domain([0, d3.max(dados, b => b.aptos_2t)]).range([0, 14]);
+  const svg = d3.select("#cwb-dispersao").html("").append("svg").attr("width", W).attr("height", H);
+  const marcas = [200, 300, 500, 1000, 2000, 3000, 5000, 10000];
+  const fmt = d => d >= 1000 ? (d / 1000).toLocaleString("pt-BR") + " mil" : d;
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${H - M.b})`).call(d3.axisBottom(x).tickValues(marcas.filter(m => m >= lim[0] && m <= lim[1])).tickFormat(fmt));
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(${M.l},0)`).call(d3.axisLeft(y).tickValues(marcas.filter(m => m >= lim[0] && m <= lim[1])).tickFormat(fmt));
+  svg.append("text").attr("x", W - M.r).attr("y", H - 6).attr("text-anchor", "end").text("votos ganhos pelo Lula →");
+  svg.append("text").attr("x", M.l + 4).attr("y", M.t + 4).text("↑ votos ganhos pelo Flávio");
+  svg.append("line").attr("x1", x(lim[0])).attr("y1", y(lim[0])).attr("x2", x(lim[1])).attr("y2", y(lim[1])).attr("stroke", css("--suave")).attr("stroke-dasharray", "4 3");
+  svg.append("text").attr("x", x(lim[1]) - 4).attr("y", y(lim[1]) + 14).attr("text-anchor", "end").text("os dois ganharam igual");
+  svg.append("g").selectAll("circle").data(dados.sort((a, b) => b.aptos_2t - a.aptos_2t)).join("circle")
+    .attr("cx", b => x(b.d_lula)).attr("cy", b => y(b.d_flavio)).attr("r", b => Math.max(3, r(b.aptos_2t)))
+    .attr("fill", b => b.d_flavio > b.d_lula ? css("--flavio") : css("--lula")).attr("fill-opacity", .8).attr("stroke", css("--cartao")).attr("stroke-width", 1.5)
+    .on("mousemove", (ev, b) => mostrar(ev, `<b>${b.bairro}</b> · ${br(b.aptos_2t)} eleitores<br>votos ganhos: Lula <b>${sn(b.d_lula, br)}</b> · Flávio <b>${sn(b.d_flavio, br)}</b><br>
+      dos votos novos, ${pc(b.d_lula / (b.d_lula + b.d_flavio) * 100)} foram para o Lula<br>Lula ${pc(b.pct_lula_1t)} → ${pc(b.pct_lula_2t)}`)).on("mouseleave", esconder);
+  const rotular = new Set(dados.filter(b => b.aptos_2t >= 50000 || b.d_flavio > b.d_lula).map(b => b.bairro));
+  svg.append("g").selectAll("text").data(dados.filter(b => rotular.has(b.bairro))).join("text").attr("class", "rot")
+    .attr("x", b => x(b.d_lula) + Math.max(3, r(b.aptos_2t)) + 3).attr("y", b => y(b.d_flavio) + 4)
+    .attr("text-anchor", b => x(b.d_lula) > W * 0.8 ? "end" : "start").attr("dx", b => x(b.d_lula) > W * 0.8 ? -2 * Math.max(3, r(b.aptos_2t)) - 6 : 0)
+    .text(b => b.bairro.replace("Cidade Industrial de Curitiba", "CIC"));
+}
+
+const colunas = [["bairro", "Bairro", v => v], ["aptos_2t", "Eleitores", br], ["pct_lula_1t", "Lula 1º", v => pc(v)], ["pct_lula_2t", "Lula 2º", v => pc(v)],
+  ["swing", "Mudança", v => pts(v)], ["d_lula", "Votos Lula", v => sn(v, br)], ["d_flavio", "Votos Flávio", v => sn(v, br)],
+  ["d_abst", "Abstenção", v => sn(v, br)], ["pct_abstencao_2t", "Abst. 2º", v => pc(v)]];
+let ordem = ["aptos_2t", -1];
+function tabelaCwb() {
+  const dados = [...B].sort((a, b) => (a[ordem[0]] > b[ordem[0]] ? 1 : -1) * ordem[1]);
+  document.getElementById("cwb-tabela").innerHTML = `<tr>${colunas.map(([k, n]) => `<th class="ord" data-k="${k}">${n}${ordem[0] === k ? (ordem[1] > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}</tr>` +
+    dados.map(b => `<tr>${colunas.map(([k, , f]) => `<td>${f(b[k])}</td>`).join("")}</tr>`).join("");
+}
+document.getElementById("cwb-tabela").addEventListener("click", e => {
+  const th = e.target.closest("th"); if (!th) return;
+  ordem = [th.dataset.k, ordem[0] === th.dataset.k ? -ordem[1] : (th.dataset.k === "bairro" ? 1 : -1)]; tabelaCwb();
+});
+
+
+// ===================== HISTÓRIA =====================
+function historia() {
+  const H0 = D.historia, anos = [2002, 2006, 2010, 2014, 2018, 2022, 2026];
+  const cwb = H0.find(h => h.cd === "75353"), pr = H0.find(h => h.cd === "PR"), brasil = H0.find(h => h.cd === "BR");
+  const caps = H0.filter(h => !["75353", "PR", "BR"].includes(h.cd));
+  const W = largura("hist-grafico"), Hh = 380, M = { t: 14, r: 96, b: 30, l: 44 };
+  const x = d3.scalePoint().domain(anos).range([M.l, W - M.r]).padding(.1);
+  const y = d3.scaleLinear().domain([15, 85]).range([Hh - M.b, M.t]);
+  const svg = d3.select("#hist-grafico").html("").append("svg").attr("width", W).attr("height", Hh);
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${Hh - M.b})`).call(d3.axisBottom(x).tickSize(0)).call(g => g.select(".domain").remove());
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(${M.l},0)`).call(d3.axisLeft(y).ticks(7).tickSize(-(W - M.l - M.r)).tickFormat(d => d + "%"))
+    .call(g => g.selectAll(".tick line").attr("stroke-opacity", .5)).call(g => g.select(".domain").remove());
+  svg.append("line").attr("x1", M.l).attr("x2", W - M.r).attr("y1", y(50)).attr("y2", y(50)).attr("stroke", css("--texto")).attr("stroke-opacity", .5).attr("stroke-dasharray", "4 3");
+  svg.append("text").attr("x", x(2014)).attr("y", y(50) + 14).attr("text-anchor", "middle").text("50%: acima da linha, o PT ganha");
+  const linha = h => d3.line().defined(a => h.t2[a] != null).x(a => x(a)).y(a => y(h.t2[a]))(anos);
+  svg.append("g").selectAll("path").data(caps).join("path").attr("d", linha).attr("fill", "none").attr("stroke", css("--meio")).attr("stroke-width", 1).attr("stroke-opacity", .7);
+  const destaque = [[brasil, "--suave", "Brasil"], [pr, "--mesmo", "Paraná"], [cwb, "--modelo", "Curitiba"]];
+  for (const [h, cor, nome] of destaque) {
+    svg.append("path").attr("d", linha(h)).attr("fill", "none").attr("stroke", css(cor)).attr("stroke-width", nome === "Curitiba" ? 3 : 2);
+    svg.append("g").selectAll("circle").data(anos).join("circle").attr("cx", a => x(a)).attr("cy", a => y(h.t2[a])).attr("r", nome === "Curitiba" ? 4.5 : 3.5)
+      .attr("fill", css(cor)).attr("stroke", css("--cartao")).attr("stroke-width", 1.5);
+  }
+  // rótulos diretos no fim, sem encostar um no outro
+  const fim = destaque.map(([h, , nome]) => ({ nome, y: y(h.t2[2026]), v: h.t2[2026] })).sort((a, b) => a.y - b.y);
+  for (let i = 1; i < fim.length; i++) if (fim[i].y - fim[i - 1].y < 14) fim[i].y = fim[i - 1].y + 14;
+  svg.append("g").selectAll("text").data(fim).join("text").attr("class", "rot").attr("x", x(2026) + 10).attr("y", d => d.y + 4).text(d => `${d.nome} ${pc(d.v)}`);
+  // dica por ano
+  const pos = a => [...H0.filter(h => !["PR", "BR"].includes(h.cd) && h.t2[a] != null)].sort((p, q) => p.t2[a] - q.t2[a]).findIndex(h => h.cd === "75353") + 1;
+  svg.append("g").selectAll("rect").data(anos).join("rect").attr("x", a => x(a) - x.step() / 2).attr("width", x.step()).attr("y", M.t).attr("height", Hh - M.t - M.b).attr("fill", "transparent")
+    .on("mousemove", (ev, a) => mostrar(ev, `<b>${a} · PT no 2º turno</b><br>Curitiba ${pc(cwb.t2[a])} · Paraná ${pc(pr.t2[a])} · Brasil ${pc(brasil.t2[a])}<br>
+      Curitiba foi a ${pos(a)}ª capital que menos votou no PT<br><span class="sub">1º turno: Curitiba ${pc(cwb.t1[a])} · Brasil ${pc(brasil.t1[a])}</span>`)).on("mouseleave", esconder);
+  document.getElementById("hist-tabela").innerHTML = `<tr><th>Ano</th><th>Candidato do PT</th><th>Curitiba</th><th>Paraná</th><th>Brasil</th><th>Curitiba − Brasil</th><th>Posição entre as 27 capitais</th></tr>` +
+    anos.map(a => `<tr><td>${a}</td><td>${{ 2002: "Lula", 2006: "Lula", 2010: "Dilma", 2014: "Dilma", 2018: "Haddad", 2022: "Lula", 2026: "Lula" }[a]}</td>
+      <td>${pc(cwb.t2[a])}</td><td>${pc(pr.t2[a])}</td><td>${pc(brasil.t2[a])}</td><td>${pts(cwb.t2[a] - brasil.t2[a])}</td><td>${pos(a)}ª que menos votou no PT</td></tr>`).join("");
+}
+
+function tudo() { mapaCuritiba(); halteres(); dispersao(); tabelaCwb(); historia(); }
+tudo();
+let espera; addEventListener("resize", () => { clearTimeout(espera); espera = setTimeout(tudo, 150); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", tudo);
+</script>
+</body>
+</html>
