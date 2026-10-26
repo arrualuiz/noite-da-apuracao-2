@@ -34,6 +34,14 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - **20h47 · 73% apurado, Lula 51,03%; previsão 51,21%.** A previsão subiu sem parar desde os 30% (50,49 → 50,76 com 50% → 51,18 com 70%). Quando uma previsão anda sempre para o mesmo lado, isso é sinal de viés, não de ruído: o voto que chega mais tarde dentro de cada estado é mais favorável ao Lula, como no 1º turno. Minas, o termômetro (quem venceu lá venceu no Brasil em todos os 2º turnos de 2002 a 2022), está em 50,0%. Gráficos novos: mapa de quem lidera, mapa do crescimento com escala própria e o gráfico do 1º para o 2º turno por estado.
 
+- **21h02 · 89,7% apurado, Lula 51,55%; previsão 51,57%, com erro típico de 0,7 ponto: dá para afirmar com segurança.** O que os dados responderam até aqui:
+  1. *Votos dos outros candidatos:* o Lula ganhou 2,7 pontos sobre o 1º turno, em média. Pelo saldo nacional, ficou com ~80% dos votos dos outros (o case 17 dizia que ele precisava de ~65%).
+  2. *Minas:* Lula 50,29% com 91% apurado, depois de 10 trocas de liderança. O termômetro deve se manter.
+  3. *Sul:* nenhum estado mudou de lado, mas o Lula cresceu ~3 pontos nos três (PR 34,2 → 37,4; SC 27,3 → 30,6; RS 39,1 → 42,3).
+  4. *Nordeste:* os dois cresceram em votos, mas o Lula ~7 vezes mais: +2,9 milhões (21,5 → 24,4) contra +0,4 milhão do Flávio (10,4 → 10,8), na previsão para 100%.
+  5. *Comparecimento:* 81,2% contra 79,2% no 1º turno. Subiu em todas as regiões, menos no Norte.
+  6. *Virada:* +6,1 milhões de saldo para o Lula contra uma diferença de 2,2 milhões no 1º turno.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.
