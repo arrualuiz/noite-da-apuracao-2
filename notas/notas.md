@@ -52,8 +52,40 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
 
 - O Lula abriu na frente (19h18), o Flávio passou às 19h46 e liderou o placar de ~17% a ~48% apurado. **A virada veio às 20h25**, com 48,1%.
 - A previsão para 100% deu Lula o tempo todo, de 50,5% (com 30% apurado) a 51,6% (com 90%). E subiu sem parar: sinal de viés.
-- Minas, o termômetro, foi para o Lula por ~46 mil votos, depois de 9 trocas de liderança. Quem venceu em Minas venceu no Brasil de novo.
+- Minas, o termômetro, estava com o Lula por ~46 mil votos às 21h09, depois de 9 trocas de liderança. No fim a diferença mais que dobrou (veja abaixo). Quem venceu em Minas venceu no Brasil de novo.
 - **A conta dos meus palpites:** errei a margem (achei que seria menor que a de 2022, mas foi ~3,5 pontos contra 1,8) e errei a abstenção (achei que seria maior ou igual à de 2022, mas caiu para ~19%). Errei o número das 20h14 (50,2%) por ~1,5 ponto. A média das 11 pesquisas (Lula 49,2%) errou por ~2,5 pontos e apontava o Flávio na frente; eu acertei quem ganhava.
+
+## 22h17 · Números quase finais (99,99% das seções) e olhando para trás
+
+**Placar:** Lula 64.249.053 (51,78%) x Flávio 59.822.251 (48,22%), com 4.426.802 votos de diferença. Em 2022 a diferença foi de 2,14 milhões, então agora foi o dobro.
+
+**Minas:** Lula 6.345.135 (50,42%) x Flávio 6.238.495, com 106.640 votos de diferença e 99,9% apurado. Em 2022 foram 49.650. A diferença às 21h09 (~46 mil) ainda não era a final.
+
+**Quem foi votar** (em % e em pessoas):
+- Abstenção de 19,22% (30,5 milhões de pessoas), contra 21,08% no 1º turno e 20,58% no 2º turno de 2022. Votaram **2,96 milhões de pessoas a mais** que no 1º turno.
+- Brancos caíram de 2,30 para 1,43 milhão (-870 mil). Nulos caíram de 3,67 para 2,72 milhões (-951 mil).
+- A abstenção caiu em quase todo lugar. Na capital de São Paulo foi de 23,4% para 20,4% (1,86 milhão de faltosos), em Salvador de 20,1% para 15,8%, e a Bahia teve as maiores quedas (Lauro de Freitas -5,6 pts, Camaçari -4,9).
+- **A exceção foi o Norte:** em Macapá subiu +6,0 pts, em Santana (AP) +6,2 e em Cruzeiro do Sul (AC) +6,6, além de Breves e Oriximiná (PA) e Itacoatiara (AM). Ainda não sei por quê. Fica para a sprint 1.
+
+**Números absurdos (5.562 cidades 100% apuradas):**
+- Empate perfeito em Marquinho (PR), com 1.530 x 1.530. Cinco cidades foram decididas por **1 voto**: Apiacá (ES), Anhanguera (GO), Altamira do Paraná (PR), Nova Luzitânia (SP) e São João do Pau d'Alho (SP).
+- As cidades mais de um lado só foram Carnaubeira da Penha (PE), com 92,3% para o Lula, e Nova Pádua (RS), com 90,6% para o Flávio.
+- **212 cidades mudaram de lado** do 1º para o 2º turno: 211 para o Lula e 1 para o Flávio. A maior foi o Rio de Janeiro capital (47,8% → 51,5%), seguida de Osasco, Ananindeua, Macapá e São Vicente.
+- A cidade de São Paulo deu ao Lula 766 mil votos de vantagem e Curitiba deu ao Flávio 277 mil.
+- No pico, perto das 20h34, a apuração contou 32.717 votos válidos por segundo, ou ~2 milhões por minuto.
+
+**Para onde foram os votos do 1º turno** (regressão de Goodman com restrição, em todas as 5.562 cidades; é estimativa):
+- **Cury** (3,45 mi): ~55% Lula (1,9 mi), ~3% Flávio, ~41% branco/nulo (1,4 mi).
+- **Renan** (2,68 mi): ~71% Flávio (1,9 mi), ~29% Lula (0,8 mi).
+- **Caiado** (2,61 mi): ~56% Flávio (1,46 mi), ~38% Lula (0,98 mi).
+- Com todas as cidades, os números mudaram em relação aos que saíram com as cidades apuradas até as 21h (o Renan, por exemplo, foi de ~83% para ~71% Flávio). Isso mostra quanto essa estimativa depende da amostra.
+- O que ela **não** consegue ver é quem trocou de lado entre Lula e Flávio. Por isso as linhas "Lula → Lula 100%" e "Flávio → Flávio 100%" são uma suposição do método, não um resultado. Também desconfio do "branco/nulo → 84% Lula", que pode ser viés de agregação.
+
+**A minha previsão, olhando para trás** (`analise/retroativo.py`):
+- A previsão nunca deu Flávio: ficou entre 50,45% e 54% a noite toda. Mas **errou sempre para menos**: com 20% a 50% apurado, previa ~1 a 1,3 ponto menos do que deu, ou seja, 1,3 a 1,6 milhão de votos a menos na conta do Lula. Ela só chegou a ±0,5 ponto do final às 20h48, com 73% apurado.
+- **De onde veio o erro:** às 20h09 (30% das seções), 2 dos 3,2 milhões de votos de erro na diferença vieram de **São Paulo**, que tinha só 6,9% apurado (previa 42,1% para o Lula e deu 46,2%). Depois vieram Rio (-518 mil), Ceará (-373 mil) e Rio Grande do Sul (-238 mil).
+- **O peso de 10% não foi o problema.** Com 2% ou 25%, o erro mudava pouco (média de 0,86 e 0,72 ponto, contra 0,76). O problema estava no "1º turno + ganho da região": o ganho era medido nas primeiras seções, que não são parecidas com as últimas.
+- **O método que teria funcionado:** comparar cada estado com ele mesmo **no mesmo % apurado do 1º turno** e somar essa diferença ao 1º turno final do estado. Ele erra de +0,2 a +0,4 ponto desde os 20% (às 19h57, quando o placar ainda mostrava o Flávio na frente) e tem erro médio de 0,46 ponto, contra 0,76 do meu modelo. Ele não tem nenhum parâmetro para ajustar, o que é bom, mas eu testei depois de saber o resultado e numa noite só. Para confiar nele, preciso testar no 1º turno de 2026 com 2022 e nos turnos de 2022 com 2018.
 
 ## Meus palpites (19h16, antes do resultado)
 

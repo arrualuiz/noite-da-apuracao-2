@@ -2,7 +2,7 @@
 
 A noite do 2º turno da eleição para Presidente (25/10/2026), Lula x Flávio Bolsonaro, contada com dados coletados direto da API pública do TSE enquanto a apuração acontecia.
 
-**Resultado: Lula reeleito.** Na versão das 21:09 do TSE, com 97,69% das seções apuradas, o resultado ficou matematicamente definido: Lula 51,74% x Flávio Bolsonaro 48,26%. A virada no placar veio às 20h25, com 48% apurado.
+**Resultado: Lula reeleito.** Na versão das 21:09 do TSE, com 97,69% das seções apuradas, o resultado ficou matematicamente definido: Lula 51,74% x Flávio Bolsonaro 48,26%. A virada no placar veio às 20h25, com 48% apurado. Com 99,99% apurado: Lula 51,78% (64,2 milhões) x Flávio 48,22% (59,8 milhões), 4,43 milhões de votos de diferença.
 
 É a continuação do [noite-do-primeiro-turno-2026](https://github.com/arrualuiz/noite-do-primeiro-turno-2026), com o mesmo código e a mesma fonte de dados. Comecei às 19h15, com 2% das seções apuradas.
 
@@ -29,6 +29,8 @@ python3 analise/agora.py                             # onde falta apurar e o Lul
 python3 analise/trajetoria.py                        # o caminho provável do placar até 100%
 python3 analise/abstencao.py                         # abstenção de todas as cidades nos dois turnos
 python3 analise/curiosidades.py                      # números absurdos: empates, extremos, cidades que viraram
+python3 analise/transferencia.py                     # em pessoas: quem foi votar e para onde foram os votos do 1º turno
+python3 analise/retroativo.py                        # depois do resultado: o erro da previsão em cada momento e de onde ele veio
 ```
 
 Só usa a biblioteca padrão do Python.
