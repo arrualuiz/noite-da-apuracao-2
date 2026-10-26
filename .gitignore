@@ -29,3 +29,6 @@ dados/historico/ibge/
 # arquivos pessoais (só locais)
 privado/
 mover-para-dev.sh
+
+# painel consolidado: fica só no meu PC (abrir pelo Live Server)
+painel/admin.html
