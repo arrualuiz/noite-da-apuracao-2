@@ -7,6 +7,11 @@
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <link rel="stylesheet" href="comum.css">
+<style>
+.ilhas-grade { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr) 320px; align-items: start; }
+@media (max-width: 860px) { .ilhas-grade { grid-template-columns: 1fr; } }
+#ilhas-trilha a { color: var(--texto); }
+</style>
 </head>
 <body>
 <script src="menu.js"></script>
@@ -23,18 +28,26 @@
   <!-- ILHAS -->
   <section class="cartao" id="ilhas">
     <h2>Ilhas: cidades que votaram muito diferente das vizinhas</h2>
-    <div class="sub">Cada cidade comparada com as 10 mais próximas (% do Lula entre Lula e Flávio, ponderado pelos votos). Posição: centroide do município na malha do IBGE.</div>
+    <div class="sub">Cada município pintado pela diferença entre ele e as 10 cidades mais próximas (% do Lula entre Lula e Flávio). <b>Clique num estado</b> para aproximar; <b>clique numa cidade</b> para ver as vizinhas usadas na conta.</div>
     <div class="botoes" id="ilhas-modo">
       <button type="button" class="botao ativo" data-modo="fora">Diferença para as vizinhas</button>
       <button type="button" class="botao" data-modo="pct">Lula no 2º turno</button>
     </div>
-    <div id="ilhas-mapa"></div>
+    <div class="busca" style="display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 8px">
+      <select id="ilhas-uf" style="font:inherit;font-size:14px;color:var(--texto);background:var(--fundo);border:1px solid var(--linha);border-radius:8px;padding:6px 10px"></select>
+      <input id="ilhas-busca" list="ilhas-cidades" placeholder="Procure uma cidade (ex.: Curitiba)" autocomplete="off"><datalist id="ilhas-cidades"></datalist>
+    </div>
+    <div id="ilhas-trilha" style="font-size:15px;margin:6px 0"></div>
+    <div class="ilhas-grade">
+      <div id="ilhas-mapa"><div class="sub" style="padding:40px 0">carregando o mapa dos municípios…</div></div>
+      <div id="ilhas-painel"></div>
+    </div>
     <div class="legenda" id="ilhas-legenda"></div>
     <div class="duas" style="margin-top:12px">
-      <div><div class="rotulo">Ilhas vermelhas num mar azul</div><div class="sub">o Lula ganhou; as vizinhas deram Flávio</div><div class="rolar"><table id="ilhas-vermelhas"></table></div></div>
-      <div><div class="rotulo">Ilhas azuis num mar vermelho</div><div class="sub">o Flávio ganhou; as vizinhas deram Lula</div><div class="rolar"><table id="ilhas-azuis"></table></div></div>
+      <div><div class="rotulo">Ilhas vermelhas num mar azul <span id="ilhas-onde1"></span></div><div class="sub">o Lula ganhou; as vizinhas deram Flávio</div><div class="rolar"><table id="ilhas-vermelhas"></table></div></div>
+      <div><div class="rotulo">Ilhas azuis num mar vermelho <span id="ilhas-onde2"></span></div><div class="sub">o Flávio ganhou; as vizinhas deram Lula</div><div class="rolar"><table id="ilhas-azuis"></table></div></div>
     </div>
-    <p class="nota">"Votos a mais" = quantos votos o Lula teve além do que a cidade daria se votasse igual às vizinhas, com o mesmo número de votos. Quase todas as ilhas já eram ilhas no 1º turno: é algo do lugar, não da campanha. O porquê (terra indígena, universidade, polo do agronegócio, colônia europeia) ainda é hipótese: o próximo passo é testar com dados do Censo e da produção agrícola.</p>
+    <p class="nota">"Votos a mais" = quantos votos o Lula teve além do que a cidade daria se votasse igual às vizinhas, com o mesmo número de votos. Vizinhas = as 10 cidades com o centroide (IBGE) mais perto. Quase todas as ilhas já eram ilhas no 1º turno: é algo do lugar, não da campanha. O porquê (terra indígena, universidade, polo do agronegócio, colônia europeia) ainda é hipótese. Malha dos municípios: IBGE.</p>
   </section>
 
   <!-- PREVISÃO -->
@@ -82,47 +95,150 @@
 const D = /*DADOS*/null;
 document.getElementById("gerado").textContent = D.gerado;
 // ===================== ILHAS =====================
-const I = D.ilhas.map(([municipio, uf, lat, lon, eleitorado, lula, flavio, pct, viz, fora, fora_votos, pct1, fora1]) =>
-  ({ municipio, uf, lat, lon, eleitorado, lula, flavio, pct, viz, fora, fora_votos, pct1, fora1 }));
-let modoIlhas = "fora";
-const estados = topojson.feature(D.topo, D.topo.objects[Object.keys(D.topo.objects)[0]]);
-function mapaIlhas() {
-  const W = largura("ilhas-mapa"), H = Math.min(760, W * 1.0);
-  const proj = d3.geoMercator().fitExtent([[6, 6], [W - 6, H - 6]], estados);
-  const caminho = d3.geoPath(proj);
-  const svg = d3.select("#ilhas-mapa").html("").append("svg").attr("width", W).attr("height", H);
-  svg.append("g").selectAll("path").data(estados.features).join("path").attr("d", caminho)
-    .attr("fill", "none").attr("stroke", css("--suave")).attr("stroke-opacity", .45).attr("stroke-width", .8);
-  const cor = modoIlhas === "fora" ? divergente(-30, 30) : divergente(20, 80);
-  const r = d3.scaleSqrt().domain([0, 2e6]).range([0, 10]).clamp(true);
-  const ordenadas = [...I].sort((a, b) => modoIlhas === "fora" ? Math.abs(a.fora) - Math.abs(b.fora) : b.eleitorado - a.eleitorado);
-  svg.append("g").selectAll("circle").data(ordenadas).join("circle")
-    .attr("cx", c => proj([c.lon, c.lat])[0]).attr("cy", c => proj([c.lon, c.lat])[1])
-    .attr("r", c => Math.max(1.8, r(c.eleitorado))).attr("fill", c => cor(modoIlhas === "fora" ? c.fora : c.pct))
-    .attr("fill-opacity", c => modoIlhas === "fora" && Math.abs(c.fora) < 8 ? .3 : 1)
-    .attr("stroke", css("--cartao")).attr("stroke-width", .3)
-    .on("mousemove", (ev, c) => mostrar(ev, `<b>${c.municipio} (${c.uf})</b> · ${br(c.eleitorado)} eleitores<br>
-      Lula <b>${pc(c.pct)}</b> · vizinhas ${pc(c.viz)} → <b>${pts(c.fora)}</b><br>${sn(c.fora_votos, br)} votos do Lula em relação à vizinhança<br>
-      1º turno: ${pc(c.pct1)}, ${pts(c.fora1)} em relação às vizinhas<br>2º turno: Lula ${br(c.lula)} x Flávio ${br(c.flavio)}`))
-    .on("mouseleave", esconder);
-  if (modoIlhas === "fora") {
-    const rot = vermelhas.slice(0, 5).concat(azuis.slice(0, 5));
-    svg.append("g").selectAll("text").data(rot).join("text").attr("class", "rot")
-      .attr("x", c => proj([c.lon, c.lat])[0] + 5).attr("y", c => proj([c.lon, c.lat])[1] + 4).text(c => `${c.municipio} ${pts(c.fora, 0)}`);
-  }
-  const ticks = [-1, -.5, 0, .5, 1].map(t => modoIlhas === "fora" ? t * 30 : 50 + t * 30);
-  document.getElementById("ilhas-legenda").innerHTML = modoIlhas === "fora"
-    ? `<span>mais Flávio que as vizinhas (−30 pts)</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>mais Lula (+30 pts)</span><span>· tamanho = eleitores · apagadas: menos de 8 pts de diferença</span>`
-    : `<span>Flávio 80%</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>Lula 80%</span><span>· tamanho = eleitores</span>`;
-}
+// cada linha: [código IBGE, município, UF, lat, lon, eleitorado, Lula, Flávio, % Lula, % das vizinhas, diferença,
+//              votos a mais, % Lula 1º turno, diferença 1º turno, códigos IBGE das 10 vizinhas]
+const I = D.ilhas.map(([ibge, municipio, uf, lat, lon, eleitorado, lula, flavio, pct, viz, fora, fora_votos, pct1, fora1, vizinhas]) =>
+  ({ ibge: String(ibge), municipio, uf, lat, lon, eleitorado, lula, flavio, pct, viz, fora, fora_votos, pct1, fora1, vizinhas: String(vizinhas).split(" ") }));
+const porIbge = new Map(I.map(c => [c.ibge, c]));
+const UFS = { 11: "RO", 12: "AC", 13: "AM", 14: "RR", 15: "PA", 16: "AP", 17: "TO", 21: "MA", 22: "PI", 23: "CE", 24: "RN", 25: "PB", 26: "PE",
+  27: "AL", 28: "SE", 29: "BA", 31: "MG", 32: "ES", 33: "RJ", 35: "SP", 41: "PR", 42: "SC", 43: "RS", 50: "MS", 51: "MT", 52: "GO", 53: "DF" };
+const NOMES_UF = { AC: "Acre", AL: "Alagoas", AM: "Amazonas", AP: "Amapá", BA: "Bahia", CE: "Ceará", DF: "Distrito Federal", ES: "Espírito Santo",
+  GO: "Goiás", MA: "Maranhão", MG: "Minas Gerais", MS: "Mato Grosso do Sul", MT: "Mato Grosso", PA: "Pará", PB: "Paraíba", PE: "Pernambuco",
+  PI: "Piauí", PR: "Paraná", RJ: "Rio de Janeiro", RN: "Rio Grande do Norte", RO: "Rondônia", RR: "Roraima", RS: "Rio Grande do Sul",
+  SC: "Santa Catarina", SE: "Sergipe", SP: "São Paulo", TO: "Tocantins" };
+let modoIlhas = "fora", ufSel = "", cidadeSel = null, MUN = null, DIVISAS = null, PAIS = null;
 const vermelhas = I.filter(c => c.pct > 50 && c.viz < 50).sort((a, b) => b.fora - a.fora);
 const azuis = I.filter(c => c.pct < 50 && c.viz > 50).sort((a, b) => a.fora - b.fora);
-function tabelaIlhas(id, lista) {
-  document.getElementById(id).innerHTML = `<tr><th>Cidade</th><th>Lula</th><th>Vizinhas</th><th>Diferença</th><th>Votos a mais</th></tr>` +
-    lista.slice(0, 12).map(c => `<tr><td>${c.municipio} (${c.uf})</td><td>${pc(c.pct)}</td><td>${pc(c.viz)}</td><td>${pts(c.fora)}</td><td>${sn(c.fora_votos, br)}</td></tr>`).join("");
+const doEstado = c => !ufSel || c.ibge.startsWith(ufSel);
+
+document.getElementById("ilhas-uf").innerHTML = `<option value="">🇧🇷 Brasil inteiro</option>` +
+  Object.entries(UFS).sort((a, b) => NOMES_UF[a[1]].localeCompare(NOMES_UF[b[1]])).map(([cd, uf]) => `<option value="${cd}">${NOMES_UF[uf]}</option>`).join("");
+document.getElementById("ilhas-cidades").innerHTML = [...I].sort((a, b) => a.municipio.localeCompare(b.municipio)).map(c => `<option value="${c.municipio} (${c.uf})">`).join("");
+document.getElementById("ilhas-uf").addEventListener("change", ev => irPara(ev.target.value, null));
+document.getElementById("ilhas-busca").addEventListener("change", ev => {
+  const v = ev.target.value.trim().toLowerCase();
+  const c = I.find(c => `${c.municipio} (${c.uf})`.toLowerCase() === v) || I.find(c => c.municipio.toLowerCase() === v) || I.find(c => c.municipio.toLowerCase().includes(v));
+  if (c) irPara(c.ibge.slice(0, 2), c);
+});
+function irPara(uf, cidade) {
+  ufSel = uf; cidadeSel = cidade;
+  document.getElementById("ilhas-uf").value = uf;
+  mapaIlhas(); tabelasIlhas();
 }
-tabelaIlhas("ilhas-vermelhas", vermelhas);
-tabelaIlhas("ilhas-azuis", azuis);
+
+// a malha dos municípios é um arquivo à parte (3 MB), carregado depois da página
+d3.json("br-municipios.topo.json").then(topo => {
+  const obj = topo.objects[Object.keys(topo.objects)[0]];
+  MUN = topojson.feature(topo, obj).features;
+  MUN.forEach(f => { if (d3.geoArea(f) > 2 * Math.PI) f.geometry = rebobinar(f.geometry); });
+  DIVISAS = topojson.mesh(topo, obj, (a, b) => a !== b && a.properties.codarea.slice(0, 2) !== b.properties.codarea.slice(0, 2));
+  PAIS = topojson.mesh(topo, obj, (a, b) => a === b);
+  mapaIlhas();
+});
+function rebobinar(g) {
+  const inv = an => an.map(a => [...a].reverse());
+  return g.type === "Polygon" ? { ...g, coordinates: inv(g.coordinates) } : { ...g, coordinates: g.coordinates.map(inv) };
+}
+
+function mapaIlhas() {
+  trilha(); painelIlhas();
+  if (!MUN) return;
+  const W = largura("ilhas-mapa"), H = ufSel ? Math.min(680, W * 0.95) : Math.min(760, W * 1.0);
+  const alvo = { type: "FeatureCollection", features: MUN.filter(f => !ufSel || f.properties.codarea.startsWith(ufSel)) };
+  const proj = d3.geoMercator().fitExtent([[8, 8], [W - 8, H - 8]], alvo), cam = d3.geoPath(proj);
+  const cor = modoIlhas === "fora" ? divergente(-30, 30) : divergente(20, 80);
+  const valor = c => modoIlhas === "fora" ? c.fora : c.pct;
+  const svg = d3.select("#ilhas-mapa").html("").append("svg").attr("width", W).attr("height", H).style("overflow", "hidden");
+  const viz = new Set(cidadeSel ? cidadeSel.vizinhas : []);
+  svg.append("g").selectAll("path").data(MUN).join("path").attr("d", cam)
+    .attr("fill", f => { const c = porIbge.get(f.properties.codarea); return c ? cor(valor(c)) : css("--abst"); })
+    .attr("fill-opacity", f => !ufSel || f.properties.codarea.startsWith(ufSel) ? 1 : .25)
+    .attr("stroke", css("--cartao")).attr("stroke-width", ufSel ? .5 : .12)
+    .style("cursor", "pointer")
+    .on("mousemove", (ev, f) => {
+      const c = porIbge.get(f.properties.codarea);
+      mostrar(ev, c ? `<b>${c.municipio} (${c.uf})</b> · ${br(c.eleitorado)} eleitores<br>Lula <b>${pc(c.pct)}</b> · vizinhas ${pc(c.viz)} → <b>${pts(c.fora)}</b><br>
+        ${sn(c.fora_votos, br)} votos do Lula em relação à vizinhança<br>1º turno: ${pts(c.fora1)} em relação às vizinhas<br><span class="sub">clique para ${ufSel ? "ver as vizinhas" : "aproximar o estado"}</span>` : "sem dados");
+    })
+    .on("mouseleave", esconder)
+    .on("click", (ev, f) => { esconder(); const c = porIbge.get(f.properties.codarea); if (c) irPara(f.properties.codarea.slice(0, 2), c); });
+  svg.append("path").datum(DIVISAS).attr("d", cam).attr("fill", "none").attr("stroke", css("--texto")).attr("stroke-opacity", .55).attr("stroke-width", ufSel ? 1.5 : .8).style("pointer-events", "none");
+  svg.append("path").datum(PAIS).attr("d", cam).attr("fill", "none").attr("stroke", css("--texto")).attr("stroke-opacity", .55).attr("stroke-width", 1).style("pointer-events", "none");
+  // a cidade escolhida (contorno grosso) e as vizinhas (tracejado)
+  if (cidadeSel) {
+    const fv = MUN.filter(f => viz.has(f.properties.codarea)), fc = MUN.find(f => f.properties.codarea === cidadeSel.ibge);
+    svg.append("g").selectAll("path").data(fv).join("path").attr("d", cam).attr("fill", "none").attr("stroke", css("--texto"))
+      .attr("stroke-width", 1.4).attr("stroke-dasharray", "3 2").style("pointer-events", "none");
+    if (fc) svg.append("path").datum(fc).attr("d", cam).attr("fill", "none").attr("stroke", css("--texto")).attr("stroke-width", 3).style("pointer-events", "none");
+  }
+  // nomes: as maiores ilhas da área à vista e a cidade escolhida
+  const forte = c => doEstado(c) && Math.abs(c.fora) >= 8;  // só ganha nome quem foge 8 pontos ou mais
+  const rot = modoIlhas === "fora" ? vermelhas.filter(forte).slice(0, ufSel ? 4 : 5).concat(azuis.filter(forte).slice(0, ufSel ? 4 : 5)) : [];
+  if (cidadeSel && !rot.includes(cidadeSel)) rot.push(cidadeSel);
+  const ponto = c => { const f = MUN.find(f => f.properties.codarea === c.ibge); return f ? cam.centroid(f) : proj([c.lon, c.lat]); };
+  svg.append("g").style("pointer-events", "none").selectAll("text").data(rot).join("text").attr("class", "rot")
+    .attr("x", c => ponto(c)[0] + 6).attr("y", c => ponto(c)[1] + 4)
+    .style("font-weight", c => c === cidadeSel ? 700 : 400).style("font-size", c => c === cidadeSel ? "13px" : "11px")
+    .text(c => `${c.municipio}${ufSel ? "" : ` (${c.uf})`} ${pts(c.fora, 0)}`);
+  const ticks = [-1, -.5, 0, .5, 1].map(t => modoIlhas === "fora" ? t * 30 : 50 + t * 30);
+  document.getElementById("ilhas-legenda").innerHTML = (modoIlhas === "fora"
+    ? `<span>mais Flávio que as vizinhas (−30 pts)</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>mais Lula (+30 pts)</span><span>· cinza = vota igual às vizinhas</span>`
+    : `<span>Flávio 80%</span><span class="escala" style="background:${gradiente(cor, ticks)}"></span><span>Lula 80%</span>`) +
+    (cidadeSel ? `<span>· contorno grosso: ${cidadeSel.municipio} · tracejado: as 10 vizinhas</span>` : "");
+}
+
+function trilha() {
+  const uf = ufSel ? UFS[ufSel] : null;
+  const partes = [`<a href="#ilhas" data-ir="">🇧🇷 Brasil</a>`];
+  if (uf) partes.push(`<a href="#ilhas" data-ir="${ufSel}">${NOMES_UF[uf]}</a>`);
+  if (cidadeSel) partes.push(`<b>${cidadeSel.municipio}</b>`);
+  const el = document.getElementById("ilhas-trilha");
+  el.innerHTML = partes.join(' <span class="sub">›</span> ');
+  el.querySelectorAll("a").forEach(a => a.onclick = ev => { ev.preventDefault(); irPara(a.dataset.ir, null); });
+}
+
+function painelIlhas() {
+  const el = document.getElementById("ilhas-painel");
+  const lista = I.filter(doEstado), onde = ufSel ? NOMES_UF[UFS[ufSel]] : "Brasil";
+  if (!cidadeSel) {
+    const v = vermelhas.filter(doEstado), a = azuis.filter(doEstado);
+    el.innerHTML = `<div class="tile"><div class="rotulo">${onde}</div>
+      <div style="margin:6px 0">${br(lista.length)} cidades · <b>${v.length}</b> ilhas vermelhas · <b>${a.length}</b> ilhas azuis</div>
+      <div class="sub">Maior ilha vermelha: ${v[0] ? `<b>${v[0].municipio}</b> (${pts(v[0].fora)})` : "nenhuma"}<br>
+      Maior ilha azul: ${a[0] ? `<b>${a[0].municipio}</b> (${pts(a[0].fora)})` : "nenhuma"}</div>
+      <p class="sub" style="margin-top:10px">${ufSel ? "Clique numa cidade para ver as vizinhas." : "Clique num estado no mapa (ou escolha na lista) para aproximar."}</p></div>`;
+    return;
+  }
+  const c = cidadeSel, vz = c.vizinhas.map(v => porIbge.get(v)).filter(Boolean).sort((a, b) => b.pct - a.pct);
+  const rank = [...lista].sort((a, b) => b.fora - a.fora).indexOf(c) + 1;
+  el.innerHTML = `<div class="tile"><div class="rotulo">${c.municipio} · ${NOMES_UF[c.uf] || c.uf}</div>
+    <div class="grande" style="font-size:22px">${pts(c.fora)}</div>
+    <div class="sub">Lula ${pc(c.pct)} na cidade x ${pc(c.viz)} nas vizinhas · ${sn(c.fora_votos, br)} votos do Lula em relação à vizinhança<br>
+    1º turno: ${pc(c.pct1)}, ${pts(c.fora1)} em relação às vizinhas · ${br(c.eleitorado)} eleitores · Lula ${br(c.lula)} x Flávio ${br(c.flavio)}<br>
+    Em ${onde}, é a ${rank}ª de ${lista.length} que mais foge para o lado do Lula.</div>
+    <table style="margin-top:8px;font-size:13px"><tr><th>As 10 vizinhas</th><th>Lula</th><th>Eleitores</th></tr>
+    ${vz.map(v => `<tr style="cursor:pointer" data-ibge="${v.ibge}"><td>${v.municipio}${v.uf !== c.uf ? ` <span class="sub">${v.uf}</span>` : ""}</td><td>${pc(v.pct)}</td><td>${br(v.eleitorado)}</td></tr>`).join("")}
+    <tr style="font-weight:700"><td>Média das vizinhas</td><td>${pc(c.viz)}</td><td></td></tr></table>
+    <div class="sub" style="margin-top:6px">A média é ponderada pelos votos. Clique numa vizinha para ir até ela.</div></div>`;
+  el.querySelectorAll("tr[data-ibge]").forEach(tr => tr.onclick = () => { const v = porIbge.get(tr.dataset.ibge); irPara(v.ibge.slice(0, 2), v); });
+}
+
+function tabelasIlhas() {
+  const onde = ufSel ? `em ${NOMES_UF[UFS[ufSel]]}` : "no Brasil";
+  document.getElementById("ilhas-onde1").textContent = document.getElementById("ilhas-onde2").textContent = `· ${onde}`;
+  for (const [id, lista] of [["ilhas-vermelhas", vermelhas], ["ilhas-azuis", azuis]]) {
+    const l = lista.filter(doEstado).slice(0, 12);
+    const t = document.getElementById(id);
+    t.innerHTML = `<tr><th>Cidade</th><th>Lula</th><th>Vizinhas</th><th>Diferença</th><th>Votos a mais</th></tr>` +
+      (l.length ? l.map(c => `<tr style="cursor:pointer" data-ibge="${c.ibge}"><td>${c.municipio} (${c.uf})</td><td>${pc(c.pct)}</td><td>${pc(c.viz)}</td><td>${pts(c.fora)}</td><td>${sn(c.fora_votos, br)}</td></tr>`).join("")
+        : `<tr><td colspan="5" class="sub">nenhuma</td></tr>`);
+    t.querySelectorAll("tr[data-ibge]").forEach(tr => tr.onclick = () => {
+      const c = porIbge.get(tr.dataset.ibge); irPara(c.ibge.slice(0, 2), c);
+      document.getElementById("ilhas").scrollIntoView({ behavior: "smooth" });
+    });
+  }
+}
+tabelasIlhas();
 botoes("ilhas-modo", m => { modoIlhas = m; mapaIlhas(); });
 
 // ===================== PREVISÃO =====================

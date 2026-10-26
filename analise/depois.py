@@ -102,9 +102,14 @@ def historia():
 
 
 def ilhas():
+    """Cada cidade x as vizinhas, com o código do IBGE (para achar o desenho do município na malha
+    painel/br-municipios.topo.json) e os códigos das 10 vizinhas usadas na conta."""
+    cfg = json.loads((PASTA / "municipios-6258.json").read_text(encoding="utf-8"))
+    ibge = {m["cd"]: m.get("cdi", "") for a in cfg["abr"] for m in a["mu"]}
     campos = ("municipio", "uf", "lat", "lon", "eleitorado", "lula", "flavio", "pct_lula", "pct_lula_vizinhas",
               "fora_pts", "fora_votos", "pct_lula_1t", "fora_pts_1t")
-    return [[num(r[k]) for k in campos] for r in ler("ilhas.csv")]
+    return [[ibge.get(r["cd_tse"], "")] + [num(r[k]) for k in campos] + [" ".join(ibge.get(v, "") for v in r["vizinhas"].split())]
+            for r in ler("ilhas.csv")]
 
 
 def abstencao_uf():
@@ -140,7 +145,6 @@ def main():
     dados = {
         "gerado": gerado,
         "ilhas": ilhas(),
-        "topo": json.loads((PASTA / "br-estados.topo.json").read_text(encoding="utf-8")),
         "retroativo": [{k: num(v) for k, v in r.items()} for r in ler("retroativo.csv")],
         "transferencia": [{k: num(v) for k, v in r.items()} for r in ler("transferencia.csv")],
         "abstencao": abstencao_uf(),

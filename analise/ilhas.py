@@ -144,6 +144,7 @@ def main():
         c["viz_pl1"] = sum(o["pl1"] * (o["lula"] + o["flavio"]) for o in viz) / peso
         c["viz_km"] = km(c["pos"], viz[-1]["pos"])
         c["viz_nomes"] = [o["nome"].rsplit(" (", 1)[0] for o in viz[:3]]
+        c["viz_cds"] = [o["cd"] for o in viz]
         c["fora"] = c["pl"] - c["viz_pl"]
         c["fora1"] = c["pl1"] - c["viz_pl1"]
         # votos do Lula além (ou aquém) do que a vizinhança faria com o mesmo número de votos
@@ -152,11 +153,12 @@ def main():
     with (PASTA / "ilhas.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
         w.writerow(["cd_tse", "municipio", "uf", "lat", "lon", "eleitorado", "lula", "flavio", "pct_lula", "pct_lula_vizinhas",
-                     "fora_pts", "fora_votos", "pct_lula_1t", "pct_lula_vizinhas_1t", "fora_pts_1t", "raio_km"])
+                     "fora_pts", "fora_votos", "pct_lula_1t", "pct_lula_vizinhas_1t", "fora_pts_1t", "raio_km", "vizinhas"])
         for c in sorted(cid, key=lambda c: -abs(c["fora"])):
             w.writerow([c["cd"], c["nome"].rsplit(" (", 1)[0], c["uf"], *c["pos"], c["te"], c["lula"], c["flavio"],
                         round(c["pl"], 2), round(c["viz_pl"], 2), round(c["fora"], 2), round(c["fora_votos"]),
-                        round(c["pl1"], 2), round(c["viz_pl1"], 2), round(c["fora1"], 2), round(c["viz_km"], 1)])
+                        round(c["pl1"], 2), round(c["viz_pl1"], 2), round(c["fora1"], 2), round(c["viz_km"], 1),
+                        " ".join(c["viz_cds"])])
 
     def mostrar(titulo, lista):
         print(titulo)
