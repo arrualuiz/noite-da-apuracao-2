@@ -4,6 +4,8 @@
 Junta os CSVs gerados pelos outros scripts e grava painel/depois.html a partir de
 painel/depois-template.html (troca /*DADOS*/null pelo JSON):
   - Curitiba por escola e por bairro      dados/curitiba_secoes.csv, dados/curitiba_bairros.csv (analise/bairros.py)
+                                         e o contorno do município, dados/curitiba-contorno.geojson (IBGE, malha
+                                         municipal: servicodados.ibge.gov.br/api/v3/malhas/municipios/4106902)
   - ilhas: cidades x vizinhas            dados/ilhas.csv (analise/ilhas.py)
   - a previsão olhando para trás         dados/retroativo.csv (analise/retroativo.py)
   - para onde foram os votos do 1º turno dados/transferencia.csv (analise/transferencia.py)
@@ -58,7 +60,8 @@ def curitiba():
         if e["lula_2t"] + e["flavio_2t"] and e["lula_1t"] + e["flavio_1t"]:
             lista.append(e)
     bairros = [{k: num(v) for k, v in b.items()} for b in ler("curitiba_bairros.csv")]
-    return {"escolas": lista, "fora_do_mapa": fora, "bairros": bairros}
+    contorno = json.loads((PASTA / "curitiba-contorno.geojson").read_text(encoding="utf-8"))
+    return {"escolas": lista, "fora_do_mapa": fora, "bairros": bairros, "contorno": contorno}
 
 
 def ilhas():

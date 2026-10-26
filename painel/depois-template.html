@@ -76,7 +76,7 @@ nav a { margin-right: 14px; color: var(--suave); }
     <div class="grade" id="cwb-tiles"></div>
 
     <h3>O mapa das escolas</h3>
-    <div class="sub">Cada bolinha é um local de votação; o tamanho é o número de eleitores.</div>
+    <div class="sub">Cada bolinha é um local de votação; o tamanho é o número de eleitores. Contorno do município: malha do IBGE.</div>
     <div class="botoes" id="cwb-modo">
       <button type="button" class="botao ativo" data-modo="pct">Lula no 2º turno</button>
       <button type="button" class="botao" data-modo="swing">Quanto o Lula cresceu do 1º para o 2º turno</button>
@@ -217,14 +217,19 @@ const E = C.escolas.map(e => ({ ...e,
     t("Bairros com o Lula na frente", `${lider.length} de ${B.length}`, lider.map(b => b.bairro).join(", "));
 })();
 
+// contorno do município (IBGE). O d3 quer o anel externo no sentido horário; se vier ao contrário, a área
+// passa de meia esfera e o anel é invertido
+const contornoCwb = C.contorno.features[0];
+if (d3.geoArea(contornoCwb) > 2 * Math.PI) contornoCwb.geometry.coordinates.forEach(anel => anel.reverse());
 let modoCwb = "pct";
 function mapaCuritiba() {
   const W = largura("cwb-mapa"), H = Math.min(640, Math.max(380, W * 0.95));
-  const pontos = { type: "MultiPoint", coordinates: E.map(e => [e.lon, e.lat]) };
-  const proj = d3.geoMercator().fitExtent([[10, 10], [W - 10, H - 10]], pontos);
+  const proj = d3.geoMercator().fitExtent([[10, 10], [W - 10, H - 10]], contornoCwb);
   const cor = modoCwb === "pct" ? divergente(20, 80) : sequencial(0, 7);
   const r = d3.scaleSqrt().domain([0, d3.max(E, e => e.aptos_2t)]).range([0, 11]);
   const svg = d3.select("#cwb-mapa").html("").append("svg").attr("width", W).attr("height", H);
+  svg.append("path").datum(contornoCwb).attr("d", d3.geoPath(proj))
+    .attr("fill", css("--fundo")).attr("stroke", css("--suave")).attr("stroke-width", 1.5).attr("stroke-linejoin", "round");
   // nomes dos bairros grandes, no centro das suas escolas (atrás das bolinhas)
   const porBairro = d3.rollups(E, v => ({ lat: d3.mean(v, e => e.lat), lon: d3.mean(v, e => e.lon), n: d3.sum(v, e => e.aptos_2t) }), e => e.bairro)
     .filter(([, v]) => v.n >= 40000);
