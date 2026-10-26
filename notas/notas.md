@@ -42,6 +42,8 @@ As urnas fecharam às 17h. Liguei o coletor do 1º turno, agora apontado para o 
   5. *Comparecimento:* 81,2% contra 79,2% no 1º turno. Subiu em todas as regiões, menos no Norte.
   6. *Virada:* +6,1 milhões de saldo para o Lula contra uma diferença de 2,2 milhões no 1º turno.
 
+- **21h05 · números absurdos** (`analise/curiosidades.py`, com 4.436 cidades 100% apuradas): Marquinho (PR) empatou, 1.530 x 1.530. Cinco cidades foram decididas por 1 voto. Carnaubeira da Penha (PE) deu 92,3% para o Lula, e Nova Pádua (RS), 90,6% para o Flávio. 169 cidades mudaram de lado do 1º para o 2º turno, e 168 delas para o Lula (a maior, Ribeirão das Neves-MG). Minas: Lula por 46.336 votos com 94% apurado, menos que um Mineirão lotado e menos até que os 49.650 de 2022. Pico da apuração: 32.717 votos por segundo, perto das 20h34.
+
 ## Meus palpites (19h16, antes do resultado)
 
 1. **Lula ganha, com uma margem extremamente apertada.** Em 2022 foi um sufoco (Lula 50,90% x Bolsonaro 49,10%, diferença de 1,80 ponto ou 2,14 milhões de votos). Acho que vai ser parecido, mas com a diferença menor ainda.
