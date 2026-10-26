@@ -1,6 +1,17 @@
 # Plano em sprints
 
-Agora o foco é a noite inteira: os dados guardados, os painéis e a previsão. As sprints 1 a 5 ficam para depois.
+## Onde parei (26/10, 01h)
+
+A noite acabou (Lula eleito, 100% apurado, coletor desligado) e a Sprint 1 andou quase toda na própria madrugada. Tudo está commitado e no GitHub; o site está no ar em https://arrualuiz.github.io/noite-da-apuracao-2/ (capa, A noite, O Brasil, Curitiba, 1º → 2º turno, com o menu `painel/menu.js` em todas). O painel consolidado `painel/admin.html` fica só no PC (http://127.0.0.1:5500/painel/admin.html).
+
+Para amanhã, na ordem:
+1. 🙋 Revisar e publicar o post do LinkedIn (`notas/post-linkedin.md`), com prints do mapa de Curitiba por bairro, dos mini mapas 2002–2026, da previsão olhando para trás e das ilhas.
+2. ⚙️ Testar as hipóteses das ilhas com o Censo 2022 (% indígena, já baixável por município) e a área de soja (`analise/municipios.py`).
+3. ⚙️ Testar o método "mesmo ponto do 1º turno" no 1º turno de 2026 (contra 2022), para ver se não foi sorte.
+4. ⚙️ Por que a abstenção subiu no Norte (Amapá +8 pts).
+5. Depois: Sprint 2 (R/Quarto), com os CSVs de `dados/` já prontos.
+
+Como atualizar o site: está no README, seção "O site".
 
 Objetivo: transformar a noite do 2º turno num case de **análise de dados** para o LinkedIn, mostrando o caminho completo: coleta, banco, análise em R, pipeline em Databricks e relatório em Fabric/Power BI. A ideia é que uma empresa de dados olhe e veja que eu sei trabalhar com dados de ponta a ponta.
 
@@ -17,7 +28,7 @@ A lista vai crescendo conforme as dúvidas aparecem. O painel `painel/perguntas.
 5. **O comparecimento mudou do 1º para o 2º turno?** Polêmicas sobre transporte público no Sudeste e no Nordeste, e o clima no Sul. Os dados medem a diferença; a causa precisa de outra fonte (notícias, clima por município) e fica para depois.
 6. **O Lula cresceu em cada estado? Isso dá para tirar a diferença do 1º turno?** Mapa do ganho do Lula e a virada de cada estado em votos, somada contra a diferença do 1º turno (Flávio +2,22 milhões).
 
-## Sprint 0 · A noite (25/10, 19h15 até o fim da apuração) ▶️
+## Sprint 0 · A noite (25/10, 19h15 até o fim da apuração) ✅
 
 - [x] ⚙️ Coletor do 1º turno apontado para o 2º (TSE 6258), uma coleta por minuto, PC sem suspender
 - [x] 🙋 Palpites registrados às 19h16 (`dados/palpites.csv`)
@@ -25,9 +36,9 @@ A lista vai crescendo conforme as dúvidas aparecem. O painel `painel/perguntas.
 - [x] 🙋 Repositório público no GitHub: https://github.com/arrualuiz/noite-da-apuracao-2 (19h55)
 - [x] ⚙️ Coletor religado com `--git`: envia os dados ao GitHub a cada 30 min e no fim
 - [x] ⚙️ Painel das perguntas (`painel/perguntas.html`) e previsão do resultado final (`analise/perguntas.py`, `dados/previsao.csv`), recalculados a cada coleta
-- [ ] ⚙️ Anotar no diário os marcos da noite: virada (se houver), resultado matematicamente definido e 100%
+- [x] ⚙️ Anotar no diário os marcos da noite: virada às 20h25, resultado definido às 21h09, 100% e totalização às 23h28 (`notas/notas.md` e `notas/linha-do-tempo.md`)
 
-## Sprint 1 · Fechar a noite (26 e 27/10)
+## Sprint 1 · Fechar a noite (começou na madrugada de 25 para 26/10) ▶️
 
 - [x] ⚙️ Conferir os palpites com o resultado final (em `notas/notas.md`, com 99,99% apurado)
 - [x] ⚙️ Olhar para trás: o erro da previsão em cada momento e de onde veio (`analise/retroativo.py`: o modelo previu menos Lula a noite toda, por causa de SP; o método "mesmo ponto do 1º turno" errava menos)
@@ -40,7 +51,11 @@ A lista vai crescendo conforme as dúvidas aparecem. O painel `painel/perguntas.
 - [ ] ⚙️ Adaptar o painel para o 2º turno (hoje ele ainda tem textos do 1º)
 - [x] ⚙️ README com a linha do tempo da noite (`notas/linha-do-tempo.md`)
 - [ ] 🙋 Revisar e publicar o post do LinkedIn (`notas/post-linkedin.md`), com as imagens do mapa de Curitiba, da previsão e das ilhas
-- [ ] ⚙️ Testar as hipóteses de Curitiba: renda e escolaridade por bairro (Censo 2022) x voto por bairro, de 2006 a 2026
+- [x] ⚙️ Testar as hipóteses de Curitiba: renda e cor por bairro (Censo 2022) x voto por bairro, de 2002 a 2026 (`analise/curitiba_historia.py`): até 2014 a renda explicava o voto (r ≈ −0,9); em 2026, quase nada (−0,17). Escolaridade por bairro não existe no Censo (só alfabetização, ~100% em todos)
+- [x] ⚙️ Do 1º para o 2º turno em todas as eleições do PT, por estado e capital (`analise/crescimento.py`, `painel/crescimento.html`) e Curitiba eleição a eleição
+- [x] ⚙️ Auditoria das contas do TSE (`analise/auditoria.py`): urnas de Curitiba e todos os municípios fecham, sem nenhuma inconsistência
+- [x] ⚙️ Ilhas num mapa por município, com zoom no estado e as 10 vizinhas de cada cidade
+- [x] ⚙️ Menu em todas as páginas e painel consolidado (admin) só no PC
 
 ## Sprint 2 · Análise em R (28/10 a 02/11)
 
