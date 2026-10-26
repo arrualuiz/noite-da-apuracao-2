@@ -13,7 +13,10 @@ do projeto aberta.
 | Curitiba, escola por escola (com busca) | http://127.0.0.1:5500/painel/depois.html#curitiba |
 | Ilhas | http://127.0.0.1:5500/painel/depois.html#ilhas |
 | A previsão olhando para trás | http://127.0.0.1:5500/painel/depois.html#previsao |
+| **O site publicado (GitHub Pages)** | https://arrualuiz.github.io/noite-da-apuracao-2/ |
+| Curitiba no site (mapa por bairro, escolas e o voto desde 2002) | https://arrualuiz.github.io/noite-da-apuracao-2/painel/curitiba.html |
 | Diário da noite (palpites, virada, resultado, olhando para trás) | [notas.md](notas.md) |
+| Rascunho do post do LinkedIn | [post-linkedin.md](post-linkedin.md) |
 | Plano em sprints | [../PLANO.md](../PLANO.md) |
 | Repositório | https://github.com/arrualuiz/noite-da-apuracao-2 |
 
@@ -52,6 +55,15 @@ do projeto aberta.
 - **23h28** · Página **Depois da apuração**, com tudo em gráficos. O coletor fechou: apuração encerrada, 100%.
 - **23h29** · Mapa de Curitiba com o contorno do município (IBGE).
 - **23h34** · Busca de escola no mapa. A minha, o **Colégio Estadual Professor Narciso Mendes** (Xaxim, 11 seções), foi de 26,7% para 31,6% de Lula: a 13ª de 405 escolas em que o Lula mais cresceu.
+
+- **23h41** · Esta linha do tempo. **23h48** · As pendências que saíram da noite foram para o `PLANO.md`.
+- **23h59** · **O site no GitHub Pages:** capa (`index.html`), página de Curitiba e página do Brasil, e o painel da noite congelado no resultado final. Na página de Curitiba:
+  - o mapa por bairro, pintando cada um dos 75 bairros oficiais (malha do IPPUC), e o mapa por escola com as divisas. Cada escola entra no bairro onde ela fica de fato: em 680 seções, o bairro do cadastro do TSE era outro;
+  - **por que Curitiba vota assim**, com `capitais_historia.py`: em 2002, Curitiba deu 64,7% ao Lula, mais que o Brasil. A virada foi em 2006; em 2014, foi a capital que menos votou no PT; em 2018, 76,5% Bolsonaro. Em 2026 (37,7%), votou igual ao Paraná. O porquê (Lava Jato, classe média, imigração) ficou como hipótese, com fontes.
+
+## Depois da meia-noite (26/10)
+
+- **00h01** · Rascunho do post do LinkedIn ([post-linkedin.md](post-linkedin.md)).
 
 ## Como fecharam os palpites
 
