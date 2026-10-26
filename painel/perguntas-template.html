@@ -125,6 +125,16 @@ svg .eixo { stroke: var(--linha); }
   </div>
 
   <section class="cartao secao">
+    <div class="rotulo">Minas, o espelho do Brasil</div>
+    <div class="pergunta">Minas vota como o Brasil? Quem ganha lá ganha no país?</div>
+    <div id="espelho-resumo" class="sub"></div>
+    <div class="grade" id="espelho-anos" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"></div>
+    <div class="rotulo" style="margin-top:6px">2026, Minas x Brasil, número a número</div>
+    <div class="grade" id="espelho-cartoes"></div>
+    <p class="nota">PT = o candidato do PT entre os dois do 2º turno (Lula em 2002, 2006, 2022 e 2026; Dilma em 2010 e 2014; Haddad em 2018). Os números de 2026 são do 2º turno nas seções já apuradas e do resultado final do 1º turno. "Brancos e nulos" é % de quem foi votar.</p>
+  </section>
+
+  <section class="cartao secao">
     <div class="rotulo">Capital x interior</div>
     <div class="pergunta">Como o Lula está na capital, na Grande SP e no interior? (e no Rio e em BH)</div>
     <div class="rolar"><table id="t-segmentos"></table></div>
@@ -403,6 +413,50 @@ document.querySelectorAll("[data-escala]").forEach(b => b.addEventListener("clic
   h += linha("Nordeste", "", R.lula_1t, R.prev_lula, R.flavio_1t, R.prev_flavio, true);
   for (const e of ufs) h += linha(e.nome, pc(e.apurado, 1), e.lula_1t, e.prev_lula, e.flavio_1t, e.prev_flavio);
   document.getElementById("t-nordeste").innerHTML = h;
+})();
+
+// Minas, o espelho do Brasil
+(function () {
+  const E = D.espelho, M = E.lado.mg, B = E.lado.br;
+  const n2 = n => n.toFixed(2).replace(".", ",");
+  const pts = n => sinal(n, x => n2(x)) + " pts";
+  const mi = n => sinal(n, x => x >= 1e6 ? (x / 1e6).toFixed(2).replace(".", ",") + " mi" : br(x));
+  const quem = p => p >= 50 ? "PT" : "rival";
+  const nomes = { PSDB: "PSDB", PSL: "Bolsonaro", PL: "Bolsonaro" };
+  const l1 = s => s.lula_1t / (s.lula_1t + s.flavio_1t) * 100;  // Lula entre Lula e Flávio no 1º turno
+  const anos = E.anos.map(a => ({ titulo: `${a.ano}`, sub: `PT x ${nomes[a.rival] || a.rival}`, mg: a.mg, br: a.br }))
+    .concat([{ titulo: "2026 · 1º turno", sub: "Lula x Flávio", mg: l1(M), br: l1(B) },
+             { titulo: "2026", sub: "Lula x Flávio", mg: M.lula_2t, br: B.lula_2t }]);
+  const iguais = anos.filter(a => quem(a.mg) === quem(a.br)).length;
+  const media = anos.reduce((s, a) => s + Math.abs(a.mg - a.br), 0) / anos.length;
+  document.getElementById("espelho-resumo").innerHTML =
+    `Em <b>${iguais} de ${anos.length}</b> disputas desde 2002, quem venceu em Minas venceu no Brasil. A distância média entre Minas e o Brasil é de <b>${n2(media)} pts</b>.`;
+  const linhaPct = (rot, p) => `<div style="display:flex;justify-content:space-between;font-variant-numeric:tabular-nums"><span class="sub">${rot}</span><b>${pc(p)}</b></div>${barra(p)}`;
+  document.getElementById("espelho-anos").innerHTML = anos.map(a => {
+    const ok = quem(a.mg) === quem(a.br);
+    return `<div class="cartao"><div class="rotulo">${a.titulo}</div><div class="sub" style="margin-bottom:4px">${a.sub} · % do ${a.sub.split(" x ")[0]}</div>
+      ${linhaPct("Minas", a.mg)}${linhaPct("Brasil", a.br)}
+      <div class="sub" style="color:${ok ? "var(--ok)" : "var(--destaque)"}">${ok ? "✔ mesmo vencedor" : "✘ vencedores diferentes"} · Minas ${pts(a.mg - a.br)}</div></div>`;
+  }).join("");
+  const cartaoEsp = (rot, mg, brr, mgPessoas, brPessoas, nota) => `<div class="cartao"><div class="rotulo">${rot}</div>
+    <div style="display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:baseline;margin-top:4px">
+      <span class="sub">Minas</span><b class="grande" style="font-size:22px">${mg}</b><span class="sub">${mgPessoas}</span>
+      <span class="sub">Brasil</span><b style="font-size:17px">${brr}</b><span class="sub">${brPessoas}</span></div>
+    <div class="sub" style="margin-top:4px">${nota}</div></div>`;
+  const dif = (a, b) => `Minas ${pts(a - b)} em relação ao Brasil`;
+  document.getElementById("espelho-cartoes").innerHTML = [
+    cartaoEsp("Lula no 2º turno · % dos válidos", pc(M.lula_2t), pc(B.lula_2t), `${mi(M.lula_votos - M.flavio_votos)} de vantagem`, `${mi(B.lula_votos - B.flavio_votos)} de vantagem`, dif(M.lula_2t, B.lula_2t)),
+    cartaoEsp("Lula no 1º turno · % dos válidos", pc(M.lula_1t), pc(B.lula_1t), `${br(M.lula_1t_votos)} votos`, `${br(B.lula_1t_votos)} votos`, dif(M.lula_1t, B.lula_1t)),
+    cartaoEsp("Flávio no 1º turno · % dos válidos", pc(M.flavio_1t), pc(B.flavio_1t), `${br(M.flavio_1t_votos)} votos`, `${br(B.flavio_1t_votos)} votos`, dif(M.flavio_1t, B.flavio_1t)),
+    cartaoEsp("Os outros candidatos no 1º turno", pc(M.outros_1t), pc(B.outros_1t), `${br(M.outros_1t_votos)} votos`, `${br(B.outros_1t_votos)} votos`,
+      `Cury ${pc(M.cury_1t)} em Minas (Brasil ${pc(B.cury_1t)}) · Renan ${pc(M.renan_1t)} (${pc(B.renan_1t)}) · Caiado ${pc(M.caiado_1t)} (${pc(B.caiado_1t)})`),
+    cartaoEsp("Lula: votos ganhos do 1º para o 2º turno", sinal(M.cresc_lula, pc), sinal(B.cresc_lula, pc), `${mi(M.cresc_lula_n)} pessoas`, `${mi(B.cresc_lula_n)} pessoas`, dif(M.cresc_lula, B.cresc_lula)),
+    cartaoEsp("Flávio: votos ganhos do 1º para o 2º turno", sinal(M.cresc_flavio, pc), sinal(B.cresc_flavio, pc), `${mi(M.cresc_flavio_n)} pessoas`, `${mi(B.cresc_flavio_n)} pessoas`, dif(M.cresc_flavio, B.cresc_flavio)),
+    cartaoEsp("Abstenção no 2º turno", pc(M.abst_2t), pc(B.abst_2t), `${br(M.abst_2t_n)} pessoas`, `${br(B.abst_2t_n)} pessoas`,
+      `Do 1º para o 2º turno: Minas ${pts(M.abst_2t - M.abst_1t)} (${mi(M.abst_2t_n - M.abst_1t_n)} pessoas), Brasil ${pts(B.abst_2t - B.abst_1t)} (${mi(B.abst_2t_n - B.abst_1t_n)})`),
+    cartaoEsp("Brancos e nulos no 2º turno", pc(M.bn_2t), pc(B.bn_2t), `${br(M.bn_2t_n)} pessoas`, `${br(B.bn_2t_n)} pessoas`,
+      `Do 1º para o 2º turno: Minas ${pts(M.bn_2t - M.bn_1t)} (${mi(M.bn_2t_n - M.bn_1t_n)} pessoas), Brasil ${pts(B.bn_2t - B.bn_1t)} (${mi(B.bn_2t_n - B.bn_1t_n)})`),
+  ].join("");
 })();
 
 // comparecimento

@@ -186,6 +186,52 @@ def segmentos_ultimos():
     return out
 
 
+def resumo_uf(arq):
+    """Números de um arquivo {uf}-u.json do TSE (qualquer turno), com os candidatos pelo número."""
+    u = json.loads(arq.read_text(encoding="utf-8"))
+    e, v = u["e"], u["v"]
+    c = {x["n"]: int(x["vap"]) for a in u["carg"][0]["agr"] for p in a["par"] for x in p["cand"]}
+    return {"te": int(e["te"]), "c": int(e["c"]), "a": int(e["a"]), "vv": int(v["vv"]),
+            "bn": int(v["vb"]) + int(v["tvn"]), "cand": c}
+
+
+def espelho_minas(pasta):
+    """Minas x Brasil: quem ganhou em cada 2º turno desde 2002, e os números de 2026 lado a lado."""
+    hist = {}
+    for nome, filtro in (("BR", None), ("MG", "MG")):
+        arq = "presidente_votos.csv" if filtro is None else "presidente_votos_uf.csv"
+        for r in csv.DictReader((PASTA / "historico" / arq).open(encoding="utf-8")):
+            if r["turno"] == "2" and (filtro is None or r["uf"] == filtro):
+                hist.setdefault(r["ano"], {}).setdefault(nome, {})[r["partido"]] = int(r["votos"])
+    anos = []
+    for ano, x in sorted(hist.items()):
+        pt = {k: x[k]["PT"] / sum(x[k].values()) * 100 for k in ("BR", "MG")}
+        rival = next(p for p in x["BR"] if p != "PT")
+        anos.append({"ano": int(ano), "rival": rival, "mg": round(pt["MG"], 2), "br": round(pt["BR"], 2),
+                     "mg_dif": x["MG"]["PT"] - x["MG"][rival]})
+    brutos_1t = sorted(d for d in (RAIZ.parent / "xx-noite-do-primeiro-turno-2026" / "dados" / "brutos").iterdir()
+                       if (d / "br-u.json").exists())[-1]
+    lado = {}
+    for k in ("br", "mg"):
+        t2, t1 = resumo_uf(pasta / f"{k}-u.json"), resumo_uf(brutos_1t / f"{k}-u.json")
+        l2, f2 = t2["cand"].get("13", 0), t2["cand"].get("22", 0)
+        l1, f1 = t1["cand"].get("13", 0), t1["cand"].get("22", 0)
+        lado[k] = {
+            "lula_2t": round(l2 / (l2 + f2) * 100, 2), "lula_votos": l2, "flavio_votos": f2,
+            "lula_1t": round(l1 / t1["vv"] * 100, 2), "flavio_1t": round(f1 / t1["vv"] * 100, 2),
+            "lula_1t_votos": l1, "flavio_1t_votos": f1,
+            "outros_1t": round((t1["vv"] - l1 - f1) / t1["vv"] * 100, 2), "outros_1t_votos": t1["vv"] - l1 - f1,
+            **{f"{n}_1t": round(t1["cand"].get(c, 0) / t1["vv"] * 100, 2) for n, c in (("cury", "70"), ("renan", "14"), ("caiado", "55"))},
+            "abst_1t": round(t1["a"] / (t1["c"] + t1["a"]) * 100, 2), "abst_2t": round(t2["a"] / (t2["c"] + t2["a"]) * 100, 2),
+            "abst_1t_n": t1["a"], "abst_2t_n": t2["a"],
+            "bn_1t": round(t1["bn"] / t1["c"] * 100, 2), "bn_2t": round(t2["bn"] / t2["c"] * 100, 2),
+            "bn_1t_n": t1["bn"], "bn_2t_n": t2["bn"],
+            "cresc_lula": round((l2 - l1) / l1 * 100, 2), "cresc_flavio": round((f2 - f1) / f1 * 100, 2),
+            "cresc_lula_n": l2 - l1, "cresc_flavio_n": f2 - f1, "eleitorado": t2["te"],
+        }
+    return {"anos": anos, "lado": lado}
+
+
 def main():
     t1, v22 = ler_1t(), ler_2022()
     coletas = sorted(d for d in BRUTOS.iterdir() if (d / "br-u.json").exists())
@@ -248,6 +294,7 @@ def main():
                              if (PASTA / "uol-evolucao-2026-t1.json").exists() else [])],
         "pesquisas": list(csv.DictReader((PASTA / "pesquisas.csv").open(encoding="utf-8"))) if (PASTA / "pesquisas.csv").exists() else [],
         "palpites": list(csv.DictReader((PASTA / "palpites.csv").open(encoding="utf-8"))),
+        "espelho": espelho_minas(ultima),
     }
     html = TEMPLATE.read_text(encoding="utf-8").replace("/*DADOS*/null", json.dumps(dados, ensure_ascii=False))
     SAIDA_HTML.write_text(html, encoding="utf-8")
