@@ -21,7 +21,7 @@ Abstenção: variação do 1º para o 2º turno (pts),cidades,mais perto de zero
 Abstenção: variação do 1º para o 2º turno (pts),cidades com 50.000+ eleitores,mínimo,Lauro De Freitas (BA),-5.6436,-9248,163872,0
 Abstenção: variação do 1º para o 2º turno (pts),cidades com 50.000+ eleitores,máximo,Cruzeiro Do Sul (AC),6.6369,4251,63902,0
 Abstenção: variação do 1º para o 2º turno (pts),cidades com 50.000+ eleitores,mais perto de zero,Altamira (PA),-0.0291,-25,86744,0
-Abstenção: variação do 1º para o 2º turno (pts),estados,mínimo,BA,-3.2556,-368334,11312891,0
+Abstenção: variação do 1º para o 2º turno (pts),estados,mínimo,BA,-3.2559,-368307,11312891,0
 Abstenção: variação do 1º para o 2º turno (pts),estados,máximo,AP,8.0641,46509,576910,0
 Abstenção: variação do 1º para o 2º turno (pts),estados,mais perto de zero,PI,0.037,990,2704695,0
 Brancos (% de quem foi votar),cidades,mínimo,Santa Cruz Dos Milagres (PI),0.0643,2,3971,0
@@ -62,7 +62,7 @@ Diferença Lula - Flávio (pts),cidades com 50.000+ eleitores,máximo,Candeias (
 Diferença Lula - Flávio (pts),cidades com 50.000+ eleitores,mais perto de zero,Teixeira De Freitas (BA),-0.1123,-93,105057,0
 Diferença Lula - Flávio (pts),estados,mínimo,RR,-44.9139,-136170,401540,0
 Diferença Lula - Flávio (pts),estados,máximo,PI,51.7527,1128130,2704695,0
-Diferença Lula - Flávio (pts),estados,mais perto de zero,MG,0.8475,106640,16372144,0
+Diferença Lula - Flávio (pts),estados,mais perto de zero,MG,0.8681,109313,16372144,0
 Lula: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades,mínimo,Porto Walter (AC),-24.5324,-787,8022,0
 Lula: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades,máximo,Hidrolândia (GO),55.4361,2682,23576,0
 Lula: votos ganhos do 1º para o 2º turno (% sobre o 1º),cidades com 50.000+ eleitores,mínimo,Parintins (AM),1.8826,825,73032,0
@@ -82,7 +82,7 @@ Flávio: votos ganhos do 1º para o 2º turno (% sobre o 1º),estados,máximo,GO
 "Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",cidades com 50.000+ eleitores,máximo,Campos Dos Goytacazes (RJ),5.9366,,370463,0
 "Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",cidades com 50.000+ eleitores,mais perto de zero,Crateús (CE),-0.2832,,60109,0
 "Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",estados,mínimo,PI,1.2117,,2704695,0
-"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",estados,máximo,RJ,4.2543,,12857526,0
+"Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",estados,máximo,RJ,4.2542,,12857526,0
 "Mudança do Lula entre Lula e Flávio, 1º → 2º turno (pts)",estados,mais perto de zero,PI,1.2117,,2704695,0
 Cury no 1º turno (% dos válidos),cidades,mínimo,Uirapuru (GO),0.3656,8,3080,0
 Cury no 1º turno (% dos válidos),cidades,máximo,Colina (SP),17.3103,1784,14048,0
